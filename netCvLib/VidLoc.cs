@@ -145,7 +145,8 @@ namespace netCvLib
                 prms.vect = nextMax.vect;
             } else
             {
-                prms.vect = null;
+                nextMax = processed.Last();
+                prms.vect = nextMax.vect;
             }
             //DiffVector resVect = null;
             //if (numD == 0) {

@@ -89,11 +89,10 @@ namespace WpfRoadApp
                     VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
                     info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}";
                 }
-                else
-                {
-                    sliderbval.Text = sliderb.Value.ToString("0");                                        
-                    breakAndDiff();
-                }
+            
+                sliderbval.Text = sliderb.Value.ToString("0");
+                breakAndDiff();
+
             }
         }
 
