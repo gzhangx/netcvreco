@@ -29,9 +29,43 @@ namespace WpfRoadApp
     {
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
+            new Thread(() =>
+            {
+                fillCameras();
+            }).Start();            
         }
 
+        public class CamInfo
+        {
+            public int Id { get; set; }
+            public string Name { get
+                {
+                    return $"Cam {Id + 1}";
+                }
+            }
+        }
+        List<CamInfo> AllCams = new List<CamInfo>();
+        protected void fillCameras()
+        {
+            AllCams.Clear();
+            for (int i = 0; i < 2; i++)
+            {
+                Console.WriteLine($"Tracing {i}");
+                var vv = new VideoCapture(Settings.Default.CameraId);
+                if (vv.IsOpened)
+                {
+                    AllCams.Add(new CamInfo { Id = i });
+                }
+                vv.Dispose();
+            }
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                cmdCameras.ItemsSource = AllCams;
+                if (AllCams.Count > 0)
+                    cmdCameras.SelectedIndex = AllCams.Count - 1;
+            }));            
+        }
         private VideoCapture vid;
 
         private VideoWriter vw;
@@ -39,7 +73,12 @@ namespace WpfRoadApp
         {
             if (vid == null)
             {
-                vid = new VideoCapture(Settings.Default.CameraId);
+                if (AllCams.Count == 0)
+                {
+                    MessageBox.Show("No cam detected");
+                    return;
+                }
+                vid = new VideoCapture(cmdCameras.SelectedIndex);
                 vid.ImageGrabbed += Vid_ImageGrabbed;
                 var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
                 var h = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
@@ -66,13 +105,16 @@ namespace WpfRoadApp
         {
             if (inGrab) return;
             inGrab = true;
-            Thread.Sleep(200);
+            Thread.Sleep(100);
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var mat = vid.QueryFrame();
-                var ims = Convert(mat.Bitmap);
-                vw.Write(mat);
-                mainCanv.Source = ims;
+                if (vid != null)
+                {
+                    var mat = vid.QueryFrame();
+                    var ims = Convert(mat.Bitmap);
+                    vw.Write(mat);
+                    mainCanv.Source = ims;
+                }
                 inGrab = false;
             }));            
         }
@@ -82,13 +124,15 @@ namespace WpfRoadApp
             if (vid != null)
             {
                 vid.Stop();
+                vid.Dispose();
                 new Thread(() =>
                 {
                     Thread.Sleep(2000);
                     this.Dispatcher.BeginInvoke(new Action(() => {
                         vw.Dispose();
                     }));
-                }).Start();                
+                }).Start();
+                vid = null;            
             }
         }
 
@@ -99,7 +143,7 @@ namespace WpfRoadApp
 
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
         {
-            VideoUtil.SaveVideo(@"D:\pics\2018-08-21\IMG_1217.MOV", mat =>
+            VideoUtil.SaveVideo(@"test.mp4", mat =>
             {
                 ShiftVecDector.ResizeToStdSize(mat);
                 Util.Rot90(mat, Util.RotType.CW);

@@ -16,6 +16,13 @@
         </Grid.RowDefinitions>
         <Image x:Name="mainCanv"></Image>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <ComboBox x:Name="cmdCameras" Margin="5">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Margin="4"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <Button x:Name="start" Click="start_Click" Margin="5">Start Record</Button>
             <Button x:Name="end" Click="end_Click" Margin="5">End Record</Button>
             <Button x:Name="openwin" Click="openwin_Click" Margin="5">Open Shfit Compare</Button>
