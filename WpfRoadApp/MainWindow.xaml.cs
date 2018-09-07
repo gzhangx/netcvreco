@@ -146,7 +146,7 @@ namespace WpfRoadApp
             VideoUtil.SaveVideo(@"test.mp4", mat =>
             {
                 ShiftVecDector.ResizeToStdSize(mat);
-                Util.Rot90(mat, Util.RotType.CW);
+                //Util.Rot90(mat, Util.RotType.CW);
                 return mat;
             });
         }

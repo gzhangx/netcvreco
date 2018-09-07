@@ -127,6 +127,11 @@ namespace netCvLib
                 //dyT += thisRes.Y;
                 //numD++;
             }
+            if (curMax == null)
+            {
+                Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
+                return;
+            }
             Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
             prms.NextPos = curMax.Pos;
             bool found = false;

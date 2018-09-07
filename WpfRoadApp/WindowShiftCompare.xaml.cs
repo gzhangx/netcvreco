@@ -37,13 +37,13 @@ namespace WpfRoadApp
         {
             detailWind.Show();
             InitializeComponent();
-            slidera.Maximum = sliderb.Maximum = 805;
+            slidera.Maximum = sliderb.Maximum = vidProvider.Total;
             //CropAll();
         }
 
         public void CropAll()
         {
-            for (int i = 0; i <= 805; i++)
+            for (int i = 0; i <= vidProvider.Total; i++)
             {
                 var fname = vidProvider.GetPath(i);
                 Console.WriteLine("Converting " + fname);
@@ -55,7 +55,7 @@ namespace WpfRoadApp
 
         public void RotateAll()
         {
-            for (int i = 0; i <= 805; i++)
+            for (int i = 0; i <= vidProvider.Total; i++)
             {
                 var fname = vidProvider.GetPath(i);
                 Console.WriteLine("Converting " + fname);

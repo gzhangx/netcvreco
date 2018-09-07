@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace netCvLib
 {
     public class VideoUtil
     {
+        public const string VIDINFOFILE = "videocnt.txt";
         public static void SaveVideo(string name, Func<Mat,Mat> matAct)
         {
             var cap = new VideoCapture(name);
@@ -23,6 +25,7 @@ namespace netCvLib
                 capedi = matAct(capedi);
                 capedi.Save("vid" + i + ".jpg");
             }
+            File.WriteAllText(VIDINFOFILE, fc.ToString());
             //cap.ImageGrabbed += Cap_ImageGrabbed;            
             cap.Dispose();
         }

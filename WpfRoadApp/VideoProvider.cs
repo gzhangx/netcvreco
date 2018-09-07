@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Emgu.CV;
+using System.IO;
 
 namespace WpfRoadApp
 {
     public class VideoProvider : PreVidStream
     {
-        protected int pos = 0;        
+        protected int pos = 0;
+        protected int total = -1;  
         public int Pos
         {
             get
@@ -30,7 +32,11 @@ namespace WpfRoadApp
         {
             get
             {
-                return 800;
+                if (total < 0)
+                {
+                    total = Convert.ToInt32(File.ReadAllText(VideoUtil.VIDINFOFILE));
+                }
+                return total;
             }
         }
 
