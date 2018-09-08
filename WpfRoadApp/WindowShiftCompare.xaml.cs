@@ -24,6 +24,7 @@ namespace WpfRoadApp
     public partial class WindowShiftCompare : Window
     {
         VideoProvider vidProvider = new VideoProvider();
+        public SimpleDriver driver = new SimpleDriver();
 
         protected int image1Ind = 1, image2Ind = 1;
         bool constChecking = false;
@@ -38,6 +39,7 @@ namespace WpfRoadApp
             detailWind.Show();
             InitializeComponent();
             slidera.Maximum = sliderb.Maximum = vidProvider.Total;
+            driver.SetEndPos(vidProvider.Total);
             //CropAll();
         }
 
@@ -108,6 +110,7 @@ namespace WpfRoadApp
             {
                 slidera.Value = realTimeTrack.NextPos - 1;
             }
+            driver.Track(realTimeTrack);
         }
 
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

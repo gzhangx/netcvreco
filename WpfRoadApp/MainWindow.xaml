@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfRoadApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="588.738">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -27,7 +27,8 @@
             <Button x:Name="end" Click="end_Click" Margin="5">End Record</Button>
             <Button x:Name="openwin" Click="openwin_Click" Margin="5">Open Shfit Compare</Button>
             <Button x:Name="processToStdSize" Click="processToStdSize_Click">Process Video</Button>
-            <CheckBox x:Name="chkCamTrack"></CheckBox>
+            <CheckBox x:Name="chkCamTrack" Margin="5">CamTrack</CheckBox>
+            <CheckBox x:Name="chkSendCmd" Margin="5" Checked="chkSendCmd_Checked">SendCmd</CheckBox>
         </StackPanel>
     </Grid>
 </Window>

@@ -62,7 +62,7 @@ namespace netCvLib
                 }
 
             }
-            Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
+            //Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
             if (steping == 1) return curMax;
             return FindInRage(stream, curr, 1, curMax.Pos - steping, curMax.Pos + steping);
         }
@@ -132,7 +132,7 @@ namespace netCvLib
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
                 return;
             }
-            Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
+            //Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
             prms.NextPos = curMax.Pos;
             bool found = false;
             DiffLoc nextMax = null;

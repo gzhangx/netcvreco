@@ -159,5 +159,13 @@ namespace WpfRoadApp
                 return mat;
             });
         }
+
+        private void chkSendCmd_Checked(object sender, RoutedEventArgs e)
+        {
+            if (cmpWin != null)
+            {
+                cmpWin.driver.sendCommand = chkSendCmd.IsChecked.GetValueOrDefault();
+            }
+        }
     }
 }
