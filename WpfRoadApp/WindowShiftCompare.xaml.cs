@@ -88,12 +88,25 @@ namespace WpfRoadApp
                     realTimeTrack.CurPos = image2Ind;
                     VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
                     info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}";
-                    slidera.Value = realTimeTrack.NextPos;
+                    slidera.Value = realTimeTrack.NextPos - 1;
                 }
-            
-                sliderbval.Text = sliderb.Value.ToString("0");
+                if (realTimeTrack.NextPos > 0)
+                {
+                    sliderbval.Text = sliderb.Value.ToString("0");
+                }
                 breakAndDiff();
 
+            }
+        }
+
+        public void CamTracking(Mat curImg)
+        {                     
+            realTimeTrack.CurPos = image1Ind;
+            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+            info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}";
+            if (realTimeTrack.NextPos > 0)
+            {
+                slidera.Value = realTimeTrack.NextPos - 1;
             }
         }
 

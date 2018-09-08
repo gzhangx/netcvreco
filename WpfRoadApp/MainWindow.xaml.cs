@@ -111,6 +111,10 @@ namespace WpfRoadApp
                 if (vid != null)
                 {
                     var mat = vid.QueryFrame();
+                    if (cmpWin != null && chkCamTrack.IsChecked.GetValueOrDefault())
+                    {
+                        cmpWin.CamTracking(mat);
+                    }
                     var ims = Convert(mat.Bitmap);
                     vw.Write(mat);
                     mainCanv.Source = ims;
@@ -136,9 +140,14 @@ namespace WpfRoadApp
             }
         }
 
+        protected WindowShiftCompare cmpWin = null;
         private void openwin_Click(object sender, RoutedEventArgs e)
         {
-            new WindowShiftCompare().Show();
+            if (cmpWin == null)
+            {
+                cmpWin = new WindowShiftCompare();
+                cmpWin.Show();
+            }
         }
 
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
