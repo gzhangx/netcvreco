@@ -3,3 +3,4 @@
 *.user
 *.suo
 /$tf
+/.vs/netCvReco/v15/Server/sqlite3

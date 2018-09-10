@@ -26,14 +26,14 @@ namespace WpfRoadApp
                 if (realTimeTrack.NextPos > endPos - 5)
                 {
                     Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
-                    Drive($"/steer/100/0");
+                    Drive($"/steer/100/400");
                     return;
                 }
                 if (Math.Abs(realTimeTrack.vect.X) > 1)
                 {
                     var dir = (int)(realTimeTrack.vect.X * 5 + 100);
                     Console.WriteLine($"driving {dir} {realTimeTrack.vect.X}");
-                    Drive($"steer/{dir}/200");
+                    Drive($"steer/{dir}/0");
                 }
             }                   
         }
