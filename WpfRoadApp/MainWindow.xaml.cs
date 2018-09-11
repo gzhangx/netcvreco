@@ -103,9 +103,13 @@ namespace WpfRoadApp
         bool inGrab = false;
         private void Vid_ImageGrabbed(object sender, EventArgs e)
         {
-            if (inGrab) return;
+            if (inGrab)
+            {
+                Console.WriteLine("Skipping frame");
+                return;
+            }
             inGrab = true;
-            Thread.Sleep(100);
+            //Thread.Sleep(100);
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (vid != null)
