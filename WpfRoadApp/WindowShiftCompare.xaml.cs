@@ -89,7 +89,7 @@ namespace WpfRoadApp
                     Mat m1 = vidProvider.GetCurMat();
                     realTimeTrack.CurPos = image2Ind;
                     VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
-                    info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}";
+                    info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
                     slidera.Value = realTimeTrack.NextPos - 1;
                 }
                 if (realTimeTrack.NextPos > 0)

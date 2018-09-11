@@ -74,6 +74,8 @@ namespace netCvLib
             public int NextPos { get; set; }//output
             public DiffVector vect { get; set; } //output
             public int LookAfter = 5;
+            public bool notFound = false;
+            public double diff = 0;
         }
 
 
@@ -148,10 +150,13 @@ namespace netCvLib
             if (nextMax != null)
             {
                 prms.vect = nextMax.vect;
+                prms.diff = nextMax.diff;
             } else
             {
                 nextMax = processed.Last();
                 prms.vect = nextMax.vect;
+                prms.notFound = true;
+                prms.diff = nextMax.diff;
             }
             //DiffVector resVect = null;
             //if (numD == 0) {

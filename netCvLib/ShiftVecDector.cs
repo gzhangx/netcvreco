@@ -240,8 +240,9 @@ namespace netCvLib
         public static DiffVector calculateTotalVect(List<DiffVect> allDiffs)
         {
             var dx = ((double)allDiffs.Sum(d => d.Vector.X)) / allDiffs.Count;
-            var dy = ((double)allDiffs.Sum(d => d.Vector.Y)) / allDiffs.Count;
-            return new DiffVector(dx, dy);
+            var duy = ((double)allDiffs.Take(allDiffs.Count/2).Sum(d => d.Vector.Y)) / allDiffs.Count*2;
+            var dly = ((double)allDiffs.Skip(allDiffs.Count / 2).Sum(d => d.Vector.Y)) / allDiffs.Count*2;
+            return new DiffVector(dx, duy - dly);
         }
     }
 }
