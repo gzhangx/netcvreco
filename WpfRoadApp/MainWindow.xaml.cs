@@ -49,7 +49,7 @@ namespace WpfRoadApp
         protected void fillCameras()
         {
             AllCams.Clear();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Console.WriteLine($"Tracing {i}");
                 var vv = new VideoCapture(Settings.Default.CameraId);
@@ -156,12 +156,27 @@ namespace WpfRoadApp
 
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
         {
-            VideoUtil.SaveVideo(@"test.mp4", mat =>
+            processToStdSize.IsEnabled = false;
+            new Thread(() =>
             {
-                ShiftVecDector.ResizeToStdSize(mat);
-                //Util.Rot90(mat, Util.RotType.CW);
-                return mat;
-            });
+                VideoUtil.SaveVideo(@"test.mp4", mat =>
+                {
+                    ShiftVecDector.ResizeToStdSize(mat);
+                    //Util.Rot90(mat, Util.RotType.CW);
+                    return mat;
+                }, (ind, all) =>
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        processToStdSize.Content = $"{ind}/{all}";
+                        if (ind >= all)
+                        {
+                            processToStdSize.Content = "Process Video";
+                            processToStdSize.IsEnabled = true;
+                        }
+                    }));
+                });
+            }).Start();
         }
 
         private void chkSendCmd_Checked(object sender, RoutedEventArgs e)
