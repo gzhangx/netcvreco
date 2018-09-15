@@ -171,13 +171,13 @@ namespace WpfRoadApp
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         processToStdSize.Content = $"{ind}/{all}";
-                        if (ind >= all)
+                        if (ind >= all -1)
                         {
                             processToStdSize.Content = "Process Video";
                             processToStdSize.IsEnabled = true;
                         }
                     }));
-                });
+                },"orig");
             }).Start();
         }
 

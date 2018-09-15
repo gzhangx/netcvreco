@@ -23,7 +23,7 @@ namespace WpfRoadApp
     /// </summary>
     public partial class WindowShiftCompare : Window
     {
-        VideoProvider vidProvider = new VideoProvider();
+        VideoProvider vidProvider = new VideoProvider("orig");
         public SimpleDriver driver = new SimpleDriver();
 
         protected int image1Ind = 1, image2Ind = 1;

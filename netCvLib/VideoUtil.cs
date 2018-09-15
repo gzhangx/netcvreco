@@ -12,7 +12,7 @@ namespace netCvLib
     public class VideoUtil
     {
         public const string VIDINFOFILE = "videocnt.txt";
-        public static void SaveVideo(string name, Func<Mat,Mat> matAct, Action<int,int> reporter)
+        public static void SaveVideo(string name, Func<Mat,Mat> matAct, Action<int,int> reporter, string folder)
         {
             var cap = new VideoCapture(name);
             var fc = cap.GetCaptureProperty(CapProp.FrameCount);
@@ -23,10 +23,10 @@ namespace netCvLib
                 var capedi = cap.QueryFrame();
                 Console.WriteLine("saving " + i+"/"+fc);
                 capedi = matAct(capedi);
-                capedi.Save("vid" + i + ".jpg");
+                capedi.Save($"{folder}\\vid{i}.jpg");
                 reporter(i, (int)fc);
             }
-            File.WriteAllText(VIDINFOFILE, fc.ToString());
+            File.WriteAllText($"{folder}\\{VIDINFOFILE}", fc.ToString());
             //cap.ImageGrabbed += Cap_ImageGrabbed;            
             cap.Dispose();
         }

@@ -11,6 +11,11 @@ namespace WpfRoadApp
 {
     public class VideoProvider : PreVidStream
     {
+        protected string filePath;
+        public VideoProvider(string path)
+        {
+            filePath = path;
+        }
         protected int pos = 0;
         protected int total = -1;  
         public int Pos
@@ -34,7 +39,7 @@ namespace WpfRoadApp
             {
                 if (total < 0)
                 {
-                    total = Convert.ToInt32(File.ReadAllText(VideoUtil.VIDINFOFILE));
+                    total = Convert.ToInt32(File.ReadAllText($"{filePath}\\{VideoUtil.VIDINFOFILE}"));
                 }
                 return total;
             }
@@ -44,7 +49,7 @@ namespace WpfRoadApp
         {
             if (i < 0) i = 0;
             i = i % 984;
-            var path = System.IO.Directory.GetCurrentDirectory() +  @"\vid" + i + ".jpg";
+            var path = System.IO.Directory.GetCurrentDirectory() +  $"\\{filePath}\\vid{i}.jpg";
             return path;
         }
         public Mat GetCurMat()
