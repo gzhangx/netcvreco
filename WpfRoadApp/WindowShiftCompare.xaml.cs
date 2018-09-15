@@ -36,7 +36,7 @@ namespace WpfRoadApp
         DetailsWindow detailWind = new DetailsWindow();
         public WindowShiftCompare()
         {
-            detailWind.Show();
+            //detailWind.Show();
             InitializeComponent();
             slidera.Maximum = sliderb.Maximum = vidProvider.Total;
             driver.SetEndPos(vidProvider.Total);
