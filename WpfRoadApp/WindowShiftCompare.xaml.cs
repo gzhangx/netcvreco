@@ -155,6 +155,14 @@ namespace WpfRoadApp
             constChecking = chkConstTracking.IsChecked.GetValueOrDefault();
         }
 
+        private void chkShowDetail_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkShowDetail.IsChecked.GetValueOrDefault())
+                detailWind.Show();
+            else
+                detailWind.Hide();
+        }
+
         void breakAndDiff()
         {
             vidProvider.Pos = image1Ind;

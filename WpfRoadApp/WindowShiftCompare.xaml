@@ -42,6 +42,7 @@
                 <StackPanel x:Name="bottom" Grid.Row="4" Orientation="Horizontal">
                     <Button x:Name="trackBtn" Click="trackBtn_Click" Width="100" Margin="5">Track</Button>
                     <CheckBox x:Name="chkConstTracking" Click="chkConstTracking_Click" Margin="5">Const Tracking</CheckBox>
+                    <CheckBox x:Name="chkShowDetail" Click="chkShowDetail_Click" Margin="5"></CheckBox>
                 </StackPanel>
             </Grid>
         </StackPanel>
