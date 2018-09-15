@@ -159,6 +159,7 @@ namespace WpfRoadApp
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
         {
             processToStdSize.IsEnabled = false;
+            var vidSrc = txtVideoSource.Text;
             new Thread(() =>
             {
                 VideoUtil.SaveVideo(@"test.mp4", mat =>
@@ -177,7 +178,7 @@ namespace WpfRoadApp
                             processToStdSize.IsEnabled = true;
                         }
                     }));
-                },"orig");
+                }, vidSrc);
             }).Start();
         }
 

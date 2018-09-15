@@ -14,6 +14,7 @@ namespace netCvLib
         public const string VIDINFOFILE = "videocnt.txt";
         public static void SaveVideo(string name, Func<Mat,Mat> matAct, Action<int,int> reporter, string folder)
         {
+            Directory.CreateDirectory(folder);
             var cap = new VideoCapture(name);
             var fc = cap.GetCaptureProperty(CapProp.FrameCount);
             Console.WriteLine("frame count " + fc);
