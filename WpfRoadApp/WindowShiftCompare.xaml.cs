@@ -24,13 +24,19 @@ namespace WpfRoadApp
     public partial class WindowShiftCompare : Window
     {
         VideoProvider vidProvider = new VideoProvider("orig");
+        VideoProvider vidProviderNewVid = new VideoProvider("newvid");
         public SimpleDriver driver = new SimpleDriver();
 
         protected int image1Ind = 1, image2Ind = 1;
         bool constChecking = false;
         BitmapImage GetImageAt(int i)
         {
-            return new BitmapImage(new Uri("file://" + vidProvider.GetPath(i)));
+            return GetImageAt(vidProvider, i);
+        }
+
+        BitmapImage GetImageAt(VideoProvider provider, int i)
+        {
+            return new BitmapImage(new Uri("file://" + provider.GetPath(i)));
         }
 
         DetailsWindow detailWind = new DetailsWindow();
@@ -88,6 +94,18 @@ namespace WpfRoadApp
             if (sliderbval != null)
             {
                 image2Ind = (int)sliderb.Value;
+
+                if (chkTrackSimulation.IsChecked.GetValueOrDefault())
+                {
+                    vidProviderNewVid.Pos = image2Ind;
+                    imageSecond.Source = GetImageAt(vidProviderNewVid, image2Ind);
+                    if (vidProviderNewVid.Pos >= vidProviderNewVid.Total)
+                        vidProviderNewVid.Pos = vidProviderNewVid.Total - 1;
+                    var mat = vidProviderNewVid.GetCurMat();
+                    CamTracking(mat);
+                    return;
+                }
+
                 imageSecond.Source = GetImageAt(image2Ind);
                 if (constChecking)
                 {
@@ -121,7 +139,7 @@ namespace WpfRoadApp
 
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (curProcessor == null) return;
+            if (curProcessor == null) return;            
             Mat res = curProcessor.ShowStepChange(allDiffs, (int)sliderSteps.Value, null);
             imageStepRes.Source = res.MatToImgSrc();
 
@@ -167,6 +185,11 @@ namespace WpfRoadApp
                 detailWind.Show();
             else
                 detailWind.Hide();
+        }
+
+        private void chkTrackSimulation_Click(object sender, RoutedEventArgs e)
+        {
+            vidProviderNewVid = new VideoProvider(txtSimulationDir.Text);
         }
 
         void breakAndDiff()
