@@ -27,13 +27,26 @@ namespace WpfRoadApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        protected WindowShiftCompare cmpWin = new WindowShiftCompare();
         public MainWindow()
         {
             InitializeComponent();
+            cmpWin.Show();
+            this.Left = 0;
+            this.Top = 0;
+            cmpWin.Left = this.Left + this.Width;
+            cmpWin.Top = 0;
             new Thread(() =>
             {
                 fillCameras();
-            }).Start();            
+            }).Start();
+
+            this.Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
         public class CamInfo
@@ -116,7 +129,7 @@ namespace WpfRoadApp
                 if (vid != null)
                 {
                     var mat = vid.QueryFrame();
-                    if (cmpWin != null && chkCamTrack.IsChecked.GetValueOrDefault())
+                    if (chkCamTrack.IsChecked.GetValueOrDefault())
                     {
                         cmpWin.CamTracking(mat);
                     }
@@ -146,13 +159,17 @@ namespace WpfRoadApp
             }
         }
 
-        protected WindowShiftCompare cmpWin = null;
         private void openwin_Click(object sender, RoutedEventArgs e)
         {
-            if (cmpWin == null)
+            if (cmpWin.IsVisible)
             {
-                cmpWin = new WindowShiftCompare();
+                cmpWin.Hide();
+                openwin.Content = "Open Shift Compare";
+            }
+            else
+            {
                 cmpWin.Show();
+                openwin.Content = "Hide Shift Compare";
             }
         }
 

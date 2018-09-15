@@ -40,7 +40,13 @@ namespace WpfRoadApp
             InitializeComponent();
             slidera.Maximum = sliderb.Maximum = vidProvider.Total;
             driver.SetEndPos(vidProvider.Total);
+            this.Closing += WindowShiftCompare_Closing;
             //CropAll();
+        }
+
+        private void WindowShiftCompare_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
         public void CropAll()
