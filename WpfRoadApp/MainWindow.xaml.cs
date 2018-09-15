@@ -105,11 +105,12 @@ namespace WpfRoadApp
         {
             if (inGrab)
             {
-                Console.WriteLine("Skipping frame");
+                //Console.WriteLine("Skipping frame");
                 return;
             }
             inGrab = true;
-            //Thread.Sleep(100);
+            Thread.Sleep(50);
+            Console.WriteLine("Processiing");
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (vid != null)
@@ -123,6 +124,7 @@ namespace WpfRoadApp
                     vw.Write(mat);
                     mainCanv.Source = ims;
                 }
+
                 inGrab = false;
             }));            
         }
