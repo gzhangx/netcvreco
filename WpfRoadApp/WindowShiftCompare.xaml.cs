@@ -109,9 +109,10 @@ namespace WpfRoadApp
                 imageSecond.Source = GetImageAt(image2Ind);
                 if (constChecking)
                 {
-                    vidProvider.Pos = image1Ind;
+                    vidProvider.Pos = image2Ind;
                     Mat m1 = vidProvider.GetCurMat();
-                    realTimeTrack.CurPos = image2Ind;
+                    realTimeTrack.CurPos = image1Ind;
+                    realTimeTrack.LookAfter = 30;
                     VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
                     info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
                     slidera.Value = realTimeTrack.NextPos - 1;
