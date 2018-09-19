@@ -10,5 +10,6 @@ namespace WpfRoadApp
     {
         void SetEndPos(int pos);
         void Track(netCvLib.VidLoc.RealTimeTrackLoc realTimeTrack);
+        void Stop();
     }
 }

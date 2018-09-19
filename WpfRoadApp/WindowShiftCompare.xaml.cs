@@ -117,7 +117,7 @@ namespace WpfRoadApp
                     //VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
                     //info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
                     //slidera.Value = realTimeTrack.NextPos - 1;
-    }
+                }
                 if (realTimeTrack.NextPos > 0)
                 {
                     sliderbval.Text = sliderb.Value.ToString("0");
@@ -132,10 +132,20 @@ namespace WpfRoadApp
             realTimeTrack.CurPos = image1Ind;
             realTimeTrack.LookAfter = 30;
             VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
-            info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}";
+            info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
+            var lookBackCount = 0;
+            while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
+            {
+                driver.Stop();
+                realTimeTrack.LongLook();
+                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+                info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
+                lookBackCount++;
+            }
             if (realTimeTrack.NextPos > 0)
             {
-                slidera.Value = realTimeTrack.NextPos - 1;
+                image1Ind = realTimeTrack.NextPos - 1;
+                slidera.Value = image1Ind;
             }
             driver.Track(realTimeTrack);
         }

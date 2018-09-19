@@ -19,6 +19,13 @@ namespace WpfRoadApp
             endPos = pos;
         }
 
+        public void Stop()
+        {
+            if (sendCommand)
+            {
+                Drive($"/steer/100/400");
+            }
+        }
         public void Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
             if (sendCommand)
@@ -26,7 +33,7 @@ namespace WpfRoadApp
                 if (realTimeTrack.NextPos > endPos - 5)
                 {
                     Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
-                    Drive($"/steer/100/400");
+                    Stop();
                     return;
                 }
                 if (Math.Abs(realTimeTrack.vect.X) > 1)

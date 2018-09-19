@@ -76,6 +76,12 @@ namespace netCvLib
             public int LookAfter = 5;
             public bool notFound = false;
             public double diff = 0;
+            public void LongLook()
+            {
+                CurPos -= 10;
+                if (CurPos < 0) CurPos = 0;
+                LookAfter = CurPos + 15;
+            }
         }
 
 

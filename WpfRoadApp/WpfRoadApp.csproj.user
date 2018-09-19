@@ -3,4 +3,7 @@
   <PropertyGroup>
     <ReferencePath>..\dlls\</ReferencePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <StartWorkingDirectory>D:\work\gang\cur\netCvReco.run</StartWorkingDirectory>
+  </PropertyGroup>
 </Project>
