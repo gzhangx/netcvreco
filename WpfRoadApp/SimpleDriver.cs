@@ -21,35 +21,32 @@ namespace WpfRoadApp
 
         public void Stop()
         {
-            if (sendCommand)
-            {
-                Drive($"/steer/100/400");
-            }
+            Console.WriteLine("Stoping");            
+            Drive($"/steer/100/400");            
         }
         public void Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
-            if (sendCommand)
+
+            if (realTimeTrack.NextPos > endPos - 5)
             {
-                if (realTimeTrack.NextPos > endPos - 5)
-                {
-                    Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
-                    Stop();
-                    return;
-                }
-                if (Math.Abs(realTimeTrack.vect.X) > 1)
-                {
-                    var dir = (int)(realTimeTrack.vect.X * 5 + 100);
-                    Console.WriteLine($"driving {dir} {realTimeTrack.vect.X}");
-                    Drive($"steer/{dir}/160");
-                }
-            }                   
+                Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
+                Stop();
+                return;
+            }
+            if (Math.Abs(realTimeTrack.vect.X) > 1)
+            {
+                var dir = (int)(realTimeTrack.vect.X * 5 + 100);
+                Console.WriteLine($"driving {dir} {realTimeTrack.vect.X}");
+                Drive($"steer/{dir}/160");
+            }
         }
 
-        public static void Drive(string data)
+        public void Drive(string data)
         {
+            if (!sendCommand) return;
             // Create a request for the URL.   
             WebRequest request = WebRequest.Create(
-              $"{url}/{data}");
+           $"{url}/{data}");
             // If required by the server, set the credentials.  
             request.Credentials = CredentialCache.DefaultCredentials;
             // Get the response.  
