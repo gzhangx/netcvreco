@@ -87,7 +87,7 @@ namespace netCvLib
 
         public static void FindObjectDown(PreVidStream stream, Mat curr, RealTimeTrackLoc prms)
         {
-            int from = prms.CurPos + 1;
+            int from = prms.CurPos;
             int to = from + prms.LookAfter;
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
