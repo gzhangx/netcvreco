@@ -144,7 +144,7 @@ namespace WpfRoadApp
             }
             if (realTimeTrack.NextPos > 0)
             {
-                image1Ind = realTimeTrack.NextPos - 1;
+                image1Ind = realTimeTrack.NextPos;
                 slidera.Value = image1Ind;
             }
             driver.Track(realTimeTrack);

@@ -88,43 +88,43 @@ namespace netCvLib
             int height = CalcBound(y, cutSize, cmpExtend, compareTo.Height); ;
             return new Rectangle(newX, newY, width, height);
         }
-        public static Mat BreakAndNearMatches(Mat input, Mat compareTo, int cutSize = STDWIDTH/10, int cmpExtend = STDWIDTH / 10)
-        {
+        //public static Mat BreakAndNearMatches(Mat input, Mat compareTo, int cutSize = STDWIDTH/10, int cmpExtend = STDWIDTH / 10)
+        //{
 
-            input = input.ToGray();
-            compareTo = compareTo.ToGray();
-            ResizeToStdSize(input);
-            ResizeToStdSize(compareTo);
-            //input.Save(@"d:\temp\test\resized.jpg");
-            //List<List<Mat>> cuts = new List<List<Mat>>();
-            List<DiffVect> difVector = new List<DiffVect>();
+        //    input = input.ToGray();
+        //    compareTo = compareTo.ToGray();
+        //    ResizeToStdSize(input);
+        //    ResizeToStdSize(compareTo);
+        //    //input.Save(@"d:\temp\test\resized.jpg");
+        //    //List<List<Mat>> cuts = new List<List<Mat>>();
+        //    List<DiffVect> difVector = new List<DiffVect>();
 
-            var compareToImage = compareTo.Clone();
-            for (int y = 0; y < input.Height - cutSize; y+= cutSize)
-            {
-                for (int x = 0; x < input.Width - cutSize; x+= cutSize)
-                {
-                    var corped = new Mat(input, new Rectangle(x, y, cutSize, cutSize));
-                    var cmpToRect = getExtCropRect(compareTo, x, y, cutSize, cmpExtend);
-                    var cmpToCorp = new Mat(compareTo, cmpToRect);
-                    //corped.Save(@"d:\temp\test\" + x + "_" + y + ".jpg");
-                    var matched = cmpToCorp.ToImage<Gray, Byte>().MatchTemplate(corped.ToImage<Gray, Byte>(), TemplateMatchingType.CcoeffNormed);
-                    double[] minValues, maxValues;
-                    Point[] minLocs, maxLocs;
-                    matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
-                    Point maxLoc = maxLocs[0];
-                    double maxVal = maxValues[0];                    
-                    var diffVect = new DiffVect { Location = new Point(x, y), Vector = new Point(maxLoc.X - (x - cmpToRect.X), maxLoc.Y - (y - cmpToRect.Y)), Diff = maxVal };
-                    Console.WriteLine(" got  " + diffVect);
-                    difVector.Add(diffVect);
-                    corped.CopyTo(new Mat
-                        (compareToImage, new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, cutSize, cutSize)));
-                }
-            }
+        //    var compareToImage = compareTo.Clone();
+        //    for (int y = 0; y < input.Height - cutSize; y+= cutSize)
+        //    {
+        //        for (int x = 0; x < input.Width - cutSize; x+= cutSize)
+        //        {
+        //            var corped = new Mat(input, new Rectangle(x, y, cutSize, cutSize));
+        //            var cmpToRect = getExtCropRect(compareTo, x, y, cutSize, cmpExtend);
+        //            var cmpToCorp = new Mat(compareTo, cmpToRect);
+        //            //corped.Save(@"d:\temp\test\" + x + "_" + y + ".jpg");
+        //            var matched = cmpToCorp.ToImage<Gray, Byte>().MatchTemplate(corped.ToImage<Gray, Byte>(), TemplateMatchingType.CcoeffNormed);
+        //            double[] minValues, maxValues;
+        //            Point[] minLocs, maxLocs;
+        //            matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
+        //            Point maxLoc = maxLocs[0];
+        //            double maxVal = maxValues[0];                    
+        //            var diffVect = new DiffVect { Location = new Point(x, y), Vector = new Point(maxLoc.X - (x - cmpToRect.X), maxLoc.Y - (y - cmpToRect.Y)), Diff = maxVal };
+        //            Console.WriteLine(" got  " + diffVect);
+        //            difVector.Add(diffVect);
+        //            corped.CopyTo(new Mat
+        //                (compareToImage, new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, cutSize, cutSize)));
+        //        }
+        //    }
 
-            compareToImage.Save(@"d:\temp\test\recon.jpg");
-            return compareToImage;
-        }
+        //    compareToImage.Save(@"d:\temp\test\recon.jpg");
+        //    return compareToImage;
+        //}
     }
 
     public class ShiftVecProcessor
