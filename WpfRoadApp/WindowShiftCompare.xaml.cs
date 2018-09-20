@@ -130,16 +130,19 @@ namespace WpfRoadApp
         public void CamTracking(Mat curImg)
         {                     
             realTimeTrack.CurPos = image1Ind;
-            realTimeTrack.LookAfter = 30;
+            realTimeTrack.LookAfter = 5;
             VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
-            info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
+            var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
+            //Console.WriteLine(text);
+            info.Text = text;
             var lookBackCount = 0;
             while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
             {
                 driver.Stop();
                 realTimeTrack.LongLook();
                 VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
-                info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
+                info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
+                //Console.WriteLine(text);
                 lookBackCount++;
             }
             if (realTimeTrack.NextPos > 0)
