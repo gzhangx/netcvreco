@@ -13,6 +13,12 @@ namespace netCvLib
         int Pos { get; set; }
         Mat GetCurMat();
     }
+
+    public class DiffVectorWithDiff
+    {
+        public DiffVector Vector { get; set; }
+        public double Diff { get; set; }
+    }
     public class VidLoc
     {
         public class DiffLoc
@@ -29,6 +35,19 @@ namespace netCvLib
             }
         }
         
+        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp)
+        {
+            var processor = new ShiftVecProcessor(input, comp);
+            var all = processor.GetAllDiffVect();
+            var averageDiff = all.Average(a => a.Diff);
+            var vect = ShiftVecProcessor.calculateTotalVect(all);
+            return new DiffVectorWithDiff
+            {                
+                Diff = averageDiff,
+                Vector = vect,
+            };
+        }
+
         public static DiffLoc FindInRage(PreVidStream stream, Mat curr, int steping = 10, int from = 0, int to = 0)
         {
             if (to == 0 || to > stream.Total) to = stream.Total;
