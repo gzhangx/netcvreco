@@ -196,6 +196,31 @@ namespace WpfRoadApp
                         }
                     }));
                 }, vidSrc);
+
+                VideoProvider vidProvider = new VideoProvider(vidSrc);
+                Mat prevMat = null;
+                List<string> lines = new List<string>();
+                for (int i = 0; i < vidProvider.Total; i++)
+                {
+                    vidProvider.Pos = i;
+                    var mat = vidProvider.GetCurMat();
+                    if (prevMat != null)
+                    {
+                        var diff = VidLoc.CompDiff(mat, prevMat);
+                        lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Diff}");
+                    }
+                    prevMat = mat;
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        processToStdSize.Content = $"vid {i}/{vidProvider.Total}";
+                        if (i>= vidProvider.Total - 1)
+                        {
+                            processToStdSize.Content = "Process Video";
+                            processToStdSize.IsEnabled = true;
+                        }
+                    }));
+                }
+                File.WriteAllLines($"{vidSrc}\\vect.txt", lines);
             }).Start();
         }
 
