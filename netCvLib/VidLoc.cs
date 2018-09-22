@@ -12,6 +12,7 @@ namespace netCvLib
         int Total { get; }
         int Pos { get; set; }
         Mat GetCurMat();
+        List<DiffVectorWithDiff> Vectors { get; }
     }
 
     public class DiffVectorWithDiff
@@ -93,8 +94,8 @@ namespace netCvLib
             public int NextPos { get; set; }//output
             public DiffVector vect { get; set; } //output
             public int LookAfter = 5;
-            public bool notFound = false;
-            public double diff = 0;
+            //public bool notFound = false;
+            public double diff { get; set; }
             public void LongLook()
             {
                 CurPos -= 10;
@@ -126,33 +127,6 @@ namespace netCvLib
                         curMax = loc;
                     }
                 }
-                //stream.Pos = pos;
-                //var processor = new ShiftVecProcessor(curr, stream.GetCurMat());
-                //var all = processor.GetAllDiffVect();
-                //var maxGood = all.Average(a => a.Diff);
-                //if (curMax == null)
-                //{
-                //    curMax = new VidLoc.DiffLoc
-                //    {
-                //        diff = maxGood,
-                //        Pos = pos,
-                //    };
-                //}
-                //else
-                //{
-                //    if (maxGood > curMax.diff)
-                //    {
-                //        curMax = new DiffLoc
-                //        {
-                //            diff = maxGood,
-                //            Pos = pos,
-                //        };
-                //    }
-                //}
-                //var thisRes = ShiftVecProcessor.calculateTotalVect(all);
-                //dxT += thisRes.X;
-                //dyT += thisRes.Y;
-                //numD++;
             }
             if (curMax == null)
             {
@@ -161,37 +135,12 @@ namespace netCvLib
             }
             //Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
             prms.NextPos = curMax.Pos;
-            bool found = false;
-            DiffLoc nextMax = null;
-            foreach(var l in processed)
-            {
-                if(found)
-                {
-                    nextMax = l;
-                    break;
-                }
-                if (l == curMax) found = true;
-            }
-            if (nextMax != null)
-            {
-                prms.vect = nextMax.vect;
-                prms.diff = nextMax.diff;
-            } else
-            {
-                nextMax = processed.Last();
-                prms.vect = nextMax.vect;
-                prms.notFound = true;
-                prms.diff = nextMax.diff;
-            }
-            //DiffVector resVect = null;
-            //if (numD == 0) {
-            //    resVect = new DiffVector(0, 0);
-            //}
-            //else
-            //{
-            //    resVect = new DiffVector(dxT / numD, dyT / numD);
-            //}
-            //prms.vect = resVect;
+            prms.diff = curMax.diff;
+            prms.vect = curMax.vect;
+
+            stream.Pos = curMax.Pos;
+            var diff = CompDiff(curr, stream.GetCurMat());
+            prms.vect = new DiffVector(curMax.vect.X + diff.Vector.X, curMax.vect.Y + diff.Vector.Y);
         }
     }
 }

@@ -11,10 +11,40 @@ namespace WpfRoadApp
 {
     public class VideoProvider : PreVidStream
     {
+        public const string VECT_FILE = "vect.txt";
         protected string filePath;
         public VideoProvider(string path)
         {
             filePath = path;
+            LoadDiffVectors();
+        }
+        protected List<DiffVectorWithDiff> vectors = new List<DiffVectorWithDiff>();
+        protected void LoadDiffVectors()
+        {
+            try
+            {
+                var lines = File.ReadAllLines($"{filePath}\\{VECT_FILE}");
+                foreach(var line in lines)
+                {
+                    var pars = line.Split(' ');
+                    vectors.Add(new DiffVectorWithDiff
+                    {
+                        Vector = new DiffVector(double.Parse(pars[0]), double.Parse(pars[1])),
+                        Diff = double.Parse(pars[2]),
+                    });
+                }
+            } catch (Exception exc)
+            {
+                Console.WriteLine(exc.Message);
+            }
+        }
+
+        public List<DiffVectorWithDiff> Vectors
+        {
+            get
+            {
+                return vectors;
+            }
         }
         protected int pos = 0;
         protected int total = -1;  
