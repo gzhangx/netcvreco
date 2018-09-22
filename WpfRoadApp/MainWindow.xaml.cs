@@ -84,6 +84,11 @@ namespace WpfRoadApp
         private VideoWriter vw;
         private void start_Click(object sender, RoutedEventArgs e)
         {
+            StartRecord();
+        }
+
+        protected void StartRecord()
+        {
             if (vid == null)
             {
                 if (AllCams.Count == 0)
@@ -96,12 +101,27 @@ namespace WpfRoadApp
                 var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
                 var h = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
                 File.Delete("test.mp4");
-                vw = new VideoWriter("test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size((int)w, (int)h), true);                
+                vw = new VideoWriter("test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size((int)w, (int)h), true);
                 //vw = new VideoWriter("test.mp4", -1, 10, new System.Drawing.Size((int)w, (int)h), true);
             }
             vid.Start();
         }
-
+        protected void EndRecord()
+        {
+            if (vid != null)
+            {
+                vid.Stop();
+                vid.Dispose();
+                new Thread(() =>
+                {
+                    Thread.Sleep(2000);
+                    this.Dispatcher.BeginInvoke(new Action(() => {
+                        vw.Dispose();
+                    }));
+                }).Start();
+                vid = null;
+            }
+        }
         public BitmapImage Convert(Bitmap src)
         {
             MemoryStream ms = new MemoryStream();
@@ -144,19 +164,7 @@ namespace WpfRoadApp
 
         private void end_Click(object sender, RoutedEventArgs e)
         {
-            if (vid != null)
-            {
-                vid.Stop();
-                vid.Dispose();
-                new Thread(() =>
-                {
-                    Thread.Sleep(2000);
-                    this.Dispatcher.BeginInvoke(new Action(() => {
-                        vw.Dispose();
-                    }));
-                }).Start();
-                vid = null;            
-            }
+            EndRecord();
         }
 
         private void openwin_Click(object sender, RoutedEventArgs e)
@@ -229,6 +237,19 @@ namespace WpfRoadApp
             if (cmpWin != null)
             {
                 cmpWin.driver.sendCommand = chkSendCmd.IsChecked.GetValueOrDefault();
+            }
+        }
+
+        private void chkCamTrack_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkCamTrack.IsChecked.GetValueOrDefault())
+            {
+                start.IsEnabled = false;
+                StartRecord();
+            }else
+            {
+                start.IsEnabled = true;
+                EndRecord();
             }
         }
     }
