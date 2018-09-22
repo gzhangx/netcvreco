@@ -93,6 +93,8 @@ namespace netCvLib
             public int CurPos { get; set; }  //input
             public int NextPos { get; set; }//output
             public DiffVector vect { get; set; } //output
+            public DiffVector diffVect { get; set; } //debug output, difference to current
+            public DiffVector nextVect { get; set; } //debutoutput, what next frame should go
             public int LookAfter = 5;
             //public bool notFound = false;
             public double diff { get; set; }
@@ -128,7 +130,7 @@ namespace netCvLib
                     }
                 }
             }
-            if (curMax == null)
+            if (curMax == null || curMax.Pos > stream.Total - 1)
             {
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
                 return;
@@ -140,7 +142,11 @@ namespace netCvLib
 
             stream.Pos = curMax.Pos;
             var diff = CompDiff(curr, stream.GetCurMat());
-            prms.vect = new DiffVector(curMax.vect.X + diff.Vector.X, curMax.vect.Y + diff.Vector.Y);
+            var nextVect = stream.Vectors[curMax.Pos];
+            prms.vect = new DiffVector(nextVect.Vector.X + diff.Vector.X, nextVect.Vector.Y + diff.Vector.Y);
+
+            prms.diffVect = diff.Vector;
+            prms.nextVect = nextVect.Vector;
         }
     }
 }

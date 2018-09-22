@@ -214,7 +214,7 @@ namespace WpfRoadApp
                     var mat = vidProvider.GetCurMat();
                     if (prevMat != null)
                     {
-                        var diff = VidLoc.CompDiff(mat, prevMat);
+                        var diff = VidLoc.CompDiff(prevMat, mat);
                         lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Diff}");
                     }
                     prevMat = mat;
