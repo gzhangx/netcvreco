@@ -130,7 +130,7 @@ namespace netCvLib
                     }
                 }
             }
-            if (curMax == null || curMax.Pos > stream.Total - 1)
+            if (curMax == null || curMax.Pos >= stream.Total - 1)
             {
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
                 return;

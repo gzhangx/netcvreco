@@ -244,6 +244,7 @@ namespace WpfRoadApp
         {
             if (chkCamTrack.IsChecked.GetValueOrDefault())
             {
+                cmpWin.LoadOrig();
                 start.IsEnabled = false;
                 StartRecord();
             }else

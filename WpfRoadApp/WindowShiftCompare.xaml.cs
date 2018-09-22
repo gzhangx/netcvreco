@@ -39,6 +39,10 @@ namespace WpfRoadApp
             return new BitmapImage(new Uri("file://" + provider.GetPath(i)));
         }
 
+        public void LoadOrig()
+        {
+            vidProvider = new VideoProvider("orig");
+        }
         DetailsWindow detailWind = new DetailsWindow();
         public WindowShiftCompare()
         {
@@ -111,7 +115,7 @@ namespace WpfRoadApp
                 {
                     vidProvider.Pos = image2Ind;
                     Mat m1 = vidProvider.GetCurMat();
-                    CamTracking(m1);                    
+                    CamTracking(m1);
                     //realTimeTrack.CurPos = image1Ind;
                     //realTimeTrack.LookAfter = 30;
                     //VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
@@ -128,7 +132,7 @@ namespace WpfRoadApp
         }
 
         public void CamTracking(Mat curImg)
-        {                     
+        {
             realTimeTrack.CurPos = image1Ind;
             realTimeTrack.LookAfter = 5;
             VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
@@ -150,12 +154,19 @@ namespace WpfRoadApp
                 image1Ind = realTimeTrack.NextPos;
                 slidera.Value = image1Ind;
             }
-            driver.Track(realTimeTrack);
+
+            var debug = true;
+            if (debug) {
+                vidProvider.Pos = image1Ind;
+                Mat m1 = vidProvider.GetCurMat();
+                breakAndDiff(m1, curImg);
+                driver.Track(realTimeTrack);
+            }
         }
 
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (curProcessor == null) return;            
+            if (curProcessor == null) return;
             Mat res = curProcessor.ShowStepChange(allDiffs, (int)sliderSteps.Value, null);
             imageStepRes.Source = res.MatToImgSrc();
 
@@ -214,17 +225,22 @@ namespace WpfRoadApp
             Mat m1 = vidProvider.GetCurMat();
             vidProvider.Pos = image2Ind;
             Mat m2 = vidProvider.GetCurMat();
-            curProcessor = new ShiftVecProcessor(m1, m2);
+            breakAndDiff(m1, m2);
+        }
+
+        void breakAndDiff(Mat m1, Mat m2)
+        {            
+            var curProcessor = new ShiftVecProcessor(m1, m2);
             //Mat res = ShiftVecDector.BreakAndNearMatches(m1, m2);
-            allDiffs = curProcessor.GetAllDiffVect();
+            var allDiffs = curProcessor.GetAllDiffVect();
             var vect = ShiftVecProcessor.calculateTotalVect(allDiffs);
             var average = allDiffs.Average(x => x.Diff);
-            info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");            
+            info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
 
 
             Mat res = curProcessor.ShowAllStepChange(allDiffs);
             imageThird.Source = res.MatToImgSrc();
             sliderSteps.Maximum = allDiffs.Count - 1;
         }
-}
+    }
 }
