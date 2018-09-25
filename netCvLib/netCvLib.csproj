@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDriver.cs" />
     <Compile Include="RMatFilter.cs" />
     <Compile Include="RoadDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -148,5 +148,55 @@ namespace netCvLib
             prms.diffVect = diff.Vector;
             prms.nextVect = nextVect.Vector;
         }
+
+
+
+        public static  void CamTracking(Mat curImg, VidLoc.RealTimeTrackLoc realTimeTrack, PreVidStream vidProvider, IDriver driver, BreakDiffDebugReporter debugReporter)
+        {
+            //realTimeTrack.CurPos = image1Ind;
+            realTimeTrack.LookAfter = 5;
+            int origImageInd = vidProvider.Pos;
+            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+            
+            var lookBackCount = 0;
+            while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
+            {
+                driver.Stop();
+                realTimeTrack.LongLook();
+                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+                //info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
+                //Console.WriteLine(text);
+                lookBackCount++;
+            }
+            
+
+            var debug = true;
+            if (debug)
+            {
+                vidProvider.Pos = origImageInd;
+                Mat m1 = vidProvider.GetCurMat();
+                breakAndDiff(m1, curImg, debugReporter);
+                driver.Track(realTimeTrack);
+            }
+        }        
+
+        public static void breakAndDiff(Mat m1, Mat m2, BreakDiffDebugReporter reporter)
+        {
+            var curProcessor = new ShiftVecProcessor(m1, m2);
+            //Mat res = ShiftVecDector.BreakAndNearMatches(m1, m2);
+            var allDiffs = curProcessor.GetAllDiffVect();
+            var vect = ShiftVecProcessor.calculateTotalVect(allDiffs);
+            var average = allDiffs.Average(x => x.Diff);                        
+
+
+            Mat res = curProcessor.ShowAllStepChange(allDiffs);
+            reporter.Report(res, allDiffs, vect, average);
+            
+        }
+    }
+
+    public interface BreakDiffDebugReporter
+    {
+        void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
     }
 }

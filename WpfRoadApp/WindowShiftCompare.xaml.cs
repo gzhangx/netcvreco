@@ -21,7 +21,7 @@ namespace WpfRoadApp
     /// <summary>
     /// Interaction logic for WindowShiftCompare.xaml
     /// </summary>
-    public partial class WindowShiftCompare : Window
+    public partial class WindowShiftCompare : Window, BreakDiffDebugReporter
     {
         VideoProvider vidProvider = new VideoProvider("orig");
         VideoProvider vidProviderNewVid = new VideoProvider("newvid");
@@ -131,39 +131,14 @@ namespace WpfRoadApp
             }
         }
 
-        public void CamTracking(Mat curImg)
+        void breakAndDiff()
         {
-            realTimeTrack.CurPos = image1Ind;
-            realTimeTrack.LookAfter = 5;
-            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
-            var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
-            //Console.WriteLine(text);
-            info.Text = text;
-            var lookBackCount = 0;
-            while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
-            {
-                driver.Stop();
-                realTimeTrack.LongLook();
-                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
-                info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
-                //Console.WriteLine(text);
-                lookBackCount++;
-            }
-            if (realTimeTrack.NextPos > 0)
-            {
-                image1Ind = realTimeTrack.NextPos;
-                slidera.Value = image1Ind;
-            }
-
-            var debug = true;
-            if (debug) {
-                vidProvider.Pos = image1Ind;
-                Mat m1 = vidProvider.GetCurMat();
-                breakAndDiff(m1, curImg);
-                driver.Track(realTimeTrack);
-            }
+            vidProvider.Pos = image1Ind;
+            Mat m1 = vidProvider.GetCurMat();
+            vidProvider.Pos = image2Ind;
+            Mat m2 = vidProvider.GetCurMat();
+            VidLoc.breakAndDiff(m1, m2, this);
         }
-
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (curProcessor == null) return;
@@ -219,28 +194,26 @@ namespace WpfRoadApp
             vidProviderNewVid = new VideoProvider(txtSimulationDir.Text);
         }
 
-        void breakAndDiff()
+        public void CamTracking(Mat curImg)
         {
-            vidProvider.Pos = image1Ind;
-            Mat m1 = vidProvider.GetCurMat();
-            vidProvider.Pos = image2Ind;
-            Mat m2 = vidProvider.GetCurMat();
-            breakAndDiff(m1, m2);
+            realTimeTrack.CurPos = image1Ind;
+            var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
+            //Console.WriteLine(text);
+            info.Text = text;
+
+            VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
+            if (realTimeTrack.NextPos > 0)
+            {
+                image1Ind = realTimeTrack.NextPos;
+                slidera.Value = image1Ind;
+            }
         }
 
-        void breakAndDiff(Mat m1, Mat m2)
-        {            
-            var curProcessor = new ShiftVecProcessor(m1, m2);
-            //Mat res = ShiftVecDector.BreakAndNearMatches(m1, m2);
-            var allDiffs = curProcessor.GetAllDiffVect();
-            var vect = ShiftVecProcessor.calculateTotalVect(allDiffs);
-            var average = allDiffs.Average(x => x.Diff);
+        public void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average)
+        {
             info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
-
-
-            Mat res = curProcessor.ShowAllStepChange(allDiffs);
             imageThird.Source = res.MatToImgSrc();
-            sliderSteps.Maximum = allDiffs.Count - 1;
+            sliderSteps.Maximum = diffs.Count - 1;
         }
     }
 }

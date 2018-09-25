@@ -92,7 +92,6 @@
     <Compile Include="DetailsWindow.xaml.cs">
       <DependentUpon>DetailsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IDriver.cs" />
     <Compile Include="SimpleDriver.cs" />
     <Compile Include="VideoProvider.cs" />
     <Compile Include="WindowShiftCompare.xaml.cs">

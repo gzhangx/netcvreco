@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfRoadApp
+namespace netCvLib
 {
     public interface IDriver
     {
