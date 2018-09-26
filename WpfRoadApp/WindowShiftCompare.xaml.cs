@@ -197,6 +197,7 @@ namespace WpfRoadApp
 
         public Task CamTracking(Mat curImg)
         {
+            imageSecond.Source = MainWindow.Convert(curImg.Bitmap);
             realTimeTrack.CurPos = image1Ind;
             var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
             //Console.WriteLine(text);

@@ -129,7 +129,7 @@ namespace WpfRoadApp
                 vid = null;
             }
         }
-        public BitmapImage Convert(Bitmap src)
+        public static BitmapImage Convert(Bitmap src)
         {
             MemoryStream ms = new MemoryStream();
             src.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
