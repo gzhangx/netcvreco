@@ -149,6 +149,7 @@ namespace WpfRoadApp
                 if (vid != null)
                 {
                     var mat = vid.QueryFrame();
+                    ShiftVecDector.ResizeToStdSize(mat);
                     if (chkCamTrack.IsChecked.GetValueOrDefault())
                     {
                         cmpWin.CamTracking(mat);
