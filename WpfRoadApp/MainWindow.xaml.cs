@@ -96,6 +96,7 @@ namespace WpfRoadApp
                     MessageBox.Show("No cam detected");
                     return;
                 }
+                recordCount = 0;
                 vid = new VideoCapture(cmdCameras.SelectedIndex);
                 vid.ImageGrabbed += Vid_ImageGrabbed;
                 var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
@@ -134,6 +135,7 @@ namespace WpfRoadApp
             return image;
         }
         bool inGrab = false;
+        int recordCount = 0;
         private void Vid_ImageGrabbed(object sender, EventArgs e)
         {
             if (inGrab)
@@ -143,7 +145,7 @@ namespace WpfRoadApp
             }
             inGrab = true;
             Thread.Sleep(50);
-            Console.WriteLine("Processiing");
+            Console.WriteLine($"Processiing {recordCount++}");
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (vid != null)
