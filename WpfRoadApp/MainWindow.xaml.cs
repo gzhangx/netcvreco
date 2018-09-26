@@ -1,5 +1,6 @@
 ﻿using DisplayLib;
 using Emgu.CV;
+using log4net;
 using netCvLib;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace WpfRoadApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        ILog Logger = LogManager.GetLogger("mainwin");
         public static bool DebugMode
         {
             get
@@ -87,6 +89,7 @@ namespace WpfRoadApp
             }));            
         }
         private VideoCapture vid;
+        private object vidLock = new object();
 
         private VideoWriter vw;
         private void start_Click(object sender, RoutedEventArgs e)
@@ -126,14 +129,18 @@ namespace WpfRoadApp
         {
             if (vid != null)
             {
-                vid.Stop();
-                vid.Dispose();
+                Logger.Info("End recording");
+                lock (vidLock)
+                {
+                    vid.Stop();
+                    vid.Dispose();
+                    vid = null;
+                }
                 if (vw != null)
                 {
                     vw.Dispose();
                 }
-                vw = null;               
-                vid = null;
+                vw = null;                               
             }
         }
         public static BitmapImage Convert(Bitmap src)
@@ -163,7 +170,11 @@ namespace WpfRoadApp
             {
                 if (vid != null)
                 {
-                    var mat = vid.QueryFrame();
+                    Mat mat = null;
+                    lock (vidLock)
+                    {
+                        mat = vid.QueryFrame();
+                    }
                     if (mat == null)
                     {
                         inGrab = false;
