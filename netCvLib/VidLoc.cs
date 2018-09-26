@@ -143,8 +143,8 @@ namespace netCvLib
             stream.Pos = curMax.Pos;
             var diff = CompDiff(curr, stream.GetCurMat());
             var nextVect = stream.Vectors[curMax.Pos];
-            reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {diff.Vector.X}");
-            prms.vect = new DiffVector(nextVect.Vector.X + diff.Vector.X, nextVect.Vector.Y + diff.Vector.Y);
+            reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {-diff.Vector.X}");
+            prms.vect = new DiffVector(nextVect.Vector.X - diff.Vector.X, nextVect.Vector.Y - diff.Vector.Y);
 
             prms.diffVect = diff.Vector;
             prms.nextVect = nextVect.Vector;
