@@ -107,7 +107,7 @@ namespace netCvLib
         }
 
 
-        public static void FindObjectDown(PreVidStream stream, Mat curr, RealTimeTrackLoc prms)
+        public static void FindObjectDown(PreVidStream stream, Mat curr, RealTimeTrackLoc prms, BreakDiffDebugReporter reporter)
         {
             int from = prms.CurPos;
             int to = from + prms.LookAfter;
@@ -143,6 +143,7 @@ namespace netCvLib
             stream.Pos = curMax.Pos;
             var diff = CompDiff(curr, stream.GetCurMat());
             var nextVect = stream.Vectors[curMax.Pos];
+            reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {diff.Vector.X}");
             prms.vect = new DiffVector(nextVect.Vector.X + diff.Vector.X, nextVect.Vector.Y + diff.Vector.Y);
 
             prms.diffVect = diff.Vector;
@@ -155,15 +156,15 @@ namespace netCvLib
         {
             //realTimeTrack.CurPos = image1Ind;
             realTimeTrack.LookAfter = 5;
-            int origImageInd = vidProvider.Pos;
-            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+            int origImageInd = realTimeTrack.CurPos;
+            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
             
             var lookBackCount = 0;
             while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
             {
                 driver.Stop();
                 realTimeTrack.LongLook();
-                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack);
+                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
                 //info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
                 //Console.WriteLine(text);
                 lookBackCount++;
@@ -198,5 +199,6 @@ namespace netCvLib
     public interface BreakDiffDebugReporter
     {
         void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
+        void InfoReport(string info);
     }
 }

@@ -230,5 +230,12 @@ namespace WpfRoadApp
         {
             Dispatcher.BeginInvoke(new Action(a));
         }
+
+        public void InfoReport(string s)
+        {
+            TDispatch(() => {
+                info2.Text = s;
+            });
+        }
     }
 }
