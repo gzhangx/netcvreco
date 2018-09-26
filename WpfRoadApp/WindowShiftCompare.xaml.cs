@@ -1,6 +1,7 @@
 ﻿using DisplayLib;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using log4net;
 using netCvLib;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace WpfRoadApp
         VideoProvider vidProvider = new VideoProvider("orig");
         VideoProvider vidProviderNewVid = new VideoProvider("newvid");
         public SimpleDriver driver = new SimpleDriver();
+        static ILog Logger = LogManager.GetLogger("ShWin");
 
         protected int image1Ind = 1, image2Ind = 1;
         bool constChecking = false;
@@ -262,6 +264,7 @@ namespace WpfRoadApp
         {
             TDispatch(() => {
                 info2.Text = s;
+                Logger.Info(s);
             });
         }
     }

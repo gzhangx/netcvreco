@@ -164,6 +164,11 @@ namespace WpfRoadApp
                 if (vid != null)
                 {
                     var mat = vid.QueryFrame();
+                    if (mat == null)
+                    {
+                        inGrab = false;
+                        return;
+                    }
                     ShiftVecDector.ResizeToStdSize(mat);
                     if (chkCamTrack.IsChecked.GetValueOrDefault())
                     {

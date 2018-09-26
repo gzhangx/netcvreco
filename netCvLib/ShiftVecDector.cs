@@ -59,7 +59,8 @@ namespace netCvLib
         }
 
         public static void ResizeToStdSize(this Mat input)
-        {            
+        {
+            if (input == null) return;
             if (input.Width > STDWIDTH)
             {
                 double scale = ((double)STDWIDTH) / input.Width;
