@@ -97,6 +97,7 @@ namespace WpfRoadApp
         {
             if (sliderbval != null)
             {
+                sliderbval.Text = sliderb.Value.ToString("0");
                 image2Ind = (int)sliderb.Value;
 
                 if (chkTrackSimulation.IsChecked.GetValueOrDefault())
@@ -124,12 +125,10 @@ namespace WpfRoadApp
                     //VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
                     //info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
                     //slidera.Value = realTimeTrack.NextPos - 1;
+                    return;
                 }
-                if (realTimeTrack.NextPos > 0)
-                {
-                    sliderbval.Text = sliderb.Value.ToString("0");
-                }                
 
+                breakAndDiff();
             }
         }
 
