@@ -97,15 +97,23 @@ namespace WpfRoadApp
                     return;
                 }
                 recordCount = 0;
+                vw = null;
                 vid = new VideoCapture(cmdCameras.SelectedIndex);
                 vid.ImageGrabbed += Vid_ImageGrabbed;
                 var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
                 var h = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
-                File.Delete("test.mp4");
-                vw = new VideoWriter("test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size((int)w, (int)h), true);
+                File.Delete("test.mp4");                
                 //vw = new VideoWriter("test.mp4", -1, 10, new System.Drawing.Size((int)w, (int)h), true);
             }
             vid.Start();
+        }
+
+        protected void CreateVW(int w, int h)
+        {
+            if (vw == null)
+            {
+                vw = new VideoWriter("test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size(w, h), true);
+            }
         }
         protected void EndRecord()
         {
@@ -113,13 +121,11 @@ namespace WpfRoadApp
             {
                 vid.Stop();
                 vid.Dispose();
-                new Thread(() =>
+                if (vw != null)
                 {
-                    Thread.Sleep(2000);
-                    this.Dispatcher.BeginInvoke(new Action(() => {
-                        vw.Dispose();
-                    }));
-                }).Start();
+                    vw.Dispose();
+                }
+                vw = null;               
                 vid = null;
             }
         }
@@ -154,9 +160,14 @@ namespace WpfRoadApp
                     ShiftVecDector.ResizeToStdSize(mat);
                     if (chkCamTrack.IsChecked.GetValueOrDefault())
                     {
-                        cmpWin.CamTracking(mat);
+                        cmpWin.CamTracking(mat).ContinueWith(t =>
+                        {
+                            inGrab = false;
+                        });
+                        return;
                     }
                     var ims = Convert(mat.Bitmap);
+                    CreateVW(mat.Width, mat.Height);
                     vw.Write(mat);
                     mainCanv.Source = ims;
                 }
