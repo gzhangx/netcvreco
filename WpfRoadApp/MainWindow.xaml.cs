@@ -27,6 +27,13 @@ namespace WpfRoadApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static bool DebugMode
+        {
+            get
+            {
+                return true;
+            }
+        }
         protected WindowShiftCompare cmpWin = new WindowShiftCompare();
         public MainWindow()
         {
@@ -163,17 +170,30 @@ namespace WpfRoadApp
                         cmpWin.CamTracking(mat).ContinueWith(t =>
                         {
                             inGrab = false;
+                            if (cmpWin.ShouldStopTracking())
+                            {
+                                EndRecord();
+                            }
+                            if (DebugMode)
+                            {
+                                RecordToVW(mat);
+                            }
                         });
                         return;
                     }
-                    var ims = Convert(mat.Bitmap);
-                    CreateVW(mat.Width, mat.Height);
-                    vw.Write(mat);
-                    mainCanv.Source = ims;
+                    RecordToVW(mat);
                 }
 
                 inGrab = false;
             }));            
+        }
+
+        void RecordToVW(Mat mat)
+        {
+            var ims = Convert(mat.Bitmap);
+            CreateVW(mat.Width, mat.Height);
+            vw.Write(mat);
+            mainCanv.Source = ims;
         }
 
         private void end_Click(object sender, RoutedEventArgs e)
@@ -214,7 +234,7 @@ namespace WpfRoadApp
                         if (ind >= all -1)
                         {
                             processToStdSize.Content = "Process Video";
-                            processToStdSize.IsEnabled = true;
+                            //processToStdSize.IsEnabled = true;
                         }
                     }));
                 }, vidSrc);

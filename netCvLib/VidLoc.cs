@@ -170,9 +170,7 @@ namespace netCvLib
                 lookBackCount++;
             }
             
-
-            var debug = true;
-            if (debug)
+            if (debugReporter.DebugMode)
             {
                 vidProvider.Pos = origImageInd;
                 Mat m1 = vidProvider.GetCurMat();
@@ -198,6 +196,7 @@ namespace netCvLib
 
     public interface BreakDiffDebugReporter
     {
+        bool DebugMode { get; }
         void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
         void InfoReport(string info);
     }

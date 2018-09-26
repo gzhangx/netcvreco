@@ -92,7 +92,34 @@ namespace WpfRoadApp
             }
         }
 
-        VidLoc.RealTimeTrackLoc realTimeTrack = new VidLoc.RealTimeTrackLoc();
+        protected int CurOrigVidPos
+        {
+            get
+            {
+                return realTimeTrack.CurPos;
+            }
+        }
+        protected int TotalOrigVidLen
+        {
+            get
+            {
+                return vidProvider.Total;
+            }
+        }
+
+        public bool DebugMode
+        {
+            get
+            {
+                return MainWindow.DebugMode;
+            }
+        }
+
+        public bool ShouldStopTracking()
+        {
+            return realTimeTrack.CurPos + 5 >= vidProvider.Total;
+        }
+        protected VidLoc.RealTimeTrackLoc realTimeTrack = new VidLoc.RealTimeTrackLoc();
         private void sliderb_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (sliderbval != null)
