@@ -115,7 +115,10 @@ namespace WpfRoadApp
                 {
                     vidProvider.Pos = image2Ind;
                     Mat m1 = vidProvider.GetCurMat();
-                    CamTracking(m1);
+                    CamTracking(m1).ContinueWith(t =>
+                    {
+                        TDispatch(() => { breakAndDiff(); });
+                    });
                     //realTimeTrack.CurPos = image1Ind;
                     //realTimeTrack.LookAfter = 30;
                     //VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
@@ -125,8 +128,7 @@ namespace WpfRoadApp
                 if (realTimeTrack.NextPos > 0)
                 {
                     sliderbval.Text = sliderb.Value.ToString("0");
-                }
-                breakAndDiff();
+                }                
 
             }
         }
@@ -194,26 +196,39 @@ namespace WpfRoadApp
             vidProviderNewVid = new VideoProvider(txtSimulationDir.Text);
         }
 
-        public void CamTracking(Mat curImg)
+        public Task CamTracking(Mat curImg)
         {
             realTimeTrack.CurPos = image1Ind;
             var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
             //Console.WriteLine(text);
             info.Text = text;
 
-            VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
-            if (realTimeTrack.NextPos > 0)
+            return Task.Run(() =>
             {
-                image1Ind = realTimeTrack.NextPos;
-                slidera.Value = image1Ind;
-            }
+                VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
+                TDispatch(() =>
+                {
+                    if (realTimeTrack.NextPos > 0)
+                    {
+                        image1Ind = realTimeTrack.NextPos;
+                        slidera.Value = image1Ind;
+                    }
+                });
+            });
         }
 
         public void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average)
         {
-            info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
-            imageThird.Source = res.MatToImgSrc();
-            sliderSteps.Maximum = diffs.Count - 1;
+            TDispatch(()=>{
+                info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
+                imageThird.Source = res.MatToImgSrc();
+                sliderSteps.Maximum = diffs.Count - 1;
+            });
+        }
+
+        void TDispatch(Action a)
+        {
+            Dispatcher.BeginInvoke(new Action(a));
         }
     }
 }
