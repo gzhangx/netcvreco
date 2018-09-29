@@ -144,6 +144,8 @@ namespace netCvLib
             var diff = CompDiff(curr, stream.GetCurMat());
             var nextVect = stream.Vectors[curMax.Pos];
             reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {-diff.Vector.X}");
+            //diff: negative if need to turn left
+            //vect: positive if need to turn left
             prms.vect = new DiffVector(nextVect.Vector.X - diff.Vector.X, nextVect.Vector.Y - diff.Vector.Y);
 
             prms.diffVect = diff.Vector;
