@@ -36,6 +36,13 @@ namespace WpfRoadApp
                 return true;
             }
         }
+        public static bool SaveVideoWhileDriving
+        {
+            get
+            {
+                return false;
+            }
+        }
         protected WindowShiftCompare cmpWin = new WindowShiftCompare();
         public MainWindow()
         {
@@ -164,9 +171,9 @@ namespace WpfRoadApp
                 return;
             }
             inGrab = true;
-            Thread.Sleep(50);
+            //Thread.Sleep(50);
             Console.WriteLine($"Processiing {recordCount++}");
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            //this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (vid != null)
                 {
@@ -181,7 +188,7 @@ namespace WpfRoadApp
                         return;
                     }
                     ShiftVecDector.ResizeToStdSize(mat);
-                    if (chkCamTrack.IsChecked.GetValueOrDefault())
+                    if (chkCamTrackChecked)
                     {
                         cmpWin.CamTracking(mat).ContinueWith(t =>
                         {
@@ -190,7 +197,7 @@ namespace WpfRoadApp
                             {
                                 EndRecord();
                             }
-                            if (DebugMode)
+                            if (SaveVideoWhileDriving)
                             {
                                 RecordToVW(mat);
                             }
@@ -201,15 +208,19 @@ namespace WpfRoadApp
                 }
 
                 inGrab = false;
-            }));            
+            }
+            //));            
         }
 
         void RecordToVW(Mat mat)
         {
-            var ims = Convert(mat.Bitmap);
             CreateVW(mat.Width, mat.Height);
             vw.Write(mat);
-            mainCanv.Source = ims;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var ims = Convert(mat.Bitmap);
+                mainCanv.Source = ims;
+            }));
         }
 
         private void end_Click(object sender, RoutedEventArgs e)
@@ -290,9 +301,11 @@ namespace WpfRoadApp
             }
         }
 
+        bool chkCamTrackChecked = false;
         private void chkCamTrack_Click(object sender, RoutedEventArgs e)
         {
-            if (chkCamTrack.IsChecked.GetValueOrDefault())
+            chkCamTrackChecked = chkCamTrack.IsChecked.GetValueOrDefault();
+            if (chkCamTrackChecked)
             {
                 cmpWin.LoadOrig();
                 start.IsEnabled = false;
