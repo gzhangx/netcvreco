@@ -21,11 +21,22 @@ namespace netCvLib
             for (var i = 0; i < fc; i++)
             {
                 cap.SetCaptureProperty(CapProp.PosFrames, i);
-                var capedi = cap.QueryFrame();
-                Console.WriteLine("saving " + i+"/"+fc);
-                capedi = matAct(capedi);
-                capedi.Save($"{folder}\\vid{i}.jpg");
-                reporter(i, (int)fc);
+                while (true)
+                {
+                    try
+                    {
+                        var capedi = cap.QueryFrame();
+                        Console.WriteLine("saving " + i + "/" + fc);
+                        capedi = matAct(capedi);
+                        capedi.Save($"{folder}\\vid{i}.jpg");
+                        reporter(i, (int)fc);
+                        break;
+                    }
+                    catch (Exception exc)
+                    {
+                        Console.WriteLine("Error saving, retry " + exc.Message);
+                    }
+                }
             }
             File.WriteAllText($"{folder}\\{VIDINFOFILE}", fc.ToString());
             //cap.ImageGrabbed += Cap_ImageGrabbed;            

@@ -97,6 +97,7 @@
       <DependentUpon>DetailsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SimpleDriver.cs" />
+    <Compile Include="TrackingStats.cs" />
     <Compile Include="VideoProvider.cs" />
     <Compile Include="WindowShiftCompare.xaml.cs">
       <DependentUpon>WindowShiftCompare.xaml</DependentUpon>

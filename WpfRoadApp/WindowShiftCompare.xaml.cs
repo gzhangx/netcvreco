@@ -91,6 +91,10 @@ namespace WpfRoadApp
                 slideraval.Text = slidera.Value.ToString("0");
                 image1Ind = (int)slidera.Value;
                 imageFirst.Source = GetImageAt(image1Ind);
+                if (!TrackingStats.CamTrackEnabled)
+                {
+                    realTimeTrack.CurPos = image1Ind;
+                }
             }
         }
 
@@ -121,7 +125,7 @@ namespace WpfRoadApp
         {
             return realTimeTrack.CurPos + 5 >= vidProvider.Total;
         }
-        protected VidLoc.RealTimeTrackLoc realTimeTrack = new VidLoc.RealTimeTrackLoc();
+        protected VidLoc.RealTimeTrackLoc realTimeTrack = TrackingStats.RealTimeTrack;
         private void sliderb_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (sliderbval != null)
@@ -229,7 +233,7 @@ namespace WpfRoadApp
             TDispatch(() =>
             {
                 imageSecond.Source = MainWindow.Convert(curImg.Bitmap);
-                realTimeTrack.CurPos = image1Ind;
+                //realTimeTrack.CurPos = image1Ind;
                 var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
                 //Console.WriteLine(text);
                 info.Text = text;
@@ -243,6 +247,7 @@ namespace WpfRoadApp
                     if (realTimeTrack.NextPos > 0)
                     {
                         image1Ind = realTimeTrack.NextPos;
+                        realTimeTrack.CurPos = realTimeTrack.NextPos;
                         slidera.Value = image1Ind;
                     }
                 });

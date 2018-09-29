@@ -188,7 +188,7 @@ namespace WpfRoadApp
                         return;
                     }
                     ShiftVecDector.ResizeToStdSize(mat);
-                    if (chkCamTrackChecked)
+                    if (TrackingStats.CamTrackEnabled)
                     {
                         cmpWin.CamTracking(mat).ContinueWith(t =>
                         {
@@ -301,11 +301,10 @@ namespace WpfRoadApp
             }
         }
 
-        bool chkCamTrackChecked = false;
         private void chkCamTrack_Click(object sender, RoutedEventArgs e)
         {
-            chkCamTrackChecked = chkCamTrack.IsChecked.GetValueOrDefault();
-            if (chkCamTrackChecked)
+            TrackingStats.CamTrackEnabled = chkCamTrack.IsChecked.GetValueOrDefault();
+            if (TrackingStats.CamTrackEnabled)
             {
                 cmpWin.LoadOrig();
                 start.IsEnabled = false;
