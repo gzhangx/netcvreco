@@ -6,6 +6,10 @@ namespace WpfRoadApp
     public class TrackingStats
     {
         protected static RealTimeTrackLoc realTimeTrack = new RealTimeTrackLoc();
+        public static bool StayAtSamePlace
+        {
+            get;set;
+        }
         public static RealTimeTrackLoc RealTimeTrack
         {
             get

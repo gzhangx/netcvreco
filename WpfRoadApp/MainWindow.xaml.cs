@@ -315,5 +315,10 @@ namespace WpfRoadApp
                 EndRecord();
             }
         }
+
+        private void chkStayAtSamePlace_Checked(object sender, RoutedEventArgs e)
+        {
+            TrackingStats.StayAtSamePlace = chkStayAtSamePlace.IsChecked.GetValueOrDefault();
+        }
     }
 }

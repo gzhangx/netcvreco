@@ -244,7 +244,7 @@ namespace WpfRoadApp
                 VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
                 TDispatch(() =>
                 {
-                    if (realTimeTrack.NextPos > 0)
+                    if (realTimeTrack.NextPos > 0 && !TrackingStats.StayAtSamePlace)
                     {
                         image1Ind = realTimeTrack.NextPos;
                         realTimeTrack.CurPos = realTimeTrack.NextPos;
