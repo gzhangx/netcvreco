@@ -233,7 +233,7 @@ namespace netCvLib
                 CvInvoke.Rectangle(compareToImage, toRect, new MCvScalar(100));
                 CvInvoke.Line(compareToImage, new Point(x, y), toRect.Location, new MCvScalar(150));
                 CvInvoke.PutText(compareToImage, diffVect.Diff.ToString("0.00"), ClonePointWithYOff(toRect.Location, 10), FontFace.HersheyPlain, 1, new MCvScalar(10));
-                //CvInvoke.PutText(compareToImage, diffVect.Diff.ToString("0.00"), ClonePointWithYOff(toRect.Location, 20), FontFace.HersheyPlain, 1, new MCvScalar(10));
+                CvInvoke.PutText(compareToImage, diffVect.Vector.X.ToString("0.00"), ClonePointWithYOff(toRect.Location, 20), FontFace.HersheyPlain, 1, new MCvScalar(10));
                 return compareToImage;
             }
         }
