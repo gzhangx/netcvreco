@@ -121,11 +121,6 @@ namespace WpfRoadApp
             }
         }
 
-        public bool ReturnDebugVector
-        {
-            get;set;
-        }
-
         public bool ShouldStopTracking()
         {
             return realTimeTrack.CurPos + 5 >= vidProvider.Total;
@@ -268,11 +263,19 @@ namespace WpfRoadApp
 
         public void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average)
         {
-            TDispatch(()=>{
+            TDispatch(() =>
+            {
                 info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
                 imageThird.Source = res.MatToImgSrc();
                 sliderSteps.Maximum = diffs.Count - 1;
             });
+        }
+
+        public void ReportStepChanges(ShiftVecProcessor proc, List<DiffVect> allDiffs, DiffVector vect)
+        {
+            var average = allDiffs.Average(x => x.Diff);
+            Mat res = proc.ShowAllStepChange(allDiffs);
+            Report(res, allDiffs, vect, average);            
         }
 
         void TDispatch(Action a)

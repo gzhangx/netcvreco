@@ -275,9 +275,10 @@ namespace WpfRoadApp
                     var mat = vidProvider.GetCurMat();
                     if (prevMat != null)
                     {
-                        var diff = VidLoc.CompDiff(prevMat, mat);
+                        var diff = VidLoc.CompDiff(prevMat, mat, null);
                         lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Diff}");
                     }
+                    if (prevMat != null) prevMat.Dispose();
                     prevMat = mat;
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -289,6 +290,7 @@ namespace WpfRoadApp
                         }
                     }));
                 }
+                if (prevMat != null) prevMat.Dispose();
                 File.WriteAllLines($"{vidSrc}\\vect.txt", lines);
             }).Start();
         }

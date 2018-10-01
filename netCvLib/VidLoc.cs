@@ -37,17 +37,17 @@ namespace netCvLib
             }
         }
         
-        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp, bool returnAllVects = false)
+        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp, BreakDiffDebugReporter reporter)
         {
             var processor = new ShiftVecProcessor(input, comp);
             var all = processor.GetAllDiffVect();
             var averageDiff = all.Average(a => a.Diff);
             var vect = ShiftVecProcessor.calculateTotalVect(all);
+            if (reporter!= null) reporter.ReportStepChanges(processor, all, vect);
             return new DiffVectorWithDiff
             {                
                 Diff = averageDiff,
                 Vector = vect,
-                DebugVectors = returnAllVects? all:null,
             };
         }
 
@@ -143,7 +143,7 @@ namespace netCvLib
             prms.vect = curMax.vect;
 
             stream.Pos = curMax.Pos;
-            var diff = CompDiff(curr, stream.GetCurMat(), reporter.ReturnDebugVector);
+            var diff = CompDiff(curr, stream.GetCurMat(), reporter);
             var nextVect = stream.Vectors[curMax.Pos];
             reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {-diff.Vector.X}");
             //diff: negative if need to turn left
@@ -178,8 +178,8 @@ namespace netCvLib
             driver.Track(realTimeTrack);
             if (debugReporter.DebugMode)
             {                
-                Mat m1 = vidProvider.GetCurMat();
-                breakAndDiff(m1, curImg, debugReporter);                
+                //Mat m1 = vidProvider.GetCurMat();
+                //breakAndDiff(m1, curImg, debugReporter);                
             }
         }        
 
@@ -201,8 +201,8 @@ namespace netCvLib
     public interface BreakDiffDebugReporter
     {
         bool DebugMode { get; }
-        bool ReturnDebugVector { get; }
         void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
+        void ReportStepChanges(ShiftVecProcessor proc, List<DiffVect> diffs, DiffVector vect);
         void InfoReport(string info);
     }
 }
