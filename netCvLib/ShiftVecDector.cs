@@ -160,33 +160,39 @@ namespace netCvLib
 
         public DiffVect CalculateDiffVect(int x, int y)
         {
-            return CalculateDiffVectDbg(x, y).Vect;
+            return CalculateDiffVectDbg(x, y, null);
         }
-        public DiffDebug CalculateDiffVectDbg(int x, int y)
+        public DiffVect CalculateDiffVectDbg(int x, int y, Action<DiffDebug> dbgAct)
         {
             var srcRect = new Rectangle(x, y, CutSize, CutSize);
-            var corped = new Mat(input, srcRect);
-            var cmpToRect = ShiftVecDector.getExtCropRect(compareTo, x, y, CutSize, CmpExtend);
-            var cmpToCorp = new Mat(compareTo, cmpToRect);
-            //corped.Save(@"d:\temp\test\" + x + "_" + y + ".jpg");
-            var matched = cmpToCorp.ToImage<Gray, Byte>().MatchTemplate(corped.ToImage<Gray, Byte>(), TemplateMatchingType.CcoeffNormed);
-            double[] minValues, maxValues;
-            Point[] minLocs, maxLocs;
-            matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
-            Point maxLoc = maxLocs[0];
-            double maxVal = maxValues[0];
-            var diffVect = new DiffVect { Location = new Point(x, y), Vector = new Point(maxLoc.X - (x - cmpToRect.X), maxLoc.Y - (y - cmpToRect.Y)), Diff = maxVal };
-            //Console.WriteLine(" got  " + diffVect);
-            return new DiffDebug
+            using (var corped = new Mat(input, srcRect))
             {
-                Vect = diffVect,
-                orig = corped,
-                area = cmpToCorp,
-                diffMap = matched,
-                SrcRect = srcRect,
-                CompareToRect = cmpToRect,
-            };
-            //return diffVect;
+                var cmpToRect = ShiftVecDector.getExtCropRect(compareTo, x, y, CutSize, CmpExtend);
+                using (var cmpToCorp = new Mat(compareTo, cmpToRect))
+                {
+                    //corped.Save(@"d:\temp\test\" + x + "_" + y + ".jpg");
+                    using (var matched = cmpToCorp.ToImage<Gray, Byte>().MatchTemplate(corped.ToImage<Gray, Byte>(), TemplateMatchingType.CcoeffNormed))
+                    {
+                        double[] minValues, maxValues;
+                        Point[] minLocs, maxLocs;
+                        matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
+                        Point maxLoc = maxLocs[0];
+                        double maxVal = maxValues[0];
+                        var diffVect = new DiffVect { Location = new Point(x, y), Vector = new Point(maxLoc.X - (x - cmpToRect.X), maxLoc.Y - (y - cmpToRect.Y)), Diff = maxVal };
+                        //Console.WriteLine(" got  " + diffVect);
+                        if (dbgAct != null) dbgAct(new DiffDebug
+                        {
+                            Vect = diffVect,
+                            orig = corped,
+                            area = cmpToCorp,
+                            diffMap = matched,
+                            SrcRect = srcRect,
+                            CompareToRect = cmpToRect,
+                        });
+                        return diffVect;
+                    }
+                }
+            }
         }
 
         public List<DiffVect> GetAllDiffVect()
@@ -215,17 +221,20 @@ namespace netCvLib
             var diffVect = diffs[i];
             var x = diffVect.Location.X;
             int y = diffVect.Location.Y;
-            var corped = new Mat(input, new Rectangle(x, y, CutSize, CutSize));
-            if (compareToImage == null)
-                compareToImage = compareTo.Clone();
-            CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(0));
+            using (var corped = new Mat(input, new Rectangle(x, y, CutSize, CutSize)))
+            {
+                if (compareToImage == null)
+                    compareToImage = compareTo.Clone();
+                CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(0));
 
-            var toRect = new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, CutSize, CutSize);
-            corped.CopyTo(new Mat(compareToImage, toRect));
-            CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(200));
-            CvInvoke.Rectangle(compareToImage, toRect, new MCvScalar(100));           
-            CvInvoke.PutText(compareToImage, diffVect.Diff.ToString("0.00"), ClonePointWithYOff(toRect.Location, 10), FontFace.HersheyPlain, 1, new MCvScalar(10));
-            return compareToImage;
+                var toRect = new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, CutSize, CutSize);
+                corped.CopyTo(new Mat(compareToImage, toRect));
+                CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(200));
+                CvInvoke.Rectangle(compareToImage, toRect, new MCvScalar(100));
+                CvInvoke.Line(compareToImage, new Point(x, y), toRect.Location, new MCvScalar(150));
+                CvInvoke.PutText(compareToImage, diffVect.Diff.ToString("0.00"), ClonePointWithYOff(toRect.Location, 10), FontFace.HersheyPlain, 1, new MCvScalar(10));
+                return compareToImage;
+            }
         }
 
         public Mat ShowAllStepChange(List<DiffVect> diffs)

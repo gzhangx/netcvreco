@@ -19,6 +19,7 @@ namespace netCvLib
     {
         public DiffVector Vector { get; set; }
         public double Diff { get; set; }
+        public List<DiffVect> DebugVectors { get; set; }
     }
     public class VidLoc
     {
@@ -36,7 +37,7 @@ namespace netCvLib
             }
         }
         
-        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp)
+        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp, bool returnAllVects = false)
         {
             var processor = new ShiftVecProcessor(input, comp);
             var all = processor.GetAllDiffVect();
@@ -46,6 +47,7 @@ namespace netCvLib
             {                
                 Diff = averageDiff,
                 Vector = vect,
+                DebugVectors = returnAllVects? all:null,
             };
         }
 
@@ -141,7 +143,7 @@ namespace netCvLib
             prms.vect = curMax.vect;
 
             stream.Pos = curMax.Pos;
-            var diff = CompDiff(curr, stream.GetCurMat());
+            var diff = CompDiff(curr, stream.GetCurMat(), reporter.ReturnDebugVector);
             var nextVect = stream.Vectors[curMax.Pos];
             reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {-diff.Vector.X}");
             //diff: negative if need to turn left
@@ -171,13 +173,13 @@ namespace netCvLib
                 //Console.WriteLine(text);
                 lookBackCount++;
             }
-            
+
+            vidProvider.Pos = origImageInd;
+            driver.Track(realTimeTrack);
             if (debugReporter.DebugMode)
-            {
-                vidProvider.Pos = origImageInd;
+            {                
                 Mat m1 = vidProvider.GetCurMat();
-                breakAndDiff(m1, curImg, debugReporter);
-                driver.Track(realTimeTrack);
+                breakAndDiff(m1, curImg, debugReporter);                
             }
         }        
 
@@ -199,6 +201,7 @@ namespace netCvLib
     public interface BreakDiffDebugReporter
     {
         bool DebugMode { get; }
+        bool ReturnDebugVector { get; }
         void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
         void InfoReport(string info);
     }

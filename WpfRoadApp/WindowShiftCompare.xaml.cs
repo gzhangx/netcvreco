@@ -121,6 +121,11 @@ namespace WpfRoadApp
             }
         }
 
+        public bool ReturnDebugVector
+        {
+            get;set;
+        }
+
         public bool ShouldStopTracking()
         {
             return realTimeTrack.CurPos + 5 >= vidProvider.Total;
@@ -181,21 +186,28 @@ namespace WpfRoadApp
 
 
             var dv = allDiffs[(int)sliderSteps.Value];
-            var dbg = curProcessor.CalculateDiffVectDbg(dv.Location.X, dv.Location.Y);
+            curProcessor.CalculateDiffVectDbg(dv.Location.X, dv.Location.Y, dbg=>
+            {
+                using (var inputMat = curProcessor.input.Clone())
+                {
+                    CvInvoke.Rectangle(inputMat, dbg.SrcRect, new MCvScalar(200));
+                    imageFirst.Source = inputMat.MatToImgSrc();
 
-            var inputMat = curProcessor.input.Clone();
-            CvInvoke.Rectangle(inputMat, dbg.SrcRect, new MCvScalar(200));
-            imageFirst.Source = inputMat.MatToImgSrc();
-
-            var cmpMat = curProcessor.compareTo.Clone();
-            CvInvoke.Rectangle(cmpMat, dbg.CompareToRect, new MCvScalar(200));
-            imageSecond.Source = cmpMat.MatToImgSrc();
-            detailWind.SetMyImg(1, dbg.area);
-            detailWind.SetMyImg(2, dbg.orig);
-            Mat normed = new Mat();
-            //CvInvoke.Normalize(dbg.diffMap.Mat, normed, 0, 255, Emgu.CV.CvEnum.NormType.MinMax);
-            dbg.diffMap.Mat.ConvertTo(normed, Emgu.CV.CvEnum.DepthType.Cv8U, 255);
-            detailWind.SetMyImg(3, normed);
+                    using (var cmpMat = curProcessor.compareTo.Clone())
+                    {
+                        CvInvoke.Rectangle(cmpMat, dbg.CompareToRect, new MCvScalar(200));
+                        imageSecond.Source = cmpMat.MatToImgSrc();
+                        detailWind.SetMyImg(1, dbg.area);
+                        detailWind.SetMyImg(2, dbg.orig);
+                        using (Mat normed = new Mat())
+                        {
+                            //CvInvoke.Normalize(dbg.diffMap.Mat, normed, 0, 255, Emgu.CV.CvEnum.NormType.MinMax);
+                            dbg.diffMap.Mat.ConvertTo(normed, Emgu.CV.CvEnum.DepthType.Cv8U, 255);
+                            detailWind.SetMyImg(3, normed);
+                        }
+                    }
+                }
+            });            
         }
 
         protected ShiftVecProcessor curProcessor = null;
