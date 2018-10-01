@@ -176,11 +176,11 @@ namespace netCvLib
 
             vidProvider.Pos = origImageInd;
             driver.Track(realTimeTrack);
-            if (debugReporter.DebugMode)
-            {                
+            //if (debugReporter.DebugMode)
+            //{                
                 //Mat m1 = vidProvider.GetCurMat();
                 //breakAndDiff(m1, curImg, debugReporter);                
-            }
+            //}
         }        
 
         public static void breakAndDiff(Mat m1, Mat m2, BreakDiffDebugReporter reporter)
