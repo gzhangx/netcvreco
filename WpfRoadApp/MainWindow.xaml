@@ -33,8 +33,8 @@
                 <Button x:Name="openwin" Click="openwin_Click" Margin="1">Open Shfit Compare</Button>
                 <Button x:Name="processToStdSize" Click="processToStdSize_Click" Margin="1">Process Video</Button>
                 <CheckBox x:Name="chkCamTrack" Margin="5" Click="chkCamTrack_Click">CamTrack</CheckBox>
-                <CheckBox x:Name="chkSendCmd" Margin="5" Checked="chkSendCmd_Checked">SendCmd</CheckBox>
-                <CheckBox x:Name="chkStayAtSamePlace" Checked="chkStayAtSamePlace_Checked"></CheckBox>
+                <CheckBox x:Name="chkSendCmd" Margin="5" Click="chkSendCmd_Click">SendCmd</CheckBox>
+                <CheckBox x:Name="chkStayAtSamePlace" Click="chkStayAtSamePlace_Click"></CheckBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Grid.Row="1">
                 <TextBlock Margin="1">Video</TextBlock>

@@ -293,7 +293,7 @@ namespace WpfRoadApp
             }).Start();
         }
 
-        private void chkSendCmd_Checked(object sender, RoutedEventArgs e)
+        private void chkSendCmd_Click(object sender, RoutedEventArgs e)
         {
             if (cmpWin != null)
             {
@@ -314,9 +314,9 @@ namespace WpfRoadApp
                 start.IsEnabled = true;
                 EndRecord();
             }
-        }
+        }        
 
-        private void chkStayAtSamePlace_Checked(object sender, RoutedEventArgs e)
+        private void chkStayAtSamePlace_Click(object sender, RoutedEventArgs e)
         {
             TrackingStats.StayAtSamePlace = chkStayAtSamePlace.IsChecked.GetValueOrDefault();
         }
