@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfRoadApp", "WpfRoadApp\Wp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayLib", "DisplayLib\DisplayLib.csproj", "{62F06848-D0B0-43B1-94A8-F8829E76D2AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "netCvLibTest", "netCvLibTest\netCvLibTest.csproj", "{AB625803-5618-4121-9595-FB57DB67D944}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,14 @@ Global
 		{62F06848-D0B0-43B1-94A8-F8829E76D2AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62F06848-D0B0-43B1-94A8-F8829E76D2AF}.Release|x64.ActiveCfg = Release|x64
 		{62F06848-D0B0-43B1-94A8-F8829E76D2AF}.Release|x64.Build.0 = Release|x64
+		{AB625803-5618-4121-9595-FB57DB67D944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB625803-5618-4121-9595-FB57DB67D944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB625803-5618-4121-9595-FB57DB67D944}.Debug|x64.ActiveCfg = Debug|x64
+		{AB625803-5618-4121-9595-FB57DB67D944}.Debug|x64.Build.0 = Debug|x64
+		{AB625803-5618-4121-9595-FB57DB67D944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB625803-5618-4121-9595-FB57DB67D944}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB625803-5618-4121-9595-FB57DB67D944}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB625803-5618-4121-9595-FB57DB67D944}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
