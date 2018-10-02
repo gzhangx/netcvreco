@@ -136,6 +136,7 @@ namespace netCvLib
         public Mat compareTo { get; protected set; }
 
         public List<DiffVect> DiffVectors { get; protected set; } //only available after calling GetAllDiffVect
+        public NumberGrouper.NumberRange NumberRangeX {get; protected set; }//only available after calling GetAllDiffVect
         public int CutSize
         {
             get
@@ -204,13 +205,22 @@ namespace netCvLib
             for (int y = CutSize; y < input.Height - boundReduce; y += CutSize)
             {
                 for (int x = CutSize; x < input.Width - boundReduce; x += CutSize)
-                {                    
+                {
                     var diffVect = CalculateDiffVect(x, y);
                     //Console.WriteLine(" got  " + diffVect);
                     DiffVectors.Add(diffVect);
                     //corped.CopyTo(new Mat(compareToImage, new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, cutSize, cutSize)));
                 }
             }
+
+            int[] xvalues = new int[DiffVectors.Count];
+            for (var i = 0; i < DiffVectors.Count;i++)
+            {
+                xvalues[i] = DiffVectors[i].Vector.X;
+            }
+            NumberGrouper gp = new NumberGrouper(CutSize);
+            var goodXV = gp.Process(xvalues);
+            NumberRangeX = goodXV[0];
             return DiffVectors;
         }
 
@@ -256,6 +266,18 @@ namespace netCvLib
             var duy = ((double)allDiffs.Take(allDiffs.Count/2).Sum(d => d.Vector.Y)) / allDiffs.Count*2;
             var dly = ((double)allDiffs.Skip(allDiffs.Count / 2).Sum(d => d.Vector.Y)) / allDiffs.Count*2;
             return new DiffVector(dx, duy - dly);
+        }
+
+        public List<DiffVect> DiffVectorsInRange
+        {
+            get
+            {
+                return DiffVectors.Where(v => v.Vector.X > NumberRangeX.Low && v.Vector.X < NumberRangeX.High).ToList();
+            }
+        }
+        public DiffVector calculateTotalVect()
+        {
+            return calculateTotalVect(DiffVectorsInRange);            
         }
     }
 }

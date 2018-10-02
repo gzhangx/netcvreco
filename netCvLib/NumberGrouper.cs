@@ -20,6 +20,8 @@ namespace netCvLib
         protected int[] RangeSpec;
         protected int trim;
         public double ThreadShold = 0.2; //20%
+        public int StepLow = 4;
+        public int StepHigh = 5;
         public NumberGrouper(int range)
         {
             Range = range;
@@ -32,8 +34,8 @@ namespace netCvLib
             foreach (var n in numbers)
             {
                 var un = n + Range;
-                if (n < 0) un = 0;
-                else if (n > max) un = max;
+                if (un < 0) un = 0;
+                else if (un > max) un = max;
                 RangeSpec[un]++;
             }
 
@@ -46,7 +48,7 @@ namespace netCvLib
             }
 
             List<NumberRange> ranges = new List<NumberRange>();
-            for (int step = 1; step < Range / 2; step+=2)
+            for (int step = StepLow; step < StepHigh; step++)
             {                
                 for (int i = trim; i < end; i += step)
                 {

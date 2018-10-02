@@ -40,7 +40,8 @@ namespace netCvLib
         public static DiffVectorWithDiff CompDiff(Mat input, Mat comp, BreakDiffDebugReporter reporter)
         {
             var processor = new ShiftVecProcessor(input, comp);
-            var all = processor.GetAllDiffVect();
+            processor.GetAllDiffVect();
+            var all = processor.DiffVectorsInRange;
             var averageDiff = all.Average(a => a.Diff);
             var vect = ShiftVecProcessor.calculateTotalVect(all);
             if (reporter!= null) reporter.ReportStepChanges(processor, all, vect);
