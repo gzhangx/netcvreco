@@ -134,6 +134,8 @@ namespace netCvLib
         protected Mat compareToOrig;
         public Mat input { get; protected set; }
         public Mat compareTo { get; protected set; }
+
+        public List<DiffVect> DiffVectors { get; protected set; } //only available after calling GetAllDiffVect
         public int CutSize
         {
             get
@@ -197,7 +199,7 @@ namespace netCvLib
 
         public List<DiffVect> GetAllDiffVect()
         {
-            List<DiffVect> difVector = new List<DiffVect>();
+            DiffVectors = new List<DiffVect>();
             int boundReduce = CutSize + CmpExtend;
             for (int y = CutSize; y < input.Height - boundReduce; y += CutSize)
             {
@@ -205,11 +207,11 @@ namespace netCvLib
                 {                    
                     var diffVect = CalculateDiffVect(x, y);
                     //Console.WriteLine(" got  " + diffVect);
-                    difVector.Add(diffVect);
+                    DiffVectors.Add(diffVect);
                     //corped.CopyTo(new Mat(compareToImage, new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, cutSize, cutSize)));
                 }
             }
-            return difVector;
+            return DiffVectors;
         }
 
         public static Point ClonePointWithYOff(Point p, int y)
