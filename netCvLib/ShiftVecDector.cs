@@ -13,6 +13,7 @@ namespace netCvLib
     public class DiffVect
     {
         public Point Location { get; set; }
+        public Rectangle SrcRect { get; set; }
 
         public Point Vector { get; set; }
 
@@ -141,7 +142,7 @@ namespace netCvLib
         {
             get
             {
-                return ShiftVecDector.STDWIDTH / 10;
+                return ShiftVecDector.STDWIDTH / 8;
             }
         }
         public int CmpExtend
@@ -167,7 +168,8 @@ namespace netCvLib
         }
         public DiffVect CalculateDiffVect()
         {
-            return CalculateDiffVectDbg(new Rectangle(CutSize, CutSize, compareTo.Width - CutSize, compareTo.Height - CutSize), null);
+            var cut2 = CutSize * 2;
+            return CalculateDiffVectDbg(new Rectangle(CutSize, CutSize, compareTo.Width - cut2, compareTo.Height - cut2), null);
         }
         public DiffVect CalculateDiffVectDbg(Rectangle srcRect, Action<DiffDebug> dbgAct)
         {
@@ -185,7 +187,7 @@ namespace netCvLib
                         matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
                         Point maxLoc = maxLocs[0];
                         double maxVal = maxValues[0];
-                        var diffVect = new DiffVect { Location = srcRect.Location, Vector = new Point(maxLoc.X - srcRect.X, maxLoc.Y - srcRect.Y), Diff = maxVal };
+                        var diffVect = new DiffVect { Location = srcRect.Location, SrcRect = srcRect, Vector = new Point(maxLoc.X - srcRect.X, maxLoc.Y - srcRect.Y), Diff = maxVal };
                         //Console.WriteLine(" got  " + diffVect);
                         if (dbgAct != null) dbgAct(new DiffDebug
                         {
@@ -231,9 +233,7 @@ namespace netCvLib
 
         public List<DiffVect> GetAllDiffVect()
         {
-            DiffVectors = new List<DiffVect>();
-            int boundReduce = CutSize + CmpExtend;
-            
+            DiffVectors = new List<DiffVect>();                      
             var diffVect = CalculateDiffVect();
             //Console.WriteLine(" got  " + diffVect);
             DiffVectors.Add(diffVect);
@@ -250,15 +250,15 @@ namespace netCvLib
             var diffVect = diffs[i];
             var x = diffVect.Location.X;
             int y = diffVect.Location.Y;
-            using (var corped = new Mat(input, new Rectangle(x, y, CutSize, CutSize)))
+            using (var corped = new Mat(input, diffVect.SrcRect))
             {
                 if (compareToImage == null)
                     compareToImage = compareTo.Clone();
-                CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(0));
+                //CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(0));
 
-                var toRect = new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, CutSize, CutSize);
+                var toRect = new Rectangle(x + diffVect.Vector.X, y + diffVect.Vector.Y, diffVect.SrcRect.Width, diffVect.SrcRect.Height);
                 corped.CopyTo(new Mat(compareToImage, toRect));
-                CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(200));
+                //CvInvoke.Rectangle(compareToImage, new Rectangle(x, y, CutSize, CutSize), new MCvScalar(200));
                 CvInvoke.Rectangle(compareToImage, toRect, new MCvScalar(100));
                 CvInvoke.Line(compareToImage, new Point(x, y), toRect.Location, new MCvScalar(150));
                 CvInvoke.PutText(compareToImage, diffVect.Diff.ToString("0.00"), ClonePointWithYOff(toRect.Location, 10), FontFace.HersheyPlain, 1, new MCvScalar(10));

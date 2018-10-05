@@ -52,7 +52,7 @@ namespace netCvLib
             };
         }
 
-        public static DiffLoc FindInRage(PreVidStream stream, Mat curr, int steping = 10, int from = 0, int to = 0)
+        public static DiffLoc FindInRage(PreVidStream stream, Mat curr, int steping = 1, int from = 0, int to = 0)
         {
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
@@ -98,6 +98,7 @@ namespace netCvLib
             public DiffVector vect { get; set; } //output
             public DiffVector diffVect { get; set; } //debug output, difference to current
             public DiffVector nextVect { get; set; } //debutoutput, what next frame should go
+            public List<DiffLoc> DebugAllLooks { get; set; }
             public int LookAfter = 5;
             //public bool notFound = false;
             public double diff { get; set; }
@@ -133,6 +134,8 @@ namespace netCvLib
                     }
                 }
             }
+
+            prms.DebugAllLooks = processed;
             if (curMax == null || curMax.Pos >= stream.Total - 1)
             {
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");

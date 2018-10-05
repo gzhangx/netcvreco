@@ -237,16 +237,7 @@ namespace WpfRoadApp
         }
 
         public Task CamTracking(Mat curImg)
-        {
-            TDispatch(() =>
-            {
-                imageSecond.Source = MainWindow.Convert(curImg.Bitmap);
-                //realTimeTrack.CurPos = image1Ind;
-                var text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
-                //Console.WriteLine(text);
-                info.Text = text;
-            });
-
+        {            
             return Task.Run(() =>
             {
                 VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
@@ -258,6 +249,18 @@ namespace WpfRoadApp
                         realTimeTrack.CurPos = realTimeTrack.NextPos;
                         slidera.Value = image1Ind;
                     }
+
+                    imageSecond.Source = MainWindow.Convert(curImg.Bitmap);
+                    //realTimeTrack.CurPos = image1Ind;
+                    StringBuilder sb = new StringBuilder();
+                    realTimeTrack.DebugAllLooks.ForEach(p =>
+                    {
+                        sb.Append($" {p.Pos}={p.diff} ");
+                    });
+                    var text = $"Tracked vid at {image1Ind} cam at {realTimeTrack.CurPos} next point {realTimeTrack.NextPos} {realTimeTrack.vect}  ===> diff {realTimeTrack.diff} {sb.ToString()}";
+                    //Console.WriteLine(text);
+                    info.Text = text;
+
                 });
             });
         }
@@ -266,7 +269,7 @@ namespace WpfRoadApp
         {
             TDispatch(() =>
             {
-                info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
+                //info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
                 imageThird.Source = res.MatToImgSrc();
                 sliderSteps.Maximum = diffs.Count - 1;
             });
