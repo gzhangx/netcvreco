@@ -180,7 +180,7 @@ namespace WpfRoadApp
                     Mat mat = null;
                     lock (vidLock)
                     {
-                        mat = vid.QueryFrame();
+                        if (vid != null) mat = vid.QueryFrame();
                     }
                     if (mat == null)
                     {

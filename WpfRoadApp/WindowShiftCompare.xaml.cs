@@ -179,7 +179,7 @@ namespace WpfRoadApp
             Mat res = curProcessor.ShowStepChange(allDiffs, (int)sliderSteps.Value, null);
             imageStepRes.Source = res.MatToImgSrc();
 
-
+            /*
             var dv = allDiffs[(int)sliderSteps.Value];
             curProcessor.CalculateDiffVectDbg(dv.Location.X, dv.Location.Y, dbg=>
             {
@@ -202,7 +202,8 @@ namespace WpfRoadApp
                         }
                     }
                 }
-            });            
+            });     
+            */       
         }
 
         protected ShiftVecProcessor curProcessor = null;

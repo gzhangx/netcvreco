@@ -49,7 +49,7 @@ namespace netCvLib
     }
     public static class ShiftVecDector
     {
-        public const int STDWIDTH = 512;
+        public const int STDWIDTH = 128;
         public static Mat ToGray(this Mat input)
         {
             if (input.ElementSize == 1) return input;
@@ -163,15 +163,19 @@ namespace netCvLib
 
         public DiffVect CalculateDiffVect(int x, int y)
         {
-            return CalculateDiffVectDbg(x, y, null);
+            return CalculateDiffVectDbg(new Rectangle(x, y, CutSize, CutSize), null);
         }
-        public DiffVect CalculateDiffVectDbg(int x, int y, Action<DiffDebug> dbgAct)
+        public DiffVect CalculateDiffVect()
         {
-            var srcRect = new Rectangle(x, y, CutSize, CutSize);
+            return CalculateDiffVectDbg(new Rectangle(CutSize, CutSize, compareTo.Width - CutSize, compareTo.Height - CutSize), null);
+        }
+        public DiffVect CalculateDiffVectDbg(Rectangle srcRect, Action<DiffDebug> dbgAct)
+        {
             using (var corped = new Mat(input, srcRect))
             {
-                var cmpToRect = ShiftVecDector.getExtCropRect(compareTo, x, y, CutSize, CmpExtend);
-                using (var cmpToCorp = new Mat(compareTo, cmpToRect))
+                //var cmpToRect = ShiftVecDector.getExtCropRect(compareTo, x, y, CutSize, CmpExtend);
+                //using (var cmpToCorp = new Mat(compareTo, cmpToRect))
+                var cmpToCorp = compareTo;
                 {
                     //corped.Save(@"d:\temp\test\" + x + "_" + y + ".jpg");
                     using (var matched = cmpToCorp.ToImage<Gray, Byte>().MatchTemplate(corped.ToImage<Gray, Byte>(), TemplateMatchingType.CcoeffNormed))
@@ -181,7 +185,7 @@ namespace netCvLib
                         matched.MinMax(out minValues, out maxValues, out minLocs, out maxLocs);
                         Point maxLoc = maxLocs[0];
                         double maxVal = maxValues[0];
-                        var diffVect = new DiffVect { Location = new Point(x, y), Vector = new Point(maxLoc.X - (x - cmpToRect.X), maxLoc.Y - (y - cmpToRect.Y)), Diff = maxVal };
+                        var diffVect = new DiffVect { Location = srcRect.Location, Vector = new Point(maxLoc.X - srcRect.X, maxLoc.Y - srcRect.Y), Diff = maxVal };
                         //Console.WriteLine(" got  " + diffVect);
                         if (dbgAct != null) dbgAct(new DiffDebug
                         {
@@ -190,7 +194,7 @@ namespace netCvLib
                             area = cmpToCorp,
                             diffMap = matched,
                             SrcRect = srcRect,
-                            CompareToRect = cmpToRect,
+                            //CompareToRect = cmpToRect,
                         });
                         return diffVect;
                     }
@@ -198,7 +202,7 @@ namespace netCvLib
             }
         }
 
-        public List<DiffVect> GetAllDiffVect()
+        public List<DiffVect> GetAllDiffVectOldMultiSmall()
         {
             DiffVectors = new List<DiffVect>();
             int boundReduce = CutSize + CmpExtend;
@@ -221,6 +225,19 @@ namespace netCvLib
             NumberGrouper gp = new NumberGrouper(CutSize);
             var goodXV = gp.Process(xvalues);
             NumberRangeX = goodXV[0];
+            return DiffVectors;
+        }
+
+
+        public List<DiffVect> GetAllDiffVect()
+        {
+            DiffVectors = new List<DiffVect>();
+            int boundReduce = CutSize + CmpExtend;
+            
+            var diffVect = CalculateDiffVect();
+            //Console.WriteLine(" got  " + diffVect);
+            DiffVectors.Add(diffVect);
+                                
             return DiffVectors;
         }
 
@@ -272,7 +289,7 @@ namespace netCvLib
         {
             get
             {
-                return DiffVectors.Where(v => v.Vector.X > NumberRangeX.Low && v.Vector.X < NumberRangeX.High).ToList();
+                return DiffVectors;//.Where(v => v.Vector.X > NumberRangeX.Low && v.Vector.X < NumberRangeX.High).ToList();
             }
         }
         public DiffVector calculateTotalVect()
