@@ -176,8 +176,8 @@ namespace WpfRoadApp
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (curProcessor == null) return;
-            Mat res = curProcessor.ShowStepChange(allDiffs, (int)sliderSteps.Value, null);
-            imageStepRes.Source = res.MatToImgSrc();
+            //Mat res = curProcessor.ShowStepChange(allDiffs, (int)sliderSteps.Value, null);
+            //imageStepRes.Source = res.MatToImgSrc();
 
             /*
             var dv = allDiffs[(int)sliderSteps.Value];
@@ -214,8 +214,8 @@ namespace WpfRoadApp
             vidProvider.Pos = image1Ind;
             Console.WriteLine("Starting find");
             var res = VidLoc.FindInRage(vidProvider, vidProvider.GetCurMat());
-            Console.WriteLine($"Done find {res.Pos} {res.diff.ToString("0.00")}");
-            sliderb.Value = res.Pos;
+            Console.WriteLine($"Done find {res.VidPos} {res.Vector.Diff.ToString("0.00")}");
+            sliderb.Value = res.VidPos;
         }
 
         private void chkConstTracking_Click(object sender, RoutedEventArgs e)
@@ -255,9 +255,9 @@ namespace WpfRoadApp
                     StringBuilder sb = new StringBuilder();
                     realTimeTrack.DebugAllLooks.ForEach(p =>
                     {
-                        sb.Append($" {p.Pos}={p.diff} ");
+                        sb.Append($" {p.VidPos}={p.Vector.Diff.ToString("0.00")} ");
                     });
-                    var text = $"Tracked vid at {image1Ind} cam at {realTimeTrack.CurPos} next point {realTimeTrack.NextPos} {realTimeTrack.vect}  ===> diff {realTimeTrack.diff} {sb.ToString()}";
+                    var text = $"Tracked vid at {image1Ind} cam at {realTimeTrack.CurPos} next point {realTimeTrack.NextPos} {realTimeTrack.vect}  ===> diff {realTimeTrack.diff.ToString("0.00")} {sb.ToString()}";
                     //Console.WriteLine(text);
                     info.Text = text;
 
@@ -265,21 +265,20 @@ namespace WpfRoadApp
             });
         }
 
-        public void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average)
+        public void Report(Mat res, DiffVect vect)
         {
             TDispatch(() =>
             {
                 //info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
                 imageThird.Source = res.MatToImgSrc();
-                sliderSteps.Maximum = diffs.Count - 1;
+                //sliderSteps.Maximum = diffs.Count - 1;
             });
         }
 
-        public void ReportStepChanges(ShiftVecProcessor proc, List<DiffVect> allDiffs, DiffVector vect)
-        {
-            var average = allDiffs.Average(x => x.Diff);
-            Mat res = proc.ShowAllStepChange(allDiffs);
-            Report(res, allDiffs, vect, average);            
+        public void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect)
+        {            
+            Mat res = proc.ShowAllStepChange(vect);
+            Report(res, vect);            
         }
 
         void TDispatch(Action a)

@@ -276,7 +276,7 @@ namespace WpfRoadApp
                     if (prevMat != null)
                     {
                         var diff = VidLoc.CompDiff(prevMat, mat, null);
-                        lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Diff}");
+                        lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Vector.Diff}");
                     }
                     if (prevMat != null) prevMat.Dispose();
                     prevMat = mat;

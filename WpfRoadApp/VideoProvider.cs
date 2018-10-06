@@ -18,7 +18,7 @@ namespace WpfRoadApp
             filePath = path;
             LoadDiffVectors();
         }
-        protected List<DiffVectorWithDiff> vectors = new List<DiffVectorWithDiff>();
+        protected List<DiffVector> vectors = new List<DiffVector>();
         protected void LoadDiffVectors()
         {
             try
@@ -27,11 +27,7 @@ namespace WpfRoadApp
                 foreach(var line in lines)
                 {
                     var pars = line.Split(' ');
-                    vectors.Add(new DiffVectorWithDiff
-                    {
-                        Vector = new DiffVector(double.Parse(pars[0]), double.Parse(pars[1])),
-                        Diff = double.Parse(pars[2]),
-                    });
+                    vectors.Add(new DiffVector(double.Parse(pars[0]), double.Parse(pars[1]), double.Parse(pars[2])));
                 }
             } catch (Exception exc)
             {
@@ -39,7 +35,7 @@ namespace WpfRoadApp
             }
         }
 
-        public List<DiffVectorWithDiff> Vectors
+        public List<DiffVector> Vectors
         {
             get
             {

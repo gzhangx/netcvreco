@@ -12,82 +12,47 @@ namespace netCvLib
         int Total { get; }
         int Pos { get; set; }
         Mat GetCurMat();
-        List<DiffVectorWithDiff> Vectors { get; }
+        List<DiffVector> Vectors { get; }
     }
 
-    public class DiffVectorWithDiff
-    {
-        public DiffVector Vector { get; set; }
-        public double Diff { get; set; }
-        public List<DiffVect> DebugVectors { get; set; }
-    }
     public class VidLoc
     {
-        public class DiffLoc
-        {
-            public int Pos { get; set; }
-            public double diff { get; set; }
-            public List<DiffVect> posVet { get; set; }
-            public DiffVector vect
-            {
-                get
-                {
-                    return ShiftVecProcessor.calculateTotalVect(posVet);
-                }
-            }
-        }
         
-        public static DiffVectorWithDiff CompDiff(Mat input, Mat comp, BreakDiffDebugReporter reporter)
+        public static DiffVect CompDiff(Mat input, Mat comp, BreakDiffDebugReporter reporter)
         {
             var processor = new ShiftVecProcessor(input, comp);
-            processor.GetAllDiffVect();
-            var all = processor.DiffVectorsInRange;
-            var averageDiff = all.Average(a => a.Diff);
-            var vect = ShiftVecProcessor.calculateTotalVect(all);
-            if (reporter!= null) reporter.ReportStepChanges(processor, all, vect);
-            return new DiffVectorWithDiff
-            {                
-                Diff = averageDiff,
-                Vector = vect,
-            };
+            var vect = processor.GetAllDiffVect();            
+            if (reporter!= null) reporter.ReportStepChanges(processor, vect);
+            return vect;
         }
 
-        public static DiffLoc FindInRage(PreVidStream stream, Mat curr, int steping = 1, int from = 0, int to = 0)
+        public static DiffVect FindInRage(PreVidStream stream, Mat curr, int steping = 1, int from = 0, int to = 0)
         {
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
-            DiffLoc curMax = null;
+            DiffVect curMax = null;
             for (int pos = from; pos < to; pos += steping)
             {
                 stream.Pos = pos;
                 var processor = new ShiftVecProcessor(curr, stream.GetCurMat());
                 var all = processor.GetAllDiffVect();
-                var maxGood = all.Average(a => a.Diff);
+                all.VidPos = pos;
+                var maxGood = all.Vector.Diff;
                 if (curMax == null) {
-                    curMax = new VidLoc.DiffLoc
-                    {
-                        diff = maxGood,
-                        Pos = pos,
-                        posVet = all,
-                    };
+                    curMax = all;
                 }
                 else
                 {
-                    if (maxGood > curMax.diff)
+                    if (maxGood > curMax.Vector.Diff)
                     {
-                        curMax = new DiffLoc
-                        {
-                            diff = maxGood,
-                            Pos = pos,
-                            posVet = all,
-                        };
+                        curMax = all;
                     }
                 }
 
             }
             //Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
             if (steping == 1) return curMax;
-            return FindInRage(stream, curr, 1, curMax.Pos - steping, curMax.Pos + steping);
+            return FindInRage(stream, curr, 1, curMax.VidPos - steping, curMax.VidPos + steping);
         }
 
 
@@ -96,9 +61,9 @@ namespace netCvLib
             public int CurPos { get; set; }  //input
             public int NextPos { get; set; }//output
             public DiffVector vect { get; set; } //output
-            public DiffVector diffVect { get; set; } //debug output, difference to current
+            public DiffVect diffVect { get; set; } //debug output, difference to current
             public DiffVector nextVect { get; set; } //debutoutput, what next frame should go
-            public List<DiffLoc> DebugAllLooks { get; set; }
+            public List<DiffVect> DebugAllLooks { get; set; }
             public int LookAfter = 5;
             //public bool notFound = false;
             public double diff { get; set; }
@@ -117,8 +82,8 @@ namespace netCvLib
             int to = from + prms.LookAfter;
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
-            DiffLoc curMax = null;
-            List<DiffLoc> processed = new List<DiffLoc>();
+            DiffVect curMax = null;
+            List<DiffVect> processed = new List<DiffVect>();
             //double dxT = 0, dyT = 0;
             //int numD = 0;
             for (int pos = from; pos < to; pos ++)
@@ -128,7 +93,7 @@ namespace netCvLib
                 if (curMax == null) curMax = loc;
                 else
                 {
-                    if (curMax.diff < loc.diff)
+                    if (curMax.Vector.Diff < loc.Vector.Diff)
                     {
                         curMax = loc;
                     }
@@ -136,26 +101,26 @@ namespace netCvLib
             }
 
             prms.DebugAllLooks = processed;
-            if (curMax == null || curMax.Pos >= stream.Total - 1)
+            if (curMax == null || curMax.VidPos >= stream.Total - 1)
             {
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
                 return;
             }
             //Console.WriteLine($"max at {curMax.Pos} {curMax.diff.ToString("0.00")}");
-            prms.NextPos = curMax.Pos;
-            prms.diff = curMax.diff;
-            prms.vect = curMax.vect;
+            prms.NextPos = curMax.VidPos;
+            prms.diff = curMax.Vector.Diff;
+            prms.vect = curMax.Vector;
 
-            stream.Pos = curMax.Pos;
+            stream.Pos = curMax.VidPos;
             var diff = CompDiff(curr, stream.GetCurMat(), reporter);
-            var nextVect = stream.Vectors[curMax.Pos];
-            reporter.InfoReport($"===> nextX {nextVect.Vector.X} diffX {-diff.Vector.X}");
+            var nextVect = stream.Vectors[curMax.VidPos];
+            reporter.InfoReport($"===> nextX {nextVect.X} diffX {-diff.Vector.X}");
             //diff: negative if need to turn left
             //vect: positive if need to turn left
-            prms.vect = new DiffVector(nextVect.Vector.X - diff.Vector.X, nextVect.Vector.Y - diff.Vector.Y);
+            prms.vect = new DiffVector(nextVect.X - diff.Vector.X, nextVect.Y - diff.Vector.Y, diff.Vector.Diff);
 
-            prms.diffVect = diff.Vector;
-            prms.nextVect = nextVect.Vector;
+            prms.diffVect = diff;
+            prms.nextVect = nextVect;
         }
 
 
@@ -191,13 +156,11 @@ namespace netCvLib
         {
             var curProcessor = new ShiftVecProcessor(m1, m2);
             //Mat res = ShiftVecDector.BreakAndNearMatches(m1, m2);
-            var allDiffs = curProcessor.GetAllDiffVect();
-            var vect = ShiftVecProcessor.calculateTotalVect(allDiffs);
-            var average = allDiffs.Average(x => x.Diff);                        
+            var vect = curProcessor.GetAllDiffVect();                     
 
 
-            Mat res = curProcessor.ShowAllStepChange(allDiffs);
-            reporter.Report(res, allDiffs, vect, average);
+            Mat res = curProcessor.ShowAllStepChange(vect);
+            reporter.Report(res, vect);
             
         }
     }
@@ -205,8 +168,8 @@ namespace netCvLib
     public interface BreakDiffDebugReporter
     {
         bool DebugMode { get; }
-        void Report(Mat res, List<DiffVect> diffs, DiffVector vect, double average);
-        void ReportStepChanges(ShiftVecProcessor proc, List<DiffVect> diffs, DiffVector vect);
+        void Report(Mat res,DiffVect vect);
+        void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect);
         void InfoReport(string info);
     }
 }
