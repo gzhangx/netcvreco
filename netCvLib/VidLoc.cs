@@ -64,7 +64,11 @@ namespace netCvLib
             public DiffVect diffVect { get; set; } //debug output, difference to current
             public DiffVector nextVect { get; set; } //debutoutput, what next frame should go
             public List<DiffVect> DebugAllLooks { get; set; }
-            public int LookAfter = 5;
+            public int LookAfter = 15;
+            public void LookAfterReset()
+            {
+                LookAfter = 15;
+            }
             //public bool notFound = false;
             public double diff { get; set; }
             public void LongLook()
@@ -76,31 +80,34 @@ namespace netCvLib
         }
 
 
+        public static List<DiffVect> SortProcessDiffVects(List<DiffVect> processed)
+        {
+            const double SPREADLIMIT = 0.95;
+            var ordered = processed.OrderByDescending(x => x.Vector.Diff).ToList();
+            var spreadThreadshold = processed[0].Vector.Diff* SPREADLIMIT;
+            return ordered.TakeWhile(x => x.Vector.Diff >= spreadThreadshold).OrderBy(x=>Math.Abs(x.Vector.X) + Math.Abs(x.Vector.Y)).ToList();
+        }
         public static void FindObjectDown(PreVidStream stream, Mat curr, RealTimeTrackLoc prms, BreakDiffDebugReporter reporter)
         {
             int from = prms.CurPos;
             int to = from + prms.LookAfter;
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
-            DiffVect curMax = null;
+            
             List<DiffVect> processed = new List<DiffVect>();
             //double dxT = 0, dyT = 0;
             //int numD = 0;
             for (int pos = from; pos < to; pos ++)
             {
                 var loc = FindInRage(stream, curr, 1, pos, pos + 1);
-                processed.Add(loc);
-                if (curMax == null) curMax = loc;
-                else
-                {
-                    if (curMax.Vector.Diff < loc.Vector.Diff)
-                    {
-                        curMax = loc;
-                    }
-                }
+                processed.Add(loc);                
             }
 
+            processed.OrderByDescending(x => x.Vector.Diff).Take(3);
+
             prms.DebugAllLooks = processed;
+            var sorted = SortProcessDiffVects(processed);
+            var curMax = sorted.FirstOrDefault();
             if (curMax == null || curMax.VidPos >= stream.Total - 1)
             {
                 Console.WriteLine($"max not found from={from} to={to} total={stream.Total}");
@@ -128,7 +135,7 @@ namespace netCvLib
         public static  void CamTracking(Mat curImg, VidLoc.RealTimeTrackLoc realTimeTrack, PreVidStream vidProvider, IDriver driver, BreakDiffDebugReporter debugReporter)
         {
             //realTimeTrack.CurPos = image1Ind;
-            realTimeTrack.LookAfter = 5;
+            realTimeTrack.LookAfterReset();
             int origImageInd = realTimeTrack.CurPos;
             VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
             
