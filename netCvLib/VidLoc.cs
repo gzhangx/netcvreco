@@ -56,7 +56,7 @@ namespace netCvLib
         }
 
 
-        const int LOOKAFTER = 10;
+        const int LOOKAFTER = 5;
         public class RealTimeTrackLoc
         {
             public int CurPos { get; set; }  //input
@@ -121,11 +121,12 @@ namespace netCvLib
 
             stream.Pos = curMax.VidPos;
             var diff = CompDiff(curr, stream.GetCurMat(), reporter);
-            var nextVect = stream.Vectors[curMax.VidPos];
-            reporter.InfoReport($"===> nextX {nextVect.X} diffX {-diff.Vector.X}");
+            var nextVect = stream.Vectors[curMax.VidPos];            
             //diff: negative if need to turn left
             //vect: positive if need to turn left
-            prms.vect = new DiffVector(nextVect.X - diff.Vector.X, nextVect.Y - diff.Vector.Y, diff.Vector.Diff);
+            prms.vect = new DiffVector(nextVect.X + diff.Vector.X, nextVect.Y + diff.Vector.Y, diff.Vector.Diff);
+
+            reporter.InfoReport($"===> {(prms.vect.X>0?"L":"R")} ({prms.vect}) nextX {nextVect.X} diffX {diff.Vector.X}");
 
             prms.diffVect = diff;
             prms.nextVect = nextVect;

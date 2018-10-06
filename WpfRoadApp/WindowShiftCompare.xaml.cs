@@ -255,7 +255,7 @@ namespace WpfRoadApp
                     StringBuilder sb = new StringBuilder();
                     realTimeTrack.DebugAllLooks.ForEach(p =>
                     {
-                        sb.Append($" {p.VidPos}={p.Vector.Diff.ToString("0.00")} ");
+                        sb.Append($" {p.VidPos}={p.Vector.Diff.ToString("0.00")}/{p.Vector.X.ToString("0.0")} ");
                     });
                     var text = $"Tracked vid at {image1Ind} cam at {realTimeTrack.CurPos} next point {realTimeTrack.NextPos} {realTimeTrack.vect}  ===> diff {realTimeTrack.diff.ToString("0.00")} {sb.ToString()}";
                     //Console.WriteLine(text);
