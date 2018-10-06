@@ -56,6 +56,7 @@ namespace netCvLib
         }
 
 
+        const int LOOKAFTER = 10;
         public class RealTimeTrackLoc
         {
             public int CurPos { get; set; }  //input
@@ -64,10 +65,10 @@ namespace netCvLib
             public DiffVect diffVect { get; set; } //debug output, difference to current
             public DiffVector nextVect { get; set; } //debutoutput, what next frame should go
             public List<DiffVect> DebugAllLooks { get; set; }
-            public int LookAfter = 15;
+            public int LookAfter = LOOKAFTER;
             public void LookAfterReset()
             {
-                LookAfter = 15;
+                LookAfter = LOOKAFTER;
             }
             //public bool notFound = false;
             public double diff { get; set; }
