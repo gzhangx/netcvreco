@@ -75,6 +75,7 @@
     <Compile Include="RoadDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftVecDector.cs" />
+    <Compile Include="VideoSaver.cs" />
     <Compile Include="VideoUtil.cs" />
     <Compile Include="VidLoc.cs" />
   </ItemGroup>

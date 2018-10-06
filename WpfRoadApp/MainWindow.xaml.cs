@@ -29,6 +29,7 @@ namespace WpfRoadApp
     public partial class MainWindow : Window
     {
         ILog Logger = LogManager.GetLogger("mainwin");
+        StdVideoSaver videoSaver;
         public static bool DebugMode
         {
             get
@@ -113,13 +114,23 @@ namespace WpfRoadApp
                     MessageBox.Show("No cam detected");
                     return;
                 }
+                if (!TrackingStats.CamTrackEnabled)
+                {
+                    videoSaver = new StdVideoSaver(txtVideoSource.Text, cnt =>
+                     {
+                         Dispatcher.BeginInvoke(new Action(() =>
+                         {
+                             processToStdSize.Content = $"{cnt}";
+                         }));
+                     });
+                }
                 recordCount = 0;
                 vw = null;
                 vid = new VideoCapture(cmdCameras.SelectedIndex);
                 vid.ImageGrabbed += Vid_ImageGrabbed;
                 var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
                 var h = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
-                File.Delete("test.mp4");                
+                File.Delete("test.mp4");
                 //vw = new VideoWriter("test.mp4", -1, 10, new System.Drawing.Size((int)w, (int)h), true);
             }
             vid.Start();
@@ -203,8 +214,12 @@ namespace WpfRoadApp
                             }
                         });
                         return;
+                    }else
+                    {
+                        videoSaver.SaveVid(mat);
+                        ShowMat(mat);
                     }
-                    RecordToVW(mat);
+                    //RecordToVW(mat);
                 }
 
                 inGrab = false;
@@ -216,6 +231,10 @@ namespace WpfRoadApp
         {
             CreateVW(mat.Width, mat.Height);
             vw.Write(mat);
+            ShowMat(mat);
+        }
+        void ShowMat(Mat mat)
+        {
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var ims = Convert(mat.Bitmap);
@@ -244,6 +263,7 @@ namespace WpfRoadApp
 
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
         {
+            return;
             processToStdSize.IsEnabled = false;
             var vidSrc = txtVideoSource.Text;
             new Thread(() =>

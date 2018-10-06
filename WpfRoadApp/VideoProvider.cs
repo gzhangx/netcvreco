@@ -11,7 +11,7 @@ namespace WpfRoadApp
 {
     public class VideoProvider : PreVidStream
     {
-        public const string VECT_FILE = "vect.txt";
+        public const string VECT_FILE = StdVideoSaver.VECT_FILE;
         protected string filePath;
         public VideoProvider(string path)
         {
@@ -65,7 +65,11 @@ namespace WpfRoadApp
             {
                 if (total < 0)
                 {
-                    total = Convert.ToInt32(File.ReadAllText($"{filePath}\\{VideoUtil.VIDINFOFILE}"));
+                    try
+                    {
+                        total = Convert.ToInt32(File.ReadAllText($"{filePath}\\{VideoUtil.VIDINFOFILE}"));
+                    }
+                    catch { }
                 }
                 return total;
             }
