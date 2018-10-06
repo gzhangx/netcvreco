@@ -13,11 +13,6 @@ namespace WpfRoadApp
     {
         public bool sendCommand;
         public static string url = "http://192.168.168.100";
-        protected int endPos;
-        public void SetEndPos(int pos)
-        {
-            endPos = pos;
-        }
 
         public void Stop()
         {
@@ -27,9 +22,9 @@ namespace WpfRoadApp
         public void Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
 
-            if (realTimeTrack.NextPos > endPos - 5)
+            if (realTimeTrack.ShouldStop())
             {
-                Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
+                //Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
                 Stop();
                 return;
             }

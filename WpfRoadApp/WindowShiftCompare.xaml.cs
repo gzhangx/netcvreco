@@ -45,7 +45,7 @@ namespace WpfRoadApp
         {
             vidProvider = new VideoProvider("orig");
             slidera.Maximum = sliderb.Maximum = vidProvider.Total;
-            driver.SetEndPos(vidProvider.Total);
+            realTimeTrack.EndPos = vidProvider.Total;
         }
         DetailsWindow detailWind = new DetailsWindow();
         public WindowShiftCompare()
@@ -123,8 +123,8 @@ namespace WpfRoadApp
         }
 
         public bool ShouldStopTracking()
-        {
-            return realTimeTrack.CurPos + 5 >= vidProvider.Total;
+        {            
+            return realTimeTrack.ShouldStop();
         }
         protected VidLoc.RealTimeTrackLoc realTimeTrack = TrackingStats.RealTimeTrack;
         private void sliderb_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
