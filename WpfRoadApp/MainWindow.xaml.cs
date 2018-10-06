@@ -116,13 +116,7 @@ namespace WpfRoadApp
                 }
                 if (!TrackingStats.CamTrackEnabled)
                 {
-                    videoSaver = new StdVideoSaver(txtVideoSource.Text, cnt =>
-                     {
-                         Dispatcher.BeginInvoke(new Action(() =>
-                         {
-                             processToStdSize.Content = $"{cnt}";
-                         }));
-                     });
+                    videoSaver = new StdVideoSaver(txtVideoSource.Text, cmpWin);
                 }
                 recordCount = 0;
                 vw = null;

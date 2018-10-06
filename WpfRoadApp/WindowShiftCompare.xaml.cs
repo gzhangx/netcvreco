@@ -22,9 +22,9 @@ namespace WpfRoadApp
     /// <summary>
     /// Interaction logic for WindowShiftCompare.xaml
     /// </summary>
-    public partial class WindowShiftCompare : Window, BreakDiffDebugReporter
+    public partial class WindowShiftCompare : Window, BreakDiffDebugReporter, ISaveVideoReport
     {
-        VideoProvider vidProvider = new VideoProvider("orig");
+        VideoProvider vidProvider = null;
         VideoProvider vidProviderNewVid = new VideoProvider("newvid");
         public SimpleDriver driver = new SimpleDriver();
         static ILog Logger = LogManager.GetLogger("ShWin");
@@ -44,14 +44,15 @@ namespace WpfRoadApp
         public void LoadOrig()
         {
             vidProvider = new VideoProvider("orig");
+            slidera.Maximum = sliderb.Maximum = vidProvider.Total;
+            driver.SetEndPos(vidProvider.Total);
         }
         DetailsWindow detailWind = new DetailsWindow();
         public WindowShiftCompare()
         {
             //detailWind.Show();
             InitializeComponent();
-            slidera.Maximum = sliderb.Maximum = vidProvider.Total;
-            driver.SetEndPos(vidProvider.Total);
+            LoadOrig();            
             this.Closing += WindowShiftCompare_Closing;
             //CropAll();
         }
@@ -293,5 +294,13 @@ namespace WpfRoadApp
                 Logger.Info(s);
             });
         }
+
+        void ISaveVideoReport.ShowProg(int i, string s)
+        {
+            TDispatch(() => {
+                info.Text = s;                
+            });
+        }
+
     }
 }

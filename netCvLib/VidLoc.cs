@@ -83,7 +83,7 @@ namespace netCvLib
 
         public static List<DiffVect> SortProcessDiffVects(List<DiffVect> processed)
         {
-            const double SPREADLIMIT = 0.95;
+            const double SPREADLIMIT = 0.70;
             var ordered = processed.OrderByDescending(x => x.Vector.Diff).ToList();
             var spreadThreadshold = processed[0].Vector.Diff* SPREADLIMIT;
             return ordered.TakeWhile(x => x.Vector.Diff >= spreadThreadshold).OrderBy(x=>Math.Abs(x.Vector.X) + Math.Abs(x.Vector.Y)).ToList();
