@@ -187,6 +187,7 @@ namespace WpfRoadApp
                     processToStdSize.Content = "Stop";
                     TrackingStats.CamTrackEnabled = false;
                     chkCamTrack.IsChecked = false;
+                    EndRecord();
                 }
                 processToStdSize.Content = $"Track {trackCount++}";
             });
