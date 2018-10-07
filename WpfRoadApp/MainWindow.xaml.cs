@@ -88,12 +88,12 @@ namespace WpfRoadApp
                 }
                 vv.Dispose();
             }
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            TDispatch(() =>
             {
                 cmdCameras.ItemsSource = AllCams;
                 if (AllCams.Count > 0)
                     cmdCameras.SelectedIndex = AllCams.Count - 1;
-            }));            
+            });            
         }
         private VideoCapture vid;
         private object vidLock = new object();
@@ -107,29 +107,13 @@ namespace WpfRoadApp
 
         protected void StartRecord()
         {
+            recordCount = 0;            
             rc.StartRecording();
-            return;
-            if (vid == null)
-            {
-                if (AllCams.Count == 0)
-                {
-                    MessageBox.Show("No cam detected");
-                    return;
-                }
-                if (!TrackingStats.CamTrackEnabled)
-                {
-                    videoSaver = new StdVideoSaver(txtVideoSource.Text, cmpWin);
-                }
-                recordCount = 0;
-                vw = null;
-                vid = new VideoCapture(cmdCameras.SelectedIndex);
-                vid.ImageGrabbed += Vid_ImageGrabbed;
-                var w = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
-                var h = vid.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
-                File.Delete("test.mp4");
-                //vw = new VideoWriter("test.mp4", -1, 10, new System.Drawing.Size((int)w, (int)h), true);
-            }
-            vid.Start();
+            //if (AllCams.Count == 0)
+            //{
+            //    MessageBox.Show("No cam detected");
+            //    return;
+            //}
         }
 
         protected void CreateVW(int w, int h)
@@ -143,22 +127,6 @@ namespace WpfRoadApp
         {
             rc.EndRecording();
             start.IsEnabled = true;
-            return;
-            if (vid != null)
-            {
-                Logger.Info("End recording");
-                lock (vidLock)
-                {
-                    vid.Stop();
-                    vid.Dispose();
-                    vid = null;
-                }
-                if (vw != null)
-                {
-                    vw.Dispose();
-                }
-                vw = null;                               
-            }
         }
         public static BitmapImage Convert(Bitmap src)
         {
@@ -173,58 +141,6 @@ namespace WpfRoadApp
         }
         bool inGrab = false;
         int recordCount = 0;
-        private void Vid_ImageGrabbed(object sender, EventArgs e)
-        {
-            if (inGrab)
-            {
-                //Console.WriteLine("Skipping frame");
-                return;
-            }
-            inGrab = true;
-            //Thread.Sleep(50);
-            Console.WriteLine($"Processiing {recordCount++}");
-            //this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (vid != null)
-                {
-                    Mat mat = null;
-                    lock (vidLock)
-                    {
-                        if (vid != null) mat = vid.QueryFrame();
-                    }
-                    if (mat == null)
-                    {
-                        inGrab = false;
-                        return;
-                    }
-                    ShiftVecDector.ResizeToStdSize(mat);
-                    if (TrackingStats.CamTrackEnabled)
-                    {
-                        cmpWin.CamTracking(mat).ContinueWith(t =>
-                        {
-                            inGrab = false;
-                            if (cmpWin.ShouldStopTracking())
-                            {
-                                EndRecord();
-                            }
-                            if (SaveVideoWhileDriving)
-                            {
-                                RecordToVW(mat);
-                            }
-                        });
-                        return;
-                    }else
-                    {
-                        videoSaver.SaveVid(mat);
-                        ShowMat(mat);
-                    }
-                    //RecordToVW(mat);
-                }
-
-                inGrab = false;
-            }
-            //));            
-        }
 
         void RecordToVW(Mat mat)
         {
@@ -236,14 +152,14 @@ namespace WpfRoadApp
         {
             var cm = new Mat();
             mat.CopyTo(cm);
-            Dispatcher.BeginInvoke(new Action(() =>
+            TDispatch(() =>
             {
                 using (cm)
                 {
                     var ims = Convert(cm.Bitmap);
                     mainCanv.Source = ims;
                 }
-            }));
+            });
         }
 
         private void end_Click(object sender, RoutedEventArgs e)
@@ -267,56 +183,6 @@ namespace WpfRoadApp
 
         private void processToStdSize_Click(object sender, RoutedEventArgs e)
         {
-            return;
-            processToStdSize.IsEnabled = false;
-            var vidSrc = txtVideoSource.Text;
-            new Thread(() =>
-            {
-                VideoUtil.SaveVideo(@"test.mp4", mat =>
-                {
-                    ShiftVecDector.ResizeToStdSize(mat);
-                    //Util.Rot90(mat, Util.RotType.CW);
-                    return mat;
-                }, (ind, all) =>
-                {
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        processToStdSize.Content = $"{ind}/{all}";
-                        if (ind >= all -1)
-                        {
-                            processToStdSize.Content = "Process Video";
-                            //processToStdSize.IsEnabled = true;
-                        }
-                    }));
-                }, vidSrc);
-
-                VideoProvider vidProvider = new VideoProvider(vidSrc);
-                Mat prevMat = null;
-                List<string> lines = new List<string>();
-                for (int i = 0; i < vidProvider.Total; i++)
-                {
-                    vidProvider.Pos = i;
-                    var mat = vidProvider.GetCurMat();
-                    if (prevMat != null)
-                    {
-                        var diff = VidLoc.CompDiff(prevMat, mat, null);
-                        lines.Add($"{diff.Vector.X} {diff.Vector.Y} {diff.Vector.Diff}");
-                    }
-                    if (prevMat != null) prevMat.Dispose();
-                    prevMat = mat;
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        processToStdSize.Content = $"vid {i}/{vidProvider.Total}";
-                        if (i>= vidProvider.Total - 1)
-                        {
-                            processToStdSize.Content = "Process Video";
-                            processToStdSize.IsEnabled = true;
-                        }
-                    }));
-                }
-                if (prevMat != null) prevMat.Dispose();
-                File.WriteAllLines($"{vidSrc}\\vect.txt", lines);
-            }).Start();
         }
 
         private void chkSendCmd_Click(object sender, RoutedEventArgs e)
@@ -329,23 +195,48 @@ namespace WpfRoadApp
 
         private void chkCamTrack_Click(object sender, RoutedEventArgs e)
         {
+            trackCount = 0;
             TrackingStats.CamTrackEnabled = chkCamTrack.IsChecked.GetValueOrDefault();
             if (TrackingStats.CamTrackEnabled)
             {
                 cmpWin.LoadOrig();
-                start.IsEnabled = false;
-                StartRecord();
+                start.IsEnabled = false;                
             }else
             {
                 start.IsEnabled = true;
-                EndRecord();
             }
         }        
 
+        void TDispatch(Action act)
+        {
+            Dispatcher.BeginInvoke(new Action(act));
+        }
         private void chkStayAtSamePlace_Click(object sender, RoutedEventArgs e)
         {
             TrackingStats.StayAtSamePlace = chkStayAtSamePlace.IsChecked.GetValueOrDefault();
         }
 
+        void RVReporter.Recorded()
+        {
+            TDispatch(() =>
+            {
+                processToStdSize.Content = $"Record {recordCount++}";
+            });
+        }
+
+        int trackCount = 0;
+        void RVReporter.Tracked()
+        {
+            TDispatch(() =>
+            {
+                if (cmpWin.ShouldStopTracking())
+                {
+                    processToStdSize.Content = "Stop";
+                    TrackingStats.CamTrackEnabled = false;
+                    chkCamTrack.IsChecked = false;
+                }
+                processToStdSize.Content = $"Track {trackCount++}";
+            });
+        }
     }
 }

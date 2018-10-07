@@ -12,6 +12,8 @@ namespace WpfRoadApp
     public interface RVReporter
     {
         void ShowMat(Mat mat);
+        void Recorded();
+        void Tracked();
     }
     public class RoadVideoCapture
     {
@@ -58,7 +60,8 @@ namespace WpfRoadApp
             {
                 cmpWin.CamTracking(mat).ContinueWith(t =>
                 {
-                    inGrab = false;                    
+                    inGrab = false;
+                    reporter.Tracked();
                 });
                 return;
             }
@@ -66,7 +69,11 @@ namespace WpfRoadApp
             {
                 lock (videoSaverLock)
                 {
-                    if (videoSaver != null) videoSaver.SaveVid(mat);
+                    if (videoSaver != null)
+                    {
+                        videoSaver.SaveVid(mat);
+                        reporter.Recorded();
+                    }
                 }
                 inGrab = false;
             }
