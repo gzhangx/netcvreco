@@ -131,7 +131,7 @@ namespace netCvLib
             //vect: positive if need to turn left
             prms.vect = new DiffVector(nextVect.X + diff.Vector.X, nextVect.Y + diff.Vector.Y, diff.Vector.Diff);
 
-            reporter.InfoReport($"===> {(prms.vect.X>0?"L":"R")} ({prms.vect}) nextX {nextVect.X} diffX {diff.Vector.X}");
+            reporter.InfoReport($"===> {(prms.vect.X>0?"L":"R")} ({prms.vect}) nextX {nextVect.X} diffX {diff.Vector.X} pos {curMax.VidPos}");
 
             prms.diffVect = diff;
             prms.nextVect = nextVect;
