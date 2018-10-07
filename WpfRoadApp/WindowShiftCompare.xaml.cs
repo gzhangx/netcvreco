@@ -45,6 +45,8 @@ namespace WpfRoadApp
         {
             vidProvider = new VideoProvider("orig");
             slidera.Maximum = sliderb.Maximum = vidProvider.Total;
+            vidProviderNewVid = new VideoProvider("newvid");
+            sliderb.Maximum = vidProviderNewVid.Total;
             realTimeTrack.EndPos = vidProvider.Total;
         }
         DetailsWindow detailWind = new DetailsWindow();
@@ -141,7 +143,10 @@ namespace WpfRoadApp
                     if (vidProviderNewVid.Pos >= vidProviderNewVid.Total)
                         vidProviderNewVid.Pos = vidProviderNewVid.Total - 1;
                     var mat = vidProviderNewVid.GetCurMat();
-                    CamTracking(mat);
+                    CamTracking(mat).ContinueWith(t =>
+                    {
+                        TDispatch(() => { breakAndDiff(); });
+                    });
                     return;
                 }
 

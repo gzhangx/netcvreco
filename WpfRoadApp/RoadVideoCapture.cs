@@ -30,12 +30,17 @@ namespace WpfRoadApp
             gv = new GZVideoCapture(grabbed, ind);
         }
 
-        public void StartRecording()
+        public void StartRecording(string name = "orig")
         {
             lock (videoSaverLock)
             {
-                videoSaver = new StdVideoSaver("orig", cmpWin);
+                videoSaver = new StdVideoSaver(name, cmpWin);
             }
+        }
+
+        public void StartRecordingNew()
+        {
+            StartRecording("newvid");
         }
         public void EndRecording()
         {

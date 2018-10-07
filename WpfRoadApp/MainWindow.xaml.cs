@@ -1,24 +1,11 @@
-﻿using DisplayLib;
-using Emgu.CV;
+﻿using Emgu.CV;
 using log4net;
-using netCvLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfRoadApp.Properties;
 
 namespace WpfRoadApp
@@ -29,7 +16,6 @@ namespace WpfRoadApp
     public partial class MainWindow : Window, RVReporter
     {
         ILog Logger = LogManager.GetLogger("mainwin");
-        StdVideoSaver videoSaver;
         public static bool DebugMode
         {
             get
@@ -64,39 +50,7 @@ namespace WpfRoadApp
         {
             System.Windows.Application.Current.Shutdown();
         }
-
-        public class CamInfo
-        {
-            public int Id { get; set; }
-            public string Name { get
-                {
-                    return $"Cam {Id + 1}";
-                }
-            }
-        }
-        List<CamInfo> AllCams = new List<CamInfo>();
-        protected void fillCameras()
-        {
-            AllCams.Clear();
-            for (int i = 0; i < 1; i++)
-            {
-                Console.WriteLine($"Tracing {i}");
-                var vv = new VideoCapture(Settings.Default.CameraId);
-                if (vv.IsOpened)
-                {
-                    AllCams.Add(new CamInfo { Id = i });
-                }
-                vv.Dispose();
-            }
-            TDispatch(() =>
-            {
-                cmdCameras.ItemsSource = AllCams;
-                if (AllCams.Count > 0)
-                    cmdCameras.SelectedIndex = AllCams.Count - 1;
-            });            
-        }
-        private VideoCapture vid;
-        private object vidLock = new object();
+     
 
         private VideoWriter vw;
         private void start_Click(object sender, RoutedEventArgs e)
@@ -139,7 +93,6 @@ namespace WpfRoadApp
             image.EndInit();
             return image;
         }
-        bool inGrab = false;
         int recordCount = 0;
 
         void RecordToVW(Mat mat)
@@ -181,10 +134,6 @@ namespace WpfRoadApp
             }
         }
 
-        private void processToStdSize_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
         private void chkSendCmd_Click(object sender, RoutedEventArgs e)
         {
             if (cmpWin != null)
@@ -200,9 +149,13 @@ namespace WpfRoadApp
             if (TrackingStats.CamTrackEnabled)
             {
                 cmpWin.LoadOrig();
-                start.IsEnabled = false;                
-            }else
+                start.IsEnabled = false;
+                recordCount = 0;
+                rc.StartRecordingNew();
+            }
+            else
             {
+                EndRecord();
                 start.IsEnabled = true;
             }
         }        

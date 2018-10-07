@@ -32,7 +32,7 @@ namespace WpfRoadApp
             {
                 var dir = -(int)(realTimeTrack.vect.X *20);
                 Console.WriteLine($"driving {dir} {realTimeTrack.vect.X.ToString("0.0")}");
-                Drive($"steer/{dir}/80");
+                Drive($"steer/{dir}/100");
             }
         }
 
