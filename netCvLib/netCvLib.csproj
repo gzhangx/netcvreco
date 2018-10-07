@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="harrc.cs" />
     <Compile Include="IDriver.cs" />
     <Compile Include="NumberGrouper.cs" />
     <Compile Include="RMatFilter.cs" />
