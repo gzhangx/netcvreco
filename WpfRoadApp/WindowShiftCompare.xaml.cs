@@ -237,8 +237,10 @@ namespace WpfRoadApp
             vidProviderNewVid = new VideoProvider(txtSimulationDir.Text);
         }
 
-        public Task CamTracking(Mat curImg)
-        {            
+        public Task CamTracking(Mat curImgToBeDestroyed)
+        {
+            var curImg = new Mat();
+            curImgToBeDestroyed.CopyTo(curImg);
             return Task.Run(() =>
             {
                 VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
@@ -262,6 +264,7 @@ namespace WpfRoadApp
                     //Console.WriteLine(text);
                     info.Text = text;
 
+                    curImg.Dispose();
                 });
             });
         }

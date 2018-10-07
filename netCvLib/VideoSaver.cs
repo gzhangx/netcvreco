@@ -43,8 +43,10 @@ namespace netCvLib
                 }                
                 File.AppendAllText(VectFileName, $"{diff.Vector.X} {diff.Vector.Y} {diff.Vector.Diff}\n");
                 Reporter.ShowProg(curVidNum, $"{diff.Vector.X} {diff.Vector.Y}");
-            }
-            prevMat = mat;
+                prevMat.Dispose();
+            }            
+            prevMat = new Mat();
+            mat.CopyTo(prevMat);
             mat.Save($"{folderName}\\vid{curVidNum}.jpg");            
             Reporter.ShowProg(curVidNum,"");
             curVidNum++;

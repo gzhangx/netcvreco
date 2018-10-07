@@ -26,7 +26,7 @@ namespace WpfRoadApp
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, RVReporter
     {
         ILog Logger = LogManager.GetLogger("mainwin");
         StdVideoSaver videoSaver;
@@ -45,6 +45,7 @@ namespace WpfRoadApp
             }
         }
         protected WindowShiftCompare cmpWin = new WindowShiftCompare();
+        protected RoadVideoCapture rc;
         public MainWindow()
         {
             InitializeComponent();
@@ -52,12 +53,10 @@ namespace WpfRoadApp
             this.Left = 0;
             this.Top = 0;
             cmpWin.Left = this.Left + this.Width;
-            cmpWin.Top = 0;
-            new Thread(() =>
-            {
-                fillCameras();
-            }).Start();
+            cmpWin.Top = 0;            
 
+
+            rc = new RoadVideoCapture(cmpWin, this);
             this.Closing += MainWindow_Closing;
         }
 
@@ -102,11 +101,14 @@ namespace WpfRoadApp
         private VideoWriter vw;
         private void start_Click(object sender, RoutedEventArgs e)
         {
+            start.IsEnabled = false;
             StartRecord();
         }
 
         protected void StartRecord()
         {
+            rc.StartRecording();
+            return;
             if (vid == null)
             {
                 if (AllCams.Count == 0)
@@ -139,6 +141,9 @@ namespace WpfRoadApp
         }
         protected void EndRecord()
         {
+            rc.EndRecording();
+            start.IsEnabled = true;
+            return;
             if (vid != null)
             {
                 Logger.Info("End recording");
@@ -227,12 +232,17 @@ namespace WpfRoadApp
             vw.Write(mat);
             ShowMat(mat);
         }
-        void ShowMat(Mat mat)
+        public void ShowMat(Mat mat)
         {
+            var cm = new Mat();
+            mat.CopyTo(cm);
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                var ims = Convert(mat.Bitmap);
-                mainCanv.Source = ims;
+                using (cm)
+                {
+                    var ims = Convert(cm.Bitmap);
+                    mainCanv.Source = ims;
+                }
             }));
         }
 
@@ -336,5 +346,6 @@ namespace WpfRoadApp
         {
             TrackingStats.StayAtSamePlace = chkStayAtSamePlace.IsChecked.GetValueOrDefault();
         }
+
     }
 }
