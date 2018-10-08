@@ -31,7 +31,7 @@
                 <Button x:Name="start" Click="start_Click" Margin="1">Start Record</Button>
                 <Button x:Name="end" Click="end_Click" Margin="1">End Record</Button>
                 <Button x:Name="openwin" Click="openwin_Click" Margin="1">Open Shfit Compare</Button>
-                <Button x:Name="processToStdSize" Margin="1">Process Video</Button>
+                <Button x:Name="btnReset" Click="btnReset_Click" Margin="1">Reset</Button>
                 <CheckBox x:Name="chkCamTrack" Margin="5" Click="chkCamTrack_Click">CamTrack</CheckBox>
                 <CheckBox x:Name="chkSendCmd" Margin="5" Click="chkSendCmd_Click">SendCmd</CheckBox>
                 <CheckBox x:Name="chkStayAtSamePlace" Click="chkStayAtSamePlace_Click"></CheckBox>

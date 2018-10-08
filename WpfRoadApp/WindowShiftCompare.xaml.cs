@@ -89,6 +89,11 @@ namespace WpfRoadApp
 
         private void slidera_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            ProcessSliderA();
+        }
+
+        public void ProcessSliderA()
+        {
             if (slideraval != null)
             {
                 slideraval.Text = slidera.Value.ToString("0");
@@ -98,6 +103,15 @@ namespace WpfRoadApp
                 {
                     realTimeTrack.CurPos = image1Ind;
                 }
+            }
+        }
+
+        public void ResetSliderA()
+        {
+            if (!TrackingStats.CamTrackEnabled)
+            {
+                slidera.Value = 0;
+                ProcessSliderA();
             }
         }
 

@@ -150,6 +150,7 @@ namespace WpfRoadApp
             if (TrackingStats.CamTrackEnabled)
             {
                 cmpWin.LoadOrig();
+                cmpWin.ProcessSliderA();
                 start.IsEnabled = false;
                 recordCount = 0;
                 rc.StartRecordingNew();
@@ -174,7 +175,7 @@ namespace WpfRoadApp
         {
             TDispatch(() =>
             {
-                processToStdSize.Content = $"Record {recordCount++}";
+                btnReset.Content = $"Record {recordCount++}";
             });
         }
 
@@ -186,7 +187,7 @@ namespace WpfRoadApp
             {
                 if (cmpWin.ShouldStopTracking())
                 {
-                    processToStdSize.Content = "Stop";
+                    btnReset.Content = "Stop";
                     TrackingStats.CamTrackEnabled = false;
                     chkCamTrack.IsChecked = false;
                     EndRecord();
@@ -194,10 +195,15 @@ namespace WpfRoadApp
                     ts.SetResult(true);
                     return;
                 }
-                processToStdSize.Content = $"Track {trackCount++}";
+                btnReset.Content = $"Track {trackCount++}";
                 ts.SetResult(false);
             });
             return ts.Task;
+        }
+
+        private void btnReset_Click(object sender, RoutedEventArgs e)
+        {
+            cmpWin.ResetSliderA();
         }
     }
 }
