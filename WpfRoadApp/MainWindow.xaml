@@ -39,6 +39,7 @@
             <StackPanel Orientation="Horizontal" Grid.Row="1">
                 <TextBlock Margin="1">Video</TextBlock>
                 <TextBox x:Name="txtVideoSource" Text="orig" Width="200" Margin="1"></TextBox>
+                <Button x:Name="processingInd">Ind</Button>
             </StackPanel>
         </Grid>
         

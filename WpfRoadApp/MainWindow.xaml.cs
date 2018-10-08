@@ -45,6 +45,12 @@ namespace WpfRoadApp
 
             rc = new RoadVideoCapture(cmpWin, this);
             this.Closing += MainWindow_Closing;
+            cmpWin.InProcessing = processing =>
+            {
+                TDispatch(() => {
+                    processingInd.Background = processing ? System.Windows.Media.Brushes.Red : System.Windows.Media.Brushes.Green;
+                });
+            };
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

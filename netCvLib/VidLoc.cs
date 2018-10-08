@@ -146,7 +146,9 @@ namespace netCvLib
             if (!realTimeTrack.ShouldStop())
             {
                 int origImageInd = realTimeTrack.CurPos;
+                debugReporter.ReportInProcessing(true);
                 VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
+                debugReporter.ReportInProcessing(false);
 
                 //var lookBackCount = 0;
                 //while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
@@ -188,5 +190,6 @@ namespace netCvLib
         void Report(Mat res,DiffVect vect);
         void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect);
         void InfoReport(string info);
+        void ReportInProcessing(bool processing);
     }
 }

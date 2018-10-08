@@ -29,6 +29,8 @@ namespace WpfRoadApp
         public SimpleDriver driver = new SimpleDriver();
         static ILog Logger = LogManager.GetLogger("ShWin");
 
+        public Action<bool> InProcessing = null;
+
         protected int image1Ind = 1, image2Ind = 1;
         bool constChecking = false;
         BitmapImage GetImageAt(int i)
@@ -135,6 +137,14 @@ namespace WpfRoadApp
             get
             {
                 return MainWindow.DebugMode;
+            }
+        }
+
+        bool BreakDiffDebugReporter.DebugMode
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -329,5 +339,12 @@ namespace WpfRoadApp
             });
         }
 
+        void BreakDiffDebugReporter.ReportInProcessing(bool processing)
+        {
+            if (InProcessing != null)
+            {
+                InProcessing(processing);
+            }
+        }
     }
 }
