@@ -13,7 +13,7 @@ namespace WpfRoadApp
     {
         void ShowMat(Mat mat);
         void Recorded();
-        void Tracked();
+        Task Tracked();
     }
     public class RoadVideoCapture
     {
@@ -64,9 +64,11 @@ namespace WpfRoadApp
             if (TrackingStats.CamTrackEnabled)
             {
                 cmpWin.CamTracking(mat).ContinueWith(t =>
-                {
-                    inGrab = false;
-                    reporter.Tracked();
+                {                    
+                    reporter.Tracked().ContinueWith(t1=>
+                    {
+                        inGrab = false;
+                    });
                 });
                 return;
             }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using WpfRoadApp.Properties;
@@ -178,8 +179,9 @@ namespace WpfRoadApp
         }
 
         int trackCount = 0;
-        void RVReporter.Tracked()
+        Task RVReporter.Tracked()
         {
+            var ts = new TaskCompletionSource<bool>();
             TDispatch(() =>
             {
                 if (cmpWin.ShouldStopTracking())
@@ -188,9 +190,13 @@ namespace WpfRoadApp
                     TrackingStats.CamTrackEnabled = false;
                     chkCamTrack.IsChecked = false;
                     EndRecord();
+                    ts.SetResult(true);
+                    return;
                 }
                 processToStdSize.Content = $"Track {trackCount++}";
+                ts.SetResult(false);
             });
+            return ts.Task;
         }
     }
 }
