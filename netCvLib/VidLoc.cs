@@ -143,21 +143,24 @@ namespace netCvLib
         {
             //realTimeTrack.CurPos = image1Ind;
             realTimeTrack.LookAfterReset();
-            int origImageInd = realTimeTrack.CurPos;
-            VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
-            
-            //var lookBackCount = 0;
-            //while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
-            //{
-            //    driver.Stop();
-            //    realTimeTrack.LongLook();
-            //    VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
-            //    //info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
-            //    //Console.WriteLine(text);
-            //    lookBackCount++;
-            //}
+            if (!realTimeTrack.ShouldStop())
+            {
+                int origImageInd = realTimeTrack.CurPos;
+                VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
 
-            vidProvider.Pos = origImageInd;
+                //var lookBackCount = 0;
+                //while (realTimeTrack.diff < 0.5 && lookBackCount < 3)
+                //{
+                //    driver.Stop();
+                //    realTimeTrack.LongLook();
+                //    VidLoc.FindObjectDown(vidProvider, curImg, realTimeTrack, debugReporter);
+                //    //info.Text = text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff} LB {lookBackCount}";
+                //    //Console.WriteLine(text);
+                //    lookBackCount++;
+                //}
+
+                vidProvider.Pos = origImageInd;
+            }
             driver.Track(realTimeTrack);
             //if (debugReporter.DebugMode)
             //{                

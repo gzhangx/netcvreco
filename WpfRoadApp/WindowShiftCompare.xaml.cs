@@ -171,6 +171,11 @@ namespace WpfRoadApp
             }
         }
 
+        internal void StopDrive()
+        {
+            driver.Stop();
+        }
+
         void breakAndDiff()
         {
             vidProvider.Pos = image1Ind;

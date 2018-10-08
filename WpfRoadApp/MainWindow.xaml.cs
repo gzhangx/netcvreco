@@ -190,6 +190,7 @@ namespace WpfRoadApp
                     TrackingStats.CamTrackEnabled = false;
                     chkCamTrack.IsChecked = false;
                     EndRecord();
+                    cmpWin.StopDrive();
                     ts.SetResult(true);
                     return;
                 }

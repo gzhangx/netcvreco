@@ -63,12 +63,16 @@ namespace WpfRoadApp
             ShiftVecDector.ResizeToStdSize(mat);
             if (TrackingStats.CamTrackEnabled)
             {
+                if(cmpWin.ShouldStopTracking())
+                {
+                    inGrab = false;
+                    reporter.Tracked();
+                    return;
+                }
                 cmpWin.CamTracking(mat).ContinueWith(t =>
-                {                    
-                    reporter.Tracked().ContinueWith(t1=>
-                    {
-                        inGrab = false;
-                    });
+                {
+                    inGrab = false;
+                    reporter.Tracked();
                 });
                 return;
             }
