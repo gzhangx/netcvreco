@@ -57,9 +57,7 @@ namespace WpfRoadApp
         {
             System.Windows.Application.Current.Shutdown();
         }
-     
-
-        private VideoWriter vw;
+             
         private void start_Click(object sender, RoutedEventArgs e)
         {
             start.IsEnabled = false;
@@ -77,13 +75,7 @@ namespace WpfRoadApp
             //}
         }
 
-        protected void CreateVW(int w, int h)
-        {
-            if (vw == null)
-            {
-                vw = new VideoWriter("test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size(w, h), true);
-            }
-        }
+        
         protected void EndRecord()
         {
             rc.EndRecording();
@@ -101,13 +93,7 @@ namespace WpfRoadApp
             return image;
         }
         int recordCount = 0;
-
-        void RecordToVW(Mat mat)
-        {
-            CreateVW(mat.Width, mat.Height);
-            vw.Write(mat);
-            ShowMat(mat);
-        }
+        
         public void ShowMat(Mat mat)
         {
             var cm = new Mat();
@@ -159,7 +145,7 @@ namespace WpfRoadApp
                 cmpWin.ProcessSliderA();
                 start.IsEnabled = false;
                 recordCount = 0;
-                rc.StartRecordingNew();
+                rc.StartRecordingNew(chkSaveAsMp4.IsChecked.GetValueOrDefault());
             }
             else
             {

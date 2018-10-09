@@ -30,23 +30,36 @@ namespace WpfRoadApp
             gv = new GZVideoCapture(grabbed, ind);
         }
 
-        public void StartRecording(string name = "orig")
+        public void StartRecording(string name = "orig", bool saveAsMp4 = false)
         {
             lock (videoSaverLock)
             {
-                videoSaver = new StdVideoSaver(name, cmpWin);
+                videoSaver = new StdVideoSaver(name, cmpWin, saveAsMp4);
             }
         }
 
-        public void StartRecordingNew()
+        public void StartRecordingNew(bool saveMp4)
         {
-            StartRecording("newvid");
+            StartRecording("newvid", saveMp4);
         }
         public void EndRecording()
         {
             lock (videoSaverLock)
             {
+                if (videoSaver != null) videoSaver.StopRecording();
                 videoSaver = null;
+            }
+        }
+
+        void SaveVideo(Mat mat)
+        {
+            lock (videoSaverLock)
+            {
+                if (videoSaver != null)
+                {
+                    videoSaver.SaveVid(mat);
+                    reporter.Recorded();
+                }
             }
         }
 
@@ -74,18 +87,12 @@ namespace WpfRoadApp
                     inGrab = false;
                     reporter.Tracked();
                 });
+                SaveVideo(mat);
                 return;
             }
             else
             {
-                lock (videoSaverLock)
-                {
-                    if (videoSaver != null)
-                    {
-                        videoSaver.SaveVid(mat);
-                        reporter.Recorded();
-                    }
-                }
+                SaveVideo(mat);
                 inGrab = false;
             }
         }

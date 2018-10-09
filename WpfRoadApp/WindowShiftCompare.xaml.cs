@@ -303,20 +303,27 @@ namespace WpfRoadApp
             });
         }
 
-        public void Report(Mat res, DiffVect vect)
+        public void Report(Mat resD, DiffVect vect)
         {
+            Mat res = new Mat();
+            resD.CopyTo(res);
             TDispatch(() =>
             {
                 //info.Text = "Diff Vect " + vect + " average " + average.ToString("0.00");
-                imageThird.Source = res.MatToImgSrc();
+                using (res)
+                {
+                    imageThird.Source = res.MatToImgSrc();
+                }
                 //sliderSteps.Maximum = diffs.Count - 1;
             });
         }
 
         public void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect)
-        {            
-            Mat res = proc.ShowAllStepChange(vect);
-            Report(res, vect);            
+        {
+            using (Mat res = proc.ShowAllStepChange(vect))
+            {
+                Report(res, vect);
+            }
         }
 
         void TDispatch(Action a)

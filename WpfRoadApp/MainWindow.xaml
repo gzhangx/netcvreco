@@ -40,6 +40,7 @@
                 <TextBlock Margin="1">Video</TextBlock>
                 <TextBox x:Name="txtVideoSource" Text="orig" Width="200" Margin="1"></TextBox>
                 <Button x:Name="processingInd">Ind</Button>
+                <CheckBox x:Name="chkSaveAsMp4" Margin="5">SaveMP4</CheckBox>
             </StackPanel>
         </Grid>
         

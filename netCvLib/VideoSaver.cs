@@ -15,12 +15,14 @@ namespace netCvLib
         protected int curVidNum = 0;
         protected Mat prevMat = null;
         protected ISaveVideoReport Reporter;
-        public StdVideoSaver(string folder, ISaveVideoReport reporter)
+        public StdVideoSaver(string folder, ISaveVideoReport reporter, bool saveAsMp4)
         {
             folderName = folder;
             Directory.CreateDirectory(folder);
             File.WriteAllText(VectFileName, "");
             Reporter = reporter;
+
+            saveMp4 = saveAsMp4;
         }
 
         protected string VectFileName
@@ -33,6 +35,7 @@ namespace netCvLib
         public void SaveVid(Mat mat)
         {
             ShiftVecDector.ResizeToStdSize(mat);
+            RecordToVW(mat);
             if (prevMat != null)
             {
                 var diff = VidLoc.CompDiff(prevMat, mat, null);
@@ -51,6 +54,31 @@ namespace netCvLib
             Reporter.ShowProg(curVidNum,"");
             curVidNum++;
             File.WriteAllText($"{folderName}\\{VideoUtil.VIDINFOFILE}", curVidNum.ToString());
+        }
+
+        public void StopRecording()
+        {
+            if (vw != null)
+            {
+                vw.Dispose();
+            }
+        }
+        private VideoWriter vw;
+        bool saveMp4;
+        protected void CreateVW(int w, int h)
+        {
+            if (vw == null && saveMp4)
+            {
+                vw = new VideoWriter($"{folderName}\\test.mp4", VideoWriter.Fourcc('P', 'I', 'M', '1'), 10, new System.Drawing.Size(w, h), true);
+            }
+        }
+        void RecordToVW(Mat mat)
+        {
+            if (saveMp4)
+            {
+                CreateVW(mat.Width, mat.Height);
+                vw.Write(mat);
+            }
         }
     }
 
