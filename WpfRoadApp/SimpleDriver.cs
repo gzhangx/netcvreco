@@ -17,7 +17,7 @@ namespace WpfRoadApp
         public void Stop()
         {
             Console.WriteLine("Stoping");            
-            Drive($"/steer/100/400");            
+            Drive($"steer/100/400");            
         }
         public void Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
@@ -63,7 +63,7 @@ namespace WpfRoadApp
                 response.Close();
             } catch (Exception exc)
             {
-                Console.WriteLine($"Driver Failure {exc.Message}");
+                Console.WriteLine($"Driver Failure {exc.Message} {data}");
             }
         }
     }
