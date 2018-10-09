@@ -167,10 +167,7 @@ namespace WpfRoadApp
                     if (vidProviderNewVid.Pos >= vidProviderNewVid.Total)
                         vidProviderNewVid.Pos = vidProviderNewVid.Total - 1;
                     var mat = vidProviderNewVid.GetCurMat();
-                    CamTracking(mat).ContinueWith(t =>
-                    {
-                        TDispatch(() => { breakAndDiff(); });
-                    });
+                    CamTracking(mat);
                     return;
                 }
 
@@ -179,34 +176,16 @@ namespace WpfRoadApp
                 {
                     vidProvider.Pos = image2Ind;
                     Mat m1 = vidProvider.GetCurMat();
-                    CamTracking(m1).ContinueWith(t =>
-                    {
-                        TDispatch(() => { breakAndDiff(); });
-                    });
-                    //realTimeTrack.CurPos = image1Ind;
-                    //realTimeTrack.LookAfter = 30;
-                    //VidLoc.FindObjectDown(vidProvider, m1, realTimeTrack);
-                    //info.Text = $"Tracked vid at ${image1Ind} cam at ${image2Ind} next point ${realTimeTrack.NextPos} ${realTimeTrack.vect}  ===> diff {realTimeTrack.diff}";
-                    //slidera.Value = realTimeTrack.NextPos - 1;
+                    CamTracking(m1);
                     return;
                 }
-
-                breakAndDiff();
+                
             }
         }
 
         internal void StopDrive()
         {
             driver.Stop();
-        }
-
-        void breakAndDiff()
-        {
-            vidProvider.Pos = image1Ind;
-            Mat m1 = vidProvider.GetCurMat();
-            vidProvider.Pos = image2Ind;
-            Mat m2 = vidProvider.GetCurMat();
-            VidLoc.breakAndDiff(m1, m2, this);
         }
         private void sliderSteps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
