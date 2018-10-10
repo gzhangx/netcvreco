@@ -25,8 +25,22 @@ namespace netCvLib
                 result = results[0];
             }
             debugReporter.ReportInProcessing(false);
+            realTimeTrack.CurPos = 0;            
             DiffVect vect = new DiffVect();
-            debugReporter.ReportStepChanges(new StepChangeReporter(curImg, results, result), vect);
+            vect.Vector = realTimeTrack.vect;
+            debugReporter.ReportStepChanges(new StepChangeReporter(curImg, results, result), vect);            
+            if (result.Width == 0)
+            {
+                debugReporter.InfoReport($"NA");
+                driver.Stop();
+            }
+            else
+            {                
+                double diff = (curImg.Width / 2) - ((result.X + result.Width) / 2);
+                debugReporter.InfoReport($"{(diff > 0? "L":"R") } diff {diff.ToString("0.0")} imw ${((result.X + result.Width) / 2)}");
+                realTimeTrack.vect = new DiffVector(diff, 0, 0);
+                driver.Track(realTimeTrack);
+            }            
         }
 
         
