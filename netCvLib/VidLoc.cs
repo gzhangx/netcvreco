@@ -188,8 +188,16 @@ namespace netCvLib
     {
         bool DebugMode { get; }
         void Report(Mat res,DiffVect vect);
-        void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect);
+        void ReportStepChanges(ICanShowStepChange proc, DiffVect vect);
         void InfoReport(string info);
         void ReportInProcessing(bool processing);
+    }
+
+    public class VideoLockCamTrack : ICamTrackable
+    {
+        public void CamTracking(Mat curImg, VidLoc.RealTimeTrackLoc realTimeTrack, PreVidStream vidProvider, IDriver driver, BreakDiffDebugReporter debugReporter)
+        {
+            VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, debugReporter);
+        }
     }
 }

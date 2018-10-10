@@ -130,7 +130,7 @@ namespace netCvLib
         //}
     }
 
-    public class ShiftVecProcessor
+    public class ShiftVecProcessor: ICanShowStepChange
     {
         protected Mat inputOrig;
         protected Mat compareToOrig;

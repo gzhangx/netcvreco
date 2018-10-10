@@ -29,6 +29,12 @@ namespace WpfRoadApp
         public SimpleDriver driver = new SimpleDriver();
         static ILog Logger = LogManager.GetLogger("ShWin");
 
+        ICamTrackable camTrack = new VideoLockCamTrack();
+
+        public void SetCamTrack(ICamTrackable ct)
+        {
+            camTrack = ct;
+        }
         public Action<bool> InProcessing = null;
 
         protected int image1Ind = 1, image2Ind = 1;
@@ -256,7 +262,7 @@ namespace WpfRoadApp
             curImgToBeDestroyed.CopyTo(curImg);
             return Task.Run(() =>
             {
-                VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
+                camTrack.CamTracking(curImg, realTimeTrack, vidProvider, driver, this);
                 TDispatch(() =>
                 {
                     if (realTimeTrack.NextPos > 0 && !TrackingStats.StayAtSamePlace)
@@ -269,10 +275,13 @@ namespace WpfRoadApp
                     imageSecond.Source = MainWindow.Convert(curImg.Bitmap);
                     //realTimeTrack.CurPos = image1Ind;
                     StringBuilder sb = new StringBuilder();
-                    realTimeTrack.DebugAllLooks.ForEach(p =>
+                    if (realTimeTrack.DebugAllLooks != null)
                     {
-                        sb.Append($" {p.VidPos}={p.Vector.Diff.ToString("0.00")}/{p.Vector.X.ToString("0.0")} ");
-                    });
+                        realTimeTrack.DebugAllLooks.ForEach(p =>
+                        {
+                            sb.Append($" {p.VidPos}={p.Vector.Diff.ToString("0.00")}/{p.Vector.X.ToString("0.0")} ");
+                        });
+                    }
                     var text = $"Tracked vid at {image1Ind} cam at {realTimeTrack.CurPos} next point {realTimeTrack.NextPos} {realTimeTrack.vect}  ===> diff {realTimeTrack.diff.ToString("0.00")} {sb.ToString()}";
                     //Console.WriteLine(text);
                     info.Text = text;
@@ -297,7 +306,7 @@ namespace WpfRoadApp
             });
         }
 
-        public void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect)
+        public void ReportStepChanges(ICanShowStepChange proc, DiffVect vect)
         {
             using (Mat res = proc.ShowAllStepChange(vect))
             {

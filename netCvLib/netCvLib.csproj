@@ -70,6 +70,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="harrc.cs" />
+    <Compile Include="HarrCascadeCamTrack.cs" />
+    <Compile Include="ICamTrackable.cs" />
+    <Compile Include="ICanShowStepChange.cs" />
     <Compile Include="IDriver.cs" />
     <Compile Include="NumberGrouper.cs" />
     <Compile Include="RMatFilter.cs" />
