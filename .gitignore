@@ -4,3 +4,5 @@
 /$tf
 /.vs/netCvReco/v15/Server/sqlite3
 /packages
+/tests/lidarTest/obj
+/tests/lidarTest/bin
