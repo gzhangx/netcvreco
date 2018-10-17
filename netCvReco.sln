@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayLib", "DisplayLib\Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "netCvLibTest", "netCvLibTest\netCvLibTest.csproj", "{AB625803-5618-4121-9595-FB57DB67D944}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X4Lidar", "X4Lidar\X4Lidar.csproj", "{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{AB625803-5618-4121-9595-FB57DB67D944}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB625803-5618-4121-9595-FB57DB67D944}.Release|x64.ActiveCfg = Release|Any CPU
 		{AB625803-5618-4121-9595-FB57DB67D944}.Release|x64.Build.0 = Release|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Debug|x64.ActiveCfg = Debug|x64
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Debug|x64.Build.0 = Debug|x64
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Release|x64.ActiveCfg = Release|Any CPU
+		{368AD5B6-55F8-4C80-9D14-CCCE88C4C83A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
