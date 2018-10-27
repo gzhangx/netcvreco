@@ -319,10 +319,17 @@ namespace WpfRoadApp
             Dispatcher.BeginInvoke(new Action(a));
         }
 
-        public void InfoReport(string s)
+        public void InfoReport(string s, bool isLR)
         {
             TDispatch(() => {
-                info2.Text = s;
+
+                if (isLR)
+                {
+                    lrReport.Text = s;
+                }else
+                {
+                    info2.Text = s;
+                }
                 Logger.Info(s);
             });
         }
