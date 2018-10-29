@@ -99,6 +99,7 @@
     <Compile Include="NameSel.cs" />
     <Compile Include="RoadVideoCapture.cs" />
     <Compile Include="SimpleDriver.cs" />
+    <Compile Include="SimpleHttpServer.cs" />
     <Compile Include="TrackingStats.cs" />
     <Compile Include="VideoProvider.cs" />
     <Compile Include="WindowShiftCompare.xaml.cs">
