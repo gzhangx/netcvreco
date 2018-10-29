@@ -1,6 +1,7 @@
 ﻿using com.veda.Win32Serial;
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,10 @@ namespace AdurinoTest
         }
         static void Main(string[] args)
         {
+            foreach(var pn in SerialPort.GetPortNames())
+            {
+                Console.WriteLine(pn);
+            }
             W32Serial ser = new W32Serial();
             ser.Open("COM3", 9600);
             ser.Start(new Capp());
