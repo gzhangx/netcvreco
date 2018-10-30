@@ -4,6 +4,7 @@
     using System.Net.Http;
     using Unosquare.Labs.EmbedIO;
     using Unosquare.Labs.EmbedIO.Modules;
+    using Unosquare.Net;
 
     public class SimpleHttpServer
     {
@@ -22,8 +23,7 @@
 
                 // Here we setup serving of static files
                
-                server.RegisterModule(new WebApiModule());
-                server.Module<WebApiModule>().RegisterController<SteerController>();
+                
                 // We don't need to add the line below. The default document is always index.html.
                 //server.Module<Modules.StaticFilesWebModule>().DefaultDocument = "index.html";
                 server.RegisterModule(new StaticFilesModule("../netcvreco/web/drive-app/build"));
@@ -31,6 +31,8 @@
                 server.Module<StaticFilesModule>().UseRamCache = false;
                 server.Module<StaticFilesModule>().DefaultExtension = ".html";
 
+                server.RegisterModule(new WebApiModule());
+                server.Module<WebApiModule>().RegisterController<SteerController>();
                 // Once we've registered our modules and configured them, we call the RunAsync() method.
                 server.RunAsync();
             }
@@ -38,18 +40,22 @@
 
         public class SteerController: WebApiController {
            
-            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/r/{id}")]
-            public string GetR(int id)
+            public class resp
+            {
+                public string msg { get; set; }
+            }
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
+            public bool GetR(WebServer server, HttpListenerContext context, int id)
             {
                 Console.WriteLine("Rotate " + id);
-                return id.ToString();
+                return context.JsonResponse(new resp {  msg="r "+id});
             }
 
-            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/d/{id}")]
-            public string Drive(int id)
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
+            public bool Drive(WebServer server, HttpListenerContext context, int id)
             {
                 Console.WriteLine("Drive " + id);
-                return id.ToString();
+                return context.JsonResponse(new resp { msg = "d " + id });
             }
         }
     }
