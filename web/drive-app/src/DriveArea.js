@@ -20,8 +20,8 @@ class DriveArea extends Component{
         y = parseInt(y/20);
         this.setState({ x, y });
 
-        api.cmdReq(`r/${x}`);
-        api.cmdReq(`d/${y}`);
+        api.cmdReq(`api/r/${x}`);
+        api.cmdReq(`api/d/${y}`);
     }
 
     render() {
