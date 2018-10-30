@@ -39,7 +39,7 @@ namespace netCvLib
             if (prevMat != null)
             {
                 var diff = VidLoc.CompDiff(prevMat, mat, null);
-                Reporter.InfoReport($"At {curVidNum} diff {diff.Vector.X} {diff.Vector.Y}");
+                Reporter.InfoReport($"At {curVidNum} diff {diff.Vector.X} {diff.Vector.Y}", false);
                 if (Math.Abs(diff.Vector.X) < 0.01 && Math.Abs(diff.Vector.Y) < 0.01)
                 {
                     return;
@@ -85,6 +85,6 @@ namespace netCvLib
     public interface ISaveVideoReport
     {
         void ShowProg(int i, string s);
-        void InfoReport(string s);
+        void InfoReport(string s, bool isLR);
     }
 }

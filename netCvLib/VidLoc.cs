@@ -90,16 +90,18 @@ namespace netCvLib
         {
             const double SPREADLIMIT = 0.70;
             var ordered = processed.OrderByDescending(x => x.Vector.Diff).ToList();
-            var spreadThreadshold = processed[0].Vector.Diff* SPREADLIMIT;
-            return ordered.TakeWhile(x => x.Vector.Diff >= spreadThreadshold).OrderBy(x=>Math.Abs(x.Vector.X) + Math.Abs(x.Vector.Y)).ToList();
+            return ordered;
+            //var spreadThreadshold = processed[0].Vector.Diff* SPREADLIMIT;
+            //return ordered.TakeWhile(x => x.Vector.Diff >= spreadThreadshold).OrderBy(x=>Math.Abs(x.Vector.X) + Math.Abs(x.Vector.Y)).ToList();
         }
         public static void FindObjectDown(PreVidStream stream, Mat curr, RealTimeTrackLoc prms, BreakDiffDebugReporter reporter)
         {
-            int from = prms.CurPos;
-            int to = from + prms.LookAfter;
+            const int LookBack = 2;
+            int from = prms.CurPos - LookBack;
+            int to = from + prms.LookAfter + LookBack;
             if (to == 0 || to > stream.Total) to = stream.Total;
             if (from < 0) from = 0;
-            
+            var skipAvgs = prms.CurPos >= LookBack ? LookBack : LookBack - prms.CurPos; 
             List<DiffVect> processed = new List<DiffVect>();
             //double dxT = 0, dyT = 0;
             //int numD = 0;
@@ -109,10 +111,15 @@ namespace netCvLib
                 processed.Add(loc);                
             }
 
-            processed.OrderByDescending(x => x.Vector.Diff).Take(3);
+            if (processed[2].Vector.Diff > 0.5)
+            {
+                for (var i = 0; i < LookBack; i++)
+                    processed.RemoveAt(0);
+            }
+            //processed.OrderByDescending(x => x.Vector.Diff).Take(3);
 
             prms.DebugAllLooks = processed;
-            var sorted = SortProcessDiffVects(processed);
+            var sorted = SortProcessDiffVects(processed).Take(5);
             var curMax = sorted.FirstOrDefault();
             if (curMax == null || curMax.VidPos >= stream.Total - 1)
             {
@@ -126,12 +133,13 @@ namespace netCvLib
 
             stream.Pos = curMax.VidPos;
             var diff = CompDiff(curr, stream.GetCurMat(), reporter);
-            var nextVect = stream.Vectors[curMax.VidPos];            
+            //var nextVect = stream.Vectors[curMax.VidPos];  //orig way
+            var nextVect = new DiffVector(sorted.Average(x => x.Vector.X), sorted.Average(y => y.Vector.Y), sorted.Average(d => d.Vector.Diff));
             //diff: negative if need to turn left
             //vect: positive if need to turn left
-            prms.vect = new DiffVector(nextVect.X + diff.Vector.X, nextVect.Y + diff.Vector.Y, diff.Vector.Diff);
+            prms.vect = new DiffVector(nextVect.X + (diff.Vector.X/10.0), nextVect.Y + diff.Vector.Y, diff.Vector.Diff);
 
-            reporter.InfoReport($"===> {(prms.vect.X>0?"L":"R")} ({prms.vect}) nextX {nextVect.X} diffX {diff.Vector.X} pos {curMax.VidPos}");
+            reporter.InfoReport($"===> {(prms.vect.X>0?"L":"R")} ({prms.vect}) nextX {nextVect.X} diffX {diff.Vector.X} pos {curMax.VidPos}", true);
 
             prms.diffVect = diff;
             prms.nextVect = nextVect;
@@ -188,8 +196,16 @@ namespace netCvLib
     {
         bool DebugMode { get; }
         void Report(Mat res,DiffVect vect);
-        void ReportStepChanges(ShiftVecProcessor proc, DiffVect vect);
-        void InfoReport(string info);
+        void ReportStepChanges(ICanShowStepChange proc, DiffVect vect);
+        void InfoReport(string info, bool isLR);
         void ReportInProcessing(bool processing);
+    }
+
+    public class VideoLockCamTrack : ICamTrackable
+    {
+        public void CamTracking(Mat curImg, VidLoc.RealTimeTrackLoc realTimeTrack, PreVidStream vidProvider, IDriver driver, BreakDiffDebugReporter debugReporter)
+        {
+            VidLoc.CamTracking(curImg, realTimeTrack, vidProvider, driver, debugReporter);
+        }
     }
 }

@@ -96,8 +96,10 @@
     <Compile Include="DetailsWindow.xaml.cs">
       <DependentUpon>DetailsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NameSel.cs" />
     <Compile Include="RoadVideoCapture.cs" />
     <Compile Include="SimpleDriver.cs" />
+    <Compile Include="SimpleHttpServer.cs" />
     <Compile Include="TrackingStats.cs" />
     <Compile Include="VideoProvider.cs" />
     <Compile Include="WindowShiftCompare.xaml.cs">
@@ -154,6 +156,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\com.veda.Win32Serial\com.veda.Win32Serial.csproj">
+      <Project>{474455b2-ca77-4713-a68e-25979ead4814}</Project>
+      <Name>com.veda.Win32Serial</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DisplayLib\DisplayLib.csproj">
       <Project>{62f06848-d0b0-43b1-94a8-f8829e76d2af}</Project>
       <Name>DisplayLib</Name>

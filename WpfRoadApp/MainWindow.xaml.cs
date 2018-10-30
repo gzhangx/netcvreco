@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using log4net;
+using netCvLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -50,6 +51,12 @@ namespace WpfRoadApp
                 TDispatch(() => {
                     processingInd.Background = processing ? System.Windows.Media.Brushes.Red : System.Windows.Media.Brushes.Green;
                 });
+            };
+
+            cmdCameras.ItemsSource = new List<NameSel>
+            {
+                new NameSel { Name="VidLoc" },
+                new NameSel { Name="Face" },
             };
         }
 
@@ -196,6 +203,18 @@ namespace WpfRoadApp
         private void btnReset_Click(object sender, RoutedEventArgs e)
         {
             cmpWin.ResetSliderA();
+        }
+
+        private void cmdCameras_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var sel = (NameSel)(cmdCameras.SelectedValue);
+            if (sel.Name == "VidLoc")
+            {
+                cmpWin.SetCamTrack(new VideoLockCamTrack());
+            }else if (sel.Name == "Face")
+            {
+                cmpWin.SetCamTrack(new HarrCascadeCamTrack());
+            }
         }
     }
 }

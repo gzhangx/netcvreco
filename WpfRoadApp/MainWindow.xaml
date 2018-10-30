@@ -12,7 +12,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="60"></RowDefinition>
         </Grid.RowDefinitions>
         <Image x:Name="mainCanv"></Image>
         <Grid Grid.Row="1">
@@ -21,7 +21,7 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Row="0">
-                <ComboBox x:Name="cmdCameras" Margin="5">
+                <ComboBox x:Name="cmdCameras" Margin="1" SelectionChanged="cmdCameras_SelectionChanged">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" Margin="4"/>
