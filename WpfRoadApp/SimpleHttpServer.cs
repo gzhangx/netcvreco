@@ -1,43 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace WpfRoadApp
+﻿namespace WpfRoadApp
 {
+    using System;
+    using System.Net.Http;
+    using Unosquare.Labs.EmbedIO;
+    using Unosquare.Labs.EmbedIO.Modules;
+
     public class SimpleHttpServer
     {
+        /// <summary>
+        /// Defines the entry point of the application.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
         public void Start()
         {
-            TcpListener lsn = new TcpListener(IPAddress.Any, 80);
-            new Thread(() =>
+            var url = "http://localhost:80/";
+
+            // Our web server is disposable.
+            var server = new WebServer(url, Unosquare.Labs.EmbedIO.Constants.RoutingStrategy.Regex);
             {
-                while (true)
-                {
-                    var cli = lsn.AcceptTcpClient();
-                    ListenSocket(cli);
-                }
-            }).Start();
-            lsn.Start();
+                //server.RegisterModule(new LocalSessionModule());
+
+                // Here we setup serving of static files
+               
+                server.RegisterModule(new WebApiModule());
+                server.Module<WebApiModule>().RegisterController<SteerController>();
+                // We don't need to add the line below. The default document is always index.html.
+                //server.Module<Modules.StaticFilesWebModule>().DefaultDocument = "index.html";
+                server.RegisterModule(new StaticFilesModule("../netcvreco/web/drive-app/build"));
+                // The static files module will cache small files in ram until it detects they have been modified.
+                server.Module<StaticFilesModule>().UseRamCache = false;
+                server.Module<StaticFilesModule>().DefaultExtension = ".html";
+
+                // Once we've registered our modules and configured them, we call the RunAsync() method.
+                server.RunAsync();
+            }
         }
 
-        protected async void ListenSocket(TcpClient cli)
-        {
-            try
+        public class SteerController: WebApiController {
+           
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/r/{id}")]
+            public string GetR(int id)
             {
-                var stream = cli.GetStream();
-                StreamReader sr = new StreamReader(stream);
-                var firstLine = await sr.ReadLineAsync();
-                stream.Close();
+                Console.WriteLine("Rotate " + id);
+                return id.ToString();
             }
-            catch (Exception exc)
+
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/d/{id}")]
+            public string Drive(int id)
             {
-                Console.WriteLine(exc.ToString());
+                Console.WriteLine("Drive " + id);
+                return id.ToString();
             }
         }
     }

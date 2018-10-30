@@ -58,12 +58,14 @@ namespace WpfRoadApp
             realTimeTrack.EndPos = vidProvider.Total;
         }
         DetailsWindow detailWind = new DetailsWindow();
+        public SimpleHttpServer httpServer = new SimpleHttpServer();
         public WindowShiftCompare()
         {
             //detailWind.Show();
             InitializeComponent();
             LoadOrig();            
             this.Closing += WindowShiftCompare_Closing;
+            httpServer.Start();
             //CropAll();
         }
 
