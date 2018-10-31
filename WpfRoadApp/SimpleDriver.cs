@@ -12,7 +12,11 @@ namespace WpfRoadApp
 {
     public class SimpleDriver : IDriver
     {
-        W32Serial comm;
+        public static SerialControl comm = new SerialControl();
+        public SimpleDriver()
+        {
+            comm.init(new Capp());
+        }
         public bool sendCommand;
         public static string url = "http://192.168.168.100";
 
@@ -42,26 +46,16 @@ namespace WpfRoadApp
                 if (dir == 0) driveDir = baseAng;
                 if (dir > 0) driveDir = baseAng + 20;
                 if (dir < 0) driveDir = baseAng - 20;
-                WriteComm("R" + driveDir);
+                comm.WriteComm("R" + driveDir);
             }
         }
 
         public void Drive(int level)
         {
             if (!sendCommand) return;
-            WriteComm("D" + level);
+            comm.WriteComm("D" + level);
         }
 
-        void WriteComm(string s)
-        {
-            if (comm == null)
-            {
-                comm = new W32Serial();
-                comm.Open("COM3", 9600);
-                comm.Start(new Capp());
-            }
-            comm.WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s+"\n"));
-        }
 
         class Capp : IComApp
         {

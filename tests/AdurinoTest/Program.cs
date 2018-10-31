@@ -24,7 +24,15 @@ namespace AdurinoTest
     {
         static void WriteStr(W32Serial ser, string str)
         {
-            ser.WriteComm(ASCIIEncoding.ASCII.GetBytes(str + "\n"));
+            var buf = ASCIIEncoding.ASCII.GetBytes(str + "\n");
+            ser.WriteComm(new W32Serial.SerWriteInfo
+            {
+                buf = buf,
+                Done = (ok, err) =>
+                {
+                    Console.WriteLine("err " + ok);
+                }
+            });
         }
         static void Main(string[] args)
         {

@@ -16,9 +16,14 @@ namespace com.veda.Win32Serial
         void OnStart(W32Serial ser);
         void OnData(byte[] buf);
     }
+
+    public interface IComError
+    {
+        void OnError(string err, bool finished);
+    }
     public class W32Serial
     {
-        protected Thread _thread;
+        protected Task _thread;
         protected bool threadStarted = false;
         protected void throwWinErr(string text)
         {
@@ -32,6 +37,12 @@ namespace com.veda.Win32Serial
             return errorMessage;
         }
         protected IntPtr m_hCommPort = IntPtr.Zero;
+
+        protected IComError onErr;
+        public void SetErrorListener(IComError err)
+        {
+            onErr = err;
+        }
         public void Open(string comPortName = "COM3", int baudRate = 128000)
         {
             if (m_hCommPort != IntPtr.Zero) return;
@@ -50,12 +61,22 @@ namespace com.veda.Win32Serial
             {
                 int err = Marshal.GetLastWin32Error();
                 string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+                if (onErr != null)
+                {
+                    onErr.OnError("Open com failed " + errorMessage, true);
+                    return;
+                }
                 throwWinErr("Open com failed ");
             }
 
             const uint EV_RXCHAR = 1, EV_TXEMPTY = 4;
             if (!GWin32.SetCommMask(m_hCommPort, EV_RXCHAR | EV_TXEMPTY))
             {
+                if (onErr != null)
+                {
+                    onErr.OnError("Failed to Set Comm Mask", true);
+                    return;
+                }
                 throwWinErr("Failed to Set Comm Mask");
             }
 
@@ -63,6 +84,11 @@ namespace com.veda.Win32Serial
             dcb.DCBLength = (uint)Marshal.SizeOf(dcb);
             if (!GWin32.GetCommState(m_hCommPort, ref dcb))
             {
+                if (onErr != null)
+                {
+                    onErr.OnError("CSerialCommHelper : Failed to Get Comm State", true);
+                    return;
+                }
                 throwWinErr("CSerialCommHelper : Failed to Get Comm State");
             }
 
@@ -80,6 +106,11 @@ namespace com.veda.Win32Serial
             dcb.Binary = true;
             if (!GWin32.SetCommState(m_hCommPort, ref dcb))
             {
+                if (onErr != null)
+                {
+                    onErr.OnError("CSerialCommHelper : Failed to Get Comm State", true);
+                    return;
+                }
                 throwWinErr("CSerialCommHelper : Failed to Set Comm State");
             }
 
@@ -97,6 +128,7 @@ namespace com.veda.Win32Serial
         {
             GWin32.CloseHandle(m_hCommPort);
             m_hCommPort = IntPtr.Zero;
+            threadStarted = false;
         }
 
         protected void SetTimeout(uint tm = GWin32.INFINITE)
@@ -105,13 +137,59 @@ namespace com.veda.Win32Serial
             commTimeouts.ReadIntervalTimeout = tm;
             GWin32.SetCommTimeouts(m_hCommPort, ref commTimeouts);
         }
+
+        public class SerWriteInfo
+        {
+            public byte[] buf { get; set; }
+            public Action<uint, string> Done { get; set; }
+        }
+        private List<SerWriteInfo> _writeQueue = new List<SerWriteInfo>();
+        private object _writeQueueLock = new object();
         public void Start(IComApp app)
         {            
             GWin32.PurgeComm(m_hCommPort, 0x0004 | 0x0008);
             app.OnStart(this);
             if (_thread != null) return;
-            threadStarted = true;            
-            _thread = new Thread(() =>
+            threadStarted = true;
+            new Thread(() =>
+            {
+                while (threadStarted)
+                {
+                    if (m_hCommPort == IntPtr.Zero) break;
+                    SerWriteInfo wi = null;
+                    lock(_writeQueueLock)
+                    {
+                        if (_writeQueue.Count == 0) continue;
+                        Monitor.Wait(_writeQueueLock);
+                        wi = _writeQueue[0];
+                        _writeQueue.RemoveAt(0);
+                    }
+                    //if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                    //continue;
+                    if (wi == null || wi.buf == null || wi.buf.Length == 0)
+                    {
+                        if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                        continue;
+                    }
+                    NativeOverlapped ov = new System.Threading.NativeOverlapped();
+                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
+                    {
+                        if (err != 0)
+                        {
+                            if (wi.Done != null) try { wi.Done(err, "Write come done " + err); } catch { };
+                        }
+                        else if (wi.Done != null) try { wi.Done(b, "OK"); } catch { };
+                    }))
+                    {
+                        //Console.WriteLine("failed write comm " + getWinErr());
+                        if (wi.Done != null) try { wi.Done(255, "failed write comm " + getWinErr()); } catch { };
+                    }
+                    // IOCompletion routine is only called once this thread is in an alertable wait state.
+                    gwait(); //only with thread
+                }
+                Console.WriteLine("Com Write Queue done");
+            }).Start();
+            _thread = Task.Run(() =>
             {
                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 try
@@ -171,33 +249,48 @@ namespace com.veda.Win32Serial
                 {
                     _thread = null;
                     threadStarted = false;
+                    if (onErr != null)
+                    {
+                        onErr.OnError("InvalidOperationException " + iv.Message, true);
+                        return;
+                    }
                     Console.WriteLine("InvalidOperationException " + iv.Message);
                 }
+                Close();
+                onErr.OnError("thread done", true);
                 Console.WriteLine("thread done");
             });
-            _thread.Start();
         }
 
         protected void gwait()
         {
             GWin32.SleepEx(GWin32.INFINITE, true);
         }
-        public void WriteComm(byte[] buf)
+        public void WriteComm(SerWriteInfo wi)
         {
+            if (wi == null) return;
+            lock(_writeQueueLock)
+            {
+                _writeQueue.Add(wi);
+                Monitor.Pulse(_writeQueueLock);
+            }
+            /*
             new Thread(() =>
             {
+                if (m_hCommPort == IntPtr.Zero) return;
                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 if (!GWin32.WriteFileEx(m_hCommPort, buf, (uint)buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
                 {
-                    if (err != 0) Console.WriteLine("Write come done " + err);
-                    Console.WriteLine("Write come done tran=" + b);
+                    if (err != 0) reject("Write come done " + err);
+                    resolve(b);
                 }))
                 {
-                    Console.WriteLine("failed write comm " + getWinErr());
+                    reject("failed write comm " + getWinErr());
                 }
                 // IOCompletion routine is only called once this thread is in an alertable wait state.
-                gwait();
-            }).Start();            
+                gwait(); //only with thread
+            }).Start();
+            */
         }
     }
 }

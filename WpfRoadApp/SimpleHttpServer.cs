@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net.Http;
+    using System.Threading.Tasks;
     using Unosquare.Labs.EmbedIO;
     using Unosquare.Labs.EmbedIO.Modules;
     using Unosquare.Net;
@@ -44,18 +45,49 @@
             {
                 public string msg { get; set; }
             }
-            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
-            public bool GetR(WebServer server, HttpListenerContext context, int id)
+            public bool inProcesing = false;
+            void Resolve(uint ok)
             {
-                Console.WriteLine("Rotate " + id);
-                return context.JsonResponse(new resp {  msg="r "+id});
+                inProcesing = false;
+                Console.WriteLine("console ok " + ok);
+            }
+            void Reject(string err)
+            {
+                inProcesing = false;
+                Console.WriteLine("console err " + err);
+            }
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
+            public async Task<bool> GetR(WebServer server, HttpListenerContext context, int id)
+            {
+                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
+                inProcesing = true;
+                try
+                {
+                    id = id * 180 / 200;
+                    Console.WriteLine("Rotate " + id);
+                    await SimpleDriver.comm.Turn(id);
+                    return context.JsonResponse(new resp { msg = "r " + id });
+                } finally
+                {
+                    inProcesing = false;
+                }
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
-            public bool Drive(WebServer server, HttpListenerContext context, int id)
+            public async Task<bool> Drive(WebServer server, HttpListenerContext context, int id)
             {
-                Console.WriteLine("Drive " + id);
-                return context.JsonResponse(new resp { msg = "d " + id });
+                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
+                inProcesing = true;
+                try
+                {
+                    Console.WriteLine("Drive " + id);
+                    await SimpleDriver.comm.Drive(id);
+                    return context.JsonResponse(new resp { msg = "d " + id });
+                }
+                finally
+                {
+                    inProcesing = false;
+                }
             }
         }
     }

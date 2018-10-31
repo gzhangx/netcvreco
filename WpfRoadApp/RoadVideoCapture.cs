@@ -11,7 +11,7 @@ namespace WpfRoadApp
 {
     public interface RVReporter
     {
-        void ShowMat(Mat mat);
+        Task ShowMat(Mat mat);
         void Recorded();
         Task Tracked();
     }
@@ -63,7 +63,7 @@ namespace WpfRoadApp
             }
         }
 
-        protected void grabbed(Mat mat)
+        protected void grabbed(Mat matOrig)
         {
             if (inGrab)
             {
@@ -72,29 +72,36 @@ namespace WpfRoadApp
             }
             inGrab = true;
 
-            reporter.ShowMat(mat);
-            ShiftVecDector.ResizeToStdSize(mat);
-            if (TrackingStats.CamTrackEnabled)
+            var mat = matOrig.Clone();
+            reporter.ShowMat(mat).ContinueWith(tempt =>
             {
-                if(cmpWin.ShouldStopTracking())
+                using (mat)
                 {
-                    inGrab = false;
-                    reporter.Tracked();
-                    return;
+                    ShiftVecDector.ResizeToStdSize(mat);
+                    if (TrackingStats.CamTrackEnabled)
+                    {
+                        if (cmpWin.ShouldStopTracking())
+                        {
+                            inGrab = false;
+                            reporter.Tracked();
+                            return;
+                        }
+                        cmpWin.CamTracking(mat).ContinueWith(t =>
+                        {
+                            inGrab = false;
+                            reporter.Tracked();
+                        });
+                        SaveVideo(mat);
+                        return;
+                    }
+                    else
+                    {
+                        SaveVideo(mat);
+                        inGrab = false;
+                    }
                 }
-                cmpWin.CamTracking(mat).ContinueWith(t =>
-                {
-                    inGrab = false;
-                    reporter.Tracked();
-                });
-                SaveVideo(mat);
-                return;
-            }
-            else
-            {
-                SaveVideo(mat);
-                inGrab = false;
-            }
+            });
+            
         }
     }
 }

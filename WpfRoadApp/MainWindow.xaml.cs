@@ -101,18 +101,26 @@ namespace WpfRoadApp
         }
         int recordCount = 0;
         
-        public void ShowMat(Mat mat)
+        public Task ShowMat(Mat mat)
         {
+            TaskCompletionSource<bool> ts = new TaskCompletionSource<bool>();
             var cm = new Mat();
             mat.CopyTo(cm);
             TDispatch(() =>
             {
-                using (cm)
+                try
                 {
-                    var ims = Convert(cm.Bitmap);
-                    mainCanv.Source = ims;
+                    using (cm)
+                    {
+                        var ims = Convert(cm.Bitmap);
+                        mainCanv.Source = ims;
+                    }
+                } finally
+                {
+                    ts.SetResult(true);
                 }
             });
+            return ts.Task;
         }
 
         private void end_Click(object sender, RoutedEventArgs e)
