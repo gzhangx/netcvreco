@@ -156,8 +156,8 @@ namespace com.veda.Win32Serial
                     SerWriteInfo wi = null;
                     lock(_writeQueueLock)
                     {
-                        if (_writeQueue.Count == 0) continue;
-                        Monitor.Wait(_writeQueueLock);
+                        if (_writeQueue.Count == 0)
+                            Monitor.Wait(_writeQueueLock);
                         while(inWrite)
                         {
                             Thread.Sleep(100);
