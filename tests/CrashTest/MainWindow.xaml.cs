@@ -3,6 +3,8 @@ using DisplayLib;
 using netCvLib;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +26,11 @@ namespace CrashTest
     public partial class MainWindow : Window, ISaveVideoReport
     {
         public static SerialControl comm = new SerialControl();
+        void TDispatch(Action act)
+        {
+            Dispatcher.BeginInvoke(new Action(act));
+        }
+        static object lockobj = new object();
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +40,16 @@ namespace CrashTest
             var gv = new GZVideoCapture(mat=>
             {
                 Console.Write("!");
+                MemoryStream ms = new MemoryStream();
+                lock (lockobj)
+                {
+                    mat.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                }
+                ms.Seek(0, SeekOrigin.Begin);
+                TDispatch(()=>
+                {
+                    mainCanv.Source = Convert(ms);
+                });
             }, 0);
             Task.Run( async () =>
             {
@@ -50,6 +67,17 @@ namespace CrashTest
                 }
 
             });
+        }
+
+        public static BitmapImage Convert(MemoryStream ms)
+        {
+           
+            BitmapImage image = new BitmapImage();
+            image.BeginInit();
+            image.StreamSource = ms;
+            image.EndInit();
+            return image;
+
         }
 
         public void InfoReport(string s, bool isLR)
