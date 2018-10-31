@@ -30,6 +30,14 @@ namespace com.veda.Win32Serial
             public uint OK { get; set; }
             public string Err { get; set; }
         }
+
+        public int WriteQueueLength
+        {
+            get
+            {
+                return _comm.WriteQueueLength;
+            }
+        }
         public Task<SerialRes> WriteComm(string s)
         {
             TaskCompletionSource<SerialRes> ts = new TaskCompletionSource<SerialRes>();

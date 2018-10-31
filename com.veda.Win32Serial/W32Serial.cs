@@ -271,6 +271,16 @@ namespace com.veda.Win32Serial
         {
             GWin32.SleepEx(GWin32.INFINITE, true);
         }
+        public int WriteQueueLength
+        {
+            get
+            {
+                lock (_writeQueueLock)
+                {
+                    return _writeQueue.Count;
+                }
+            }
+        }
         public void WriteComm(SerWriteInfo wi)
         {
             if (wi == null) return;
