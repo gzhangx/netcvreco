@@ -64,7 +64,6 @@ namespace com.veda.Win32Serial
                 if (onErr != null)
                 {
                     onErr.OnError("Open com failed " + errorMessage, true);
-                    return;
                 }
                 throwWinErr("Open com failed ");
             }
@@ -75,7 +74,6 @@ namespace com.veda.Win32Serial
                 if (onErr != null)
                 {
                     onErr.OnError("Failed to Set Comm Mask", true);
-                    return;
                 }
                 throwWinErr("Failed to Set Comm Mask");
             }
@@ -87,7 +85,6 @@ namespace com.veda.Win32Serial
                 if (onErr != null)
                 {
                     onErr.OnError("CSerialCommHelper : Failed to Get Comm State", true);
-                    return;
                 }
                 throwWinErr("CSerialCommHelper : Failed to Get Comm State");
             }
@@ -109,7 +106,6 @@ namespace com.veda.Win32Serial
                 if (onErr != null)
                 {
                     onErr.OnError("CSerialCommHelper : Failed to Get Comm State", true);
-                    return;
                 }
                 throwWinErr("CSerialCommHelper : Failed to Set Comm State");
             }
@@ -153,6 +149,7 @@ namespace com.veda.Win32Serial
             threadStarted = true;
             new Thread(() =>
             {
+                bool inWrite = false;
                 while (threadStarted)
                 {
                     if (m_hCommPort == IntPtr.Zero) break;
@@ -161,6 +158,11 @@ namespace com.veda.Win32Serial
                     {
                         if (_writeQueue.Count == 0) continue;
                         Monitor.Wait(_writeQueueLock);
+                        while(inWrite)
+                        {
+                            Thread.Sleep(100);
+                            Console.WriteLine("in write wait");
+                        }
                         wi = _writeQueue[0];
                         _writeQueue.RemoveAt(0);
                     }
@@ -171,6 +173,7 @@ namespace com.veda.Win32Serial
                         if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
                         continue;
                     }
+                    inWrite = true;
                     NativeOverlapped ov = new System.Threading.NativeOverlapped();
                     if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
                     {
@@ -178,11 +181,13 @@ namespace com.veda.Win32Serial
                         {
                             if (wi.Done != null) try { wi.Done(err, "Write come done " + err); } catch { };
                         }
-                        else if (wi.Done != null) try { wi.Done(b, "OK"); } catch { };
+                        else if (wi.Done != null) try { wi.Done(b, "OK"); } catch { }
+                        inWrite = false;
                     }))
                     {
                         //Console.WriteLine("failed write comm " + getWinErr());
                         if (wi.Done != null) try { wi.Done(255, "failed write comm " + getWinErr()); } catch { };
+                        inWrite = false;
                     }
                     // IOCompletion routine is only called once this thread is in an alertable wait state.
                     gwait(); //only with thread

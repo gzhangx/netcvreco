@@ -15,8 +15,14 @@ namespace WpfRoadApp
         {
             this._app = app;
             _comm.SetErrorListener(this);
-            _comm.Open("COM3", 9600);
-            _comm.Start(app);
+            try
+            {
+                _comm.Open("COM3", 9600);
+                _comm.Start(app);
+            } catch (Exception exc)
+            {
+
+            }
         }
 
         public class SerialRes
