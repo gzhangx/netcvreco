@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="GWin32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerialControl.cs" />
     <Compile Include="W32Serial.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,13 +1,12 @@
-﻿using com.veda.Win32Serial;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfRoadApp
+namespace com.veda.Win32Serial
 {
-    public class SerialControl: IComError
+    public class SerialControl : IComError
     {
         W32Serial _comm = new W32Serial();
         IComApp _app;
@@ -19,7 +18,8 @@ namespace WpfRoadApp
             {
                 _comm.Open("COM3", 9600);
                 _comm.Start(app);
-            } catch (Exception exc)
+            }
+            catch (Exception exc)
             {
 
             }
@@ -45,7 +45,7 @@ namespace WpfRoadApp
 
             return ts.Task;
         }
-        
+
         public async Task<SerialRes> Turn(int v)
         {
             if (v < 10) v = 10;

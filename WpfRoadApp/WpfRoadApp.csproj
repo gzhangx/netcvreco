@@ -107,7 +107,6 @@
     </Compile>
     <Compile Include="NameSel.cs" />
     <Compile Include="RoadVideoCapture.cs" />
-    <Compile Include="SerialControl.cs" />
     <Compile Include="SimpleDriver.cs" />
     <Compile Include="SimpleHttpServer.cs" />
     <Compile Include="TrackingStats.cs" />
