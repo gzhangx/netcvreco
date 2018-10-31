@@ -81,4 +81,18 @@ namespace com.veda.Win32Serial
             }
         }
     }
+
+
+    public class SimpleComApp : IComApp
+    {
+        public void OnData(byte[] buf)
+        {
+            Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
+        }
+
+        public void OnStart(W32Serial ser)
+        {
+
+        }
+    }
 }

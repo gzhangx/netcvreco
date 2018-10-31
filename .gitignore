@@ -8,3 +8,5 @@
 /tests/lidarTest/bin
 /tests/AdurinoTest/bin
 /tests/AdurinoTest/obj
+/tests/CrashTest/obj
+/tests/CrashTest/bin
