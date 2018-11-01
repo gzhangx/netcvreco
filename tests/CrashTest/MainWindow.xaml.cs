@@ -1,5 +1,7 @@
 ﻿using com.veda.Win32Serial;
 using DisplayLib;
+using Emgu.CV;
+using Emgu.CV.Structure;
 using netCvLib;
 using System;
 using System.Collections.Generic;
@@ -36,19 +38,43 @@ namespace CrashTest
             InitializeComponent();
             comm.init(new SimpleComApp());
 
+            bool showing = false;
             var videoSaver = new StdVideoSaver("testtestimg", this, true);
-            var gv = new GZVideoCapture(mat=>
+            var gv = new GZVideoCapture(matdel=>
             {
                 Console.Write("!");
-                MemoryStream ms = new MemoryStream();
-                lock (lockobj)
-                {
-                    mat.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                }
-                ms.Seek(0, SeekOrigin.Begin);
+
+
+                if (showing) return;
+                showing = true;
+                Console.Write("~");
+                var mat = matdel.Clone();
                 TDispatch(()=>
                 {
-                    mainCanv.Source = Convert(ms);
+                    using (mat)
+                    {
+                        CvInvoke.Imshow("test", mat);
+                    }
+                    showing = false;
+                    return;
+                    try
+                    {
+                        lock (lockobj)
+                        {
+                            
+                            using (var bmp = Bitmap.FromFile("testtestimg\\test.jpg"))
+                            {
+                                MemoryStream ms = new MemoryStream();
+                                //return;
+                                //mat.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                                //bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+
+                                //ms.Seek(0, SeekOrigin.Begin);
+                                //mainCanv.Source = Convert(ms);
+                            }
+                        }
+                    }
+                    catch (Exception exc) { }
                 });
             }, 0);
             Task.Run( async () =>
