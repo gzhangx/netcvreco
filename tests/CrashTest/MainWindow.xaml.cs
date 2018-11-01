@@ -87,7 +87,7 @@ namespace CrashTest
                         continue;
                     }
                     Console.Write("+");
-                    await comm.WriteComm("R10");
+                    await comm.WriteComm("R10\n");
                     
                 }
 

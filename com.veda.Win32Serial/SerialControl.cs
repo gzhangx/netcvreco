@@ -10,8 +10,10 @@ namespace com.veda.Win32Serial
     {
         W32Serial _comm = new W32Serial();
         IComApp _app;
+        protected bool started = false;
         public void init(IComApp app)
         {
+            started = true;
             this._app = app;
             _comm.SetErrorListener(this);
             try
@@ -23,6 +25,12 @@ namespace com.veda.Win32Serial
             {
 
             }
+        }
+
+        public void Stop()
+        {
+            started = false;
+            _comm.Close();
         }
 
         public class SerialRes
@@ -40,11 +48,15 @@ namespace com.veda.Win32Serial
         }
         public Task<SerialRes> WriteComm(string s)
         {
+            return WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s));
+        }
+        public Task<SerialRes> WriteComm(byte[] buff)
+        {
             TaskCompletionSource<SerialRes> ts = new TaskCompletionSource<SerialRes>();
 
             _comm.WriteComm(new W32Serial.SerWriteInfo
             {
-                buf = System.Text.ASCIIEncoding.ASCII.GetBytes(s + "\n"),
+                buf = buff,
                 Done = (stat, err) =>
                 {
                     ts.SetResult(new SerialRes { OK = stat, Err = err });
@@ -58,18 +70,22 @@ namespace com.veda.Win32Serial
         {
             if (v < 10) v = 10;
             if (v > 170) v = 170;
-            return await WriteComm("R" + v);
+            return await WriteComm($"R{v}\n");
         }
 
         public async Task<SerialRes> Drive(int v)
         {
             if (v < 0) v = 0;
             if (v > 5) v = 5;
-            return await WriteComm("D" + v);
+            return await WriteComm($"D{v}\n");
         }
 
+        bool inRestart = false;
         void IComError.OnError(string err, bool finished)
         {
+            if (!started) return;
+            if (inRestart) return;
+            inRestart = true;
             Console.WriteLine(err);
             if (finished)
             {
@@ -77,6 +93,7 @@ namespace com.veda.Win32Serial
                 {
                     await Task.Delay(3000);
                     init(_app);
+                    inRestart = false;
                 });
             }
         }

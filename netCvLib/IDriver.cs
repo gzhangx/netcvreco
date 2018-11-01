@@ -8,7 +8,7 @@ namespace netCvLib
 {
     public interface IDriver
     {
-        void Track(netCvLib.VidLoc.RealTimeTrackLoc realTimeTrack);
+        Task Track(netCvLib.VidLoc.RealTimeTrackLoc realTimeTrack);
         void Stop();
     }
 }

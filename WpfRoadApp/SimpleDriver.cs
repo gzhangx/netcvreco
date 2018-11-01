@@ -26,14 +26,14 @@ namespace WpfRoadApp
             Drive(0);
             //Drive($"steer/100/400");            
         }
-        public void Track(VidLoc.RealTimeTrackLoc realTimeTrack)
+        public Task Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
 
             if (realTimeTrack.ShouldStop())
             {
                 //Console.WriteLine($"next pos {realTimeTrack.NextPos}/{endPos}, skipping");
                 Stop();
-                return;
+                return Task.FromResult(0);
             }
             if (Math.Abs(realTimeTrack.vect.X) > 1)
             {
@@ -46,14 +46,15 @@ namespace WpfRoadApp
                 if (dir == 0) driveDir = baseAng;
                 if (dir > 0) driveDir = baseAng + 20;
                 if (dir < 0) driveDir = baseAng - 20;
-                comm.WriteComm("R" + driveDir);
+                return comm.Turn(driveDir);
             }
+            return Task.FromResult(0);
         }
 
-        public void Drive(int level)
+        public Task Drive(int level)
         {
-            if (!sendCommand) return;
-            comm.WriteComm("D" + level);
+            if (!sendCommand) return Task.FromResult(0);
+            return comm.Drive(level);
         }
 
 
