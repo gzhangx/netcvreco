@@ -53,28 +53,27 @@ namespace CrashTest
                 {
                     using (mat)
                     {
-                        CvInvoke.Imshow("test", mat);
-                    }
-                    showing = false;
-                    return;
-                    try
-                    {
-                        lock (lockobj)
-                        {
-                            
-                            using (var bmp = Bitmap.FromFile("testtestimg\\test.jpg"))
-                            {
-                                MemoryStream ms = new MemoryStream();
-                                //return;
-                                //mat.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                                //bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                        //CvInvoke.Imshow("test", mat);
 
-                                //ms.Seek(0, SeekOrigin.Begin);
-                                //mainCanv.Source = Convert(ms);
+                        showing = false;
+                        try
+                        {
+                            lock (lockobj)
+                            {
+
+                                using (var bmp = mat.Bitmap)
+                                {
+                                    MemoryStream ms = new MemoryStream();
+                                    //mat.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                                    bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+
+                                    ms.Seek(0, SeekOrigin.Begin);
+                                    mainCanv.Source = Convert(ms);
+                                }
                             }
                         }
+                        catch (Exception exc) { }
                     }
-                    catch (Exception exc) { }
                 });
             }, 0);
             Task.Run( async () =>

@@ -174,8 +174,8 @@ namespace com.veda.Win32Serial
                         continue;
                     }
                     inWrite = true;
-                    NativeOverlapped ov = new System.Threading.NativeOverlapped();
-                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
+                    NativeOverlapped ovo = new System.Threading.NativeOverlapped();
+                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ovo, (uint err, uint b, ref NativeOverlapped c) =>
                     {
                         if (err != 0)
                         {
@@ -196,7 +196,6 @@ namespace com.veda.Win32Serial
             }).Start();
             _thread = Task.Run(() =>
             {
-                NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 try
                 {
                     while (threadStarted)
@@ -204,7 +203,8 @@ namespace com.veda.Win32Serial
                         var buf1 = new byte[1];
                         SetTimeout(0); //set always wait
                         GWin32.SetLastError(0);
-                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ov, (uint err, uint len, ref NativeOverlapped ov1) =>
+                        NativeOverlapped ovo = new System.Threading.NativeOverlapped();
+                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ov) =>
                         {
                             if (err != 0)
                             {
