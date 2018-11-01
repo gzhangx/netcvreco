@@ -141,6 +141,16 @@ namespace com.veda.Win32Serial
         }
         private List<SerWriteInfo> _writeQueue = new List<SerWriteInfo>();
         private object _writeQueueLock = new object();
+
+        private static void ResetOverlapped(NativeOverlapped ovo)
+        {
+            ovo.OffsetHigh = 0;
+            ovo.OffsetLow = 0;
+            ovo.EventHandle = IntPtr.Zero;
+            ovo.InternalHigh = IntPtr.Zero;
+            ovo.InternalLow = IntPtr.Zero;
+        }
+
         public void Start(IComApp app)
         {            
             GWin32.PurgeComm(m_hCommPort, 0x0004 | 0x0008);
@@ -175,6 +185,7 @@ namespace com.veda.Win32Serial
                         continue;
                     }
                     inWrite = true;
+                    ResetOverlapped(ov);
                     if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
                     {
                         if (err != 0)
@@ -205,7 +216,7 @@ namespace com.veda.Win32Serial
                     {
                         SetTimeout(0); //set always wait
                         GWin32.SetLastError(0);
-                        
+                        ResetOverlapped(ovo);
                         GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ovoo) =>
                         {
                             if (err != 0)
