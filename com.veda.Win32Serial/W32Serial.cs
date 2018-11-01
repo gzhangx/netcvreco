@@ -23,7 +23,7 @@ namespace com.veda.Win32Serial
     }
     public class W32Serial
     {
-        protected Task _thread;
+        protected Thread _thread;
         protected bool threadStarted = false;
         protected void throwWinErr(string text)
         {
@@ -194,7 +194,7 @@ namespace com.veda.Win32Serial
                 }
                 Console.WriteLine("Com Write Queue done");
             }).Start();
-            _thread = Task.Run(() =>
+            _thread = new Thread(() =>
             {
                 try
                 {
@@ -204,7 +204,7 @@ namespace com.veda.Win32Serial
                         SetTimeout(0); //set always wait
                         GWin32.SetLastError(0);
                         NativeOverlapped ovo = new System.Threading.NativeOverlapped();
-                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ov) =>
+                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ovpp) =>
                         {
                             if (err != 0)
                             {
@@ -214,6 +214,7 @@ namespace com.veda.Win32Serial
                             {
                                 SetTimeout();
                                 uint numRead;
+                                NativeOverlapped ov = new System.Threading.NativeOverlapped();
                                 ov.EventHandle = GWin32.CreateEvent(IntPtr.Zero, true, false, null);
                                 var tbuf = new byte[2048];
                                 if (!GWin32.ReadFile(m_hCommPort, tbuf, (uint)tbuf.Length, out numRead, ref ov))
@@ -265,6 +266,7 @@ namespace com.veda.Win32Serial
                 onErr.OnError("thread done", true);
                 Console.WriteLine("thread done");
             });
+            _thread.Start();
         }
 
         protected void gwait()
