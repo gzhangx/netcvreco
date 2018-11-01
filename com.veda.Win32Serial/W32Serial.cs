@@ -196,11 +196,12 @@ namespace com.veda.Win32Serial
             }).Start();
             _thread = new Thread(() =>
             {
+                var tbuf = new byte[2048];
+                var buf1 = new byte[1];
                 try
                 {
                     while (threadStarted)
                     {
-                        var buf1 = new byte[1];
                         SetTimeout(0); //set always wait
                         GWin32.SetLastError(0);
                         NativeOverlapped ovo = new System.Threading.NativeOverlapped();
@@ -216,7 +217,7 @@ namespace com.veda.Win32Serial
                                 uint numRead;
                                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                                 ov.EventHandle = GWin32.CreateEvent(IntPtr.Zero, true, false, null);
-                                var tbuf = new byte[2048];
+                                
                                 if (!GWin32.ReadFile(m_hCommPort, tbuf, (uint)tbuf.Length, out numRead, ref ov))
                                 {
                                     if (GWin32.GetLastError() == 997) //IO Pending
