@@ -66,20 +66,6 @@ namespace com.veda.Win32Serial
             return ts.Task;
         }
 
-        public async Task<SerialRes> Turn(int v)
-        {
-            if (v < 10) v = 10;
-            if (v > 170) v = 170;
-            return await WriteComm($"R{v}\n");
-        }
-
-        public async Task<SerialRes> Drive(int v)
-        {
-            if (v < 0) v = 0;
-            if (v > 5) v = 5;
-            return await WriteComm($"D{v}\n");
-        }
-
         bool inRestart = false;
         void IComError.OnError(string err, bool finished)
         {
