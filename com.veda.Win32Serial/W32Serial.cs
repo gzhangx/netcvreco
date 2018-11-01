@@ -150,6 +150,7 @@ namespace com.veda.Win32Serial
             new Thread(() =>
             {
                 bool inWrite = false;
+                NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 while (threadStarted)
                 {
                     if (m_hCommPort == IntPtr.Zero) break;
@@ -174,8 +175,7 @@ namespace com.veda.Win32Serial
                         continue;
                     }
                     inWrite = true;
-                    NativeOverlapped ovo = new System.Threading.NativeOverlapped();
-                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ovo, (uint err, uint b, ref NativeOverlapped c) =>
+                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
                     {
                         if (err != 0)
                         {
@@ -198,14 +198,15 @@ namespace com.veda.Win32Serial
             {
                 var tbuf = new byte[2048];
                 var buf1 = new byte[1];
+                NativeOverlapped ovo = new System.Threading.NativeOverlapped();
                 try
                 {
                     while (threadStarted)
                     {
                         SetTimeout(0); //set always wait
                         GWin32.SetLastError(0);
-                        NativeOverlapped ovo = new System.Threading.NativeOverlapped();
-                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ovpp) =>
+                        
+                        GWin32.ReadFileEx(m_hCommPort, buf1, (uint)buf1.Length, ref ovo, (uint err, uint len, ref NativeOverlapped ov) =>
                         {
                             if (err != 0)
                             {
@@ -215,7 +216,6 @@ namespace com.veda.Win32Serial
                             {
                                 SetTimeout();
                                 uint numRead;
-                                NativeOverlapped ov = new System.Threading.NativeOverlapped();
                                 ov.EventHandle = GWin32.CreateEvent(IntPtr.Zero, true, false, null);
                                 
                                 if (!GWin32.ReadFile(m_hCommPort, tbuf, (uint)tbuf.Length, out numRead, ref ov))
