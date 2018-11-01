@@ -11,14 +11,14 @@ namespace com.veda.Win32Serial
         W32Serial _comm = new W32Serial();
         IComApp _app;
         protected bool started = false;
-        public void init(IComApp app)
+        public void init(IComApp app, string portName = "COM3", int baudRate = 9600)
         {
             started = true;
             this._app = app;
             _comm.SetErrorListener(this);
             try
             {
-                _comm.Open("COM3", 9600);
+                _comm.Open(portName, baudRate);
                 _comm.Start(app);
             }
             catch (Exception exc)
