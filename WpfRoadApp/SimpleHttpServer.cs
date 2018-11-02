@@ -55,7 +55,8 @@
                 {
                     id = id * 180 / 200;
                     Console.WriteLine("Rotate " + id);
-                    await SimpleDriver.comm.Turn(id);
+                    if (SimpleDriver.comm.WriteQueueLength == 0)
+                        await SimpleDriver.comm.Turn(id);
                     return context.JsonResponse(new resp { msg = "r " + id });
                 } finally
                 {
@@ -71,7 +72,8 @@
                 try
                 {
                     Console.WriteLine("Drive " + id);
-                    await SimpleDriver.comm.Drive(id);
+                    if (SimpleDriver.comm.WriteQueueLength == 0)
+                        await SimpleDriver.comm.Drive(id);
                     return context.JsonResponse(new resp { msg = "d " + id });
                 }
                 finally
