@@ -19,7 +19,7 @@ namespace com.veda.X4Lidar
         public string Init(IX4Tran tran)
         {
             app.SetTran(tran);
-            return this.init(app, "COM3", 128000);
+            return this.init(app, "COM4", 128000);
         }
         public void Info()
         {

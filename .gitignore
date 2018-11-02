@@ -10,3 +10,5 @@
 /tests/AdurinoTest/obj
 /tests/CrashTest/obj
 /tests/CrashTest/bin
+/netCvReco.VC.db
+/netCvReco.VC.VC.opendb
