@@ -46,16 +46,6 @@
                 public string msg { get; set; }
             }
             public bool inProcesing = false;
-            void Resolve(uint ok)
-            {
-                inProcesing = false;
-                Console.WriteLine("console ok " + ok);
-            }
-            void Reject(string err)
-            {
-                inProcesing = false;
-                Console.WriteLine("console err " + err);
-            }
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
             public async Task<bool> GetR(WebServer server, HttpListenerContext context, int id)
             {
