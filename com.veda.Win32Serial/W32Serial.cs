@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -36,7 +37,7 @@ namespace com.veda.Win32Serial
             string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
             return errorMessage;
         }
-        protected IntPtr m_hCommPort = IntPtr.Zero;
+        protected SafeFileHandle m_hCommPort = null;
 
         protected IComError onErr;
         public void SetErrorListener(IComError err)
@@ -45,7 +46,7 @@ namespace com.veda.Win32Serial
         }
         public void Open(string comPortName = "COM3", int baudRate = 128000)
         {
-            if (m_hCommPort != IntPtr.Zero) return;
+            if (m_hCommPort != null) return;
             SerialPort comm = new SerialPort();
             comm.BaudRate = baudRate;
             m_hCommPort = GWin32.CreateFile(comPortName,
@@ -57,7 +58,7 @@ namespace com.veda.Win32Serial
             IntPtr.Zero //0// no templates file for COM port...
             );
 
-            if (m_hCommPort == IntPtr.Zero)
+            if (m_hCommPort == null)
             {
                 int err = Marshal.GetLastWin32Error();
                 string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
@@ -122,8 +123,9 @@ namespace com.veda.Win32Serial
 
         public void Close()
         {
-            GWin32.CloseHandle(m_hCommPort);
-            m_hCommPort = IntPtr.Zero;
+            //GWin32.CloseHandle(m_hCommPort);
+            m_hCommPort.Close();
+            m_hCommPort = null;
             threadStarted = false;
         }
 
@@ -165,7 +167,7 @@ namespace com.veda.Win32Serial
                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 while (threadStarted)
                 {
-                    if (m_hCommPort == IntPtr.Zero) break;
+                    if (m_hCommPort == null) break;
                     SerWriteInfo wi = null;
                     lock(_writeQueueLock)
                     {

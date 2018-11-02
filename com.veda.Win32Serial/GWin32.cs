@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -16,7 +17,7 @@ namespace com.veda.Win32Serial
     public static class GWin32
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr CreateFile(
+        public static extern SafeFileHandle CreateFile(
              [MarshalAs(UnmanagedType.LPTStr)] string filename,
              [MarshalAs(UnmanagedType.U4)] FileAccess access,
              [MarshalAs(UnmanagedType.U4)] FileShare share,
@@ -26,46 +27,46 @@ namespace com.veda.Win32Serial
              IntPtr templateFile);
 
         [DllImport("kernel32.dll")]
-        public static extern bool SetCommMask(IntPtr hFile, uint dwEvtMask);
+        public static extern bool SetCommMask(SafeFileHandle hFile, uint dwEvtMask);
 
         [DllImport("kernel32.dll")]
-        public static extern bool GetCommState(IntPtr hFile, ref DCB lpDCB);
+        public static extern bool GetCommState(SafeFileHandle hFile, ref DCB lpDCB);
         [DllImport("kernel32.dll")]
-        public static extern bool SetCommState(IntPtr hFile, ref DCB lpDCB);
+        public static extern bool SetCommState(SafeFileHandle hFile, ref DCB lpDCB);
 
         [DllImport("kernel32.dll")]
-        static extern bool WaitCommEvent(IntPtr hFile, out uint lpEvtMask,
+        static extern bool WaitCommEvent(IntPtr SafeFileHandle, out uint lpEvtMask,
             IntPtr lpOverlapped);
 
         public delegate void WriteFileCompletionDelegate(UInt32 dwErrorCode,
     UInt32 dwNumberOfBytesTransfered, ref NativeOverlapped lpOverlapped);
         [DllImport("kernel32.dll")]
-        public static extern bool WriteFileEx(IntPtr hFile, byte[] lpBuffer,
+        public static extern bool WriteFileEx(SafeFileHandle hFile, byte[] lpBuffer,
    uint nNumberOfBytesToWrite, [In] ref System.Threading.NativeOverlapped lpOverlapped,
    WriteFileCompletionDelegate lpCompletionRoutine);
 
         [DllImport("kernel32.dll")]
-        public static extern bool ReadFileEx(IntPtr hFile, [Out] byte[] lpBuffer,
+        public static extern bool ReadFileEx(SafeFileHandle hFile, [Out] byte[] lpBuffer,
    uint nNumberOfBytesToRead, [In] ref System.Threading.NativeOverlapped lpOverlapped,
    WriteFileCompletionDelegate lpCompletionRoutine);
 
         [DllImport("kernel32.dll")]
-        public static extern bool ReadFile(IntPtr hFile, [Out] byte[] lpBuffer,
+        public static extern bool ReadFile(SafeFileHandle hFile, [Out] byte[] lpBuffer,
    uint nNumberOfBytesToRead, out uint lpNumRead, ref NativeOverlapped lpOverlapped);
 
         [DllImport("kernel32.dll")]
         public static extern void SleepEx(uint dwMilliseconds, bool alertable);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public  static extern bool GetOverlappedResult(IntPtr hFile,
+        public  static extern bool GetOverlappedResult(SafeFileHandle hFile,
            ref System.Threading.NativeOverlapped lpOverlapped,
            out uint lpNumberOfBytesTransferred, bool bWait);
 
         [DllImport("kernel32.dll")]
-        public static extern bool PurgeComm(IntPtr hFile, uint dwFlags);
+        public static extern bool PurgeComm(SafeFileHandle hFile, uint dwFlags);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool SetCommTimeouts(IntPtr hFile, [In] ref COMMTIMEOUTS lpCommTimeouts);
+        public static extern bool SetCommTimeouts(SafeFileHandle hFile, [In] ref COMMTIMEOUTS lpCommTimeouts);
 
         [DllImport("kernel32.dll")]
         public static extern uint GetLastError();
