@@ -71,7 +71,11 @@ namespace cser
                     }
                 });
             }
-            comm.Init(tran);
+            var res = comm.Init(tran);
+            if (res != "")
+            {
+                MessageBox.Show(res);
+            }
         }
 
         private void Stop_Click(object sender, EventArgs e)
