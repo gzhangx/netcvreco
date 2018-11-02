@@ -11,8 +11,13 @@ namespace com.veda.Win32Serial
         W32Serial _comm = new W32Serial();
         IComApp _app;
         protected bool started = false;
-        protected void init(IComApp app, string portName = "COM3", int baudRate = 9600)
+        protected string init(IComApp app, string portName = "COM3", int baudRate = 9600)
         {
+            var pns = System.IO.Ports.SerialPort.GetPortNames();
+            if (pns.Length == 0)
+            {
+                return "No ports found";
+            }
             started = true;
             this._app = app;
             _comm.SetErrorListener(this);
@@ -23,8 +28,9 @@ namespace com.veda.Win32Serial
             }
             catch (Exception exc)
             {
-
+                return exc.Message;
             }
+            return "";
         }
 
         public virtual void Stop()
