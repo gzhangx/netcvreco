@@ -58,7 +58,7 @@ namespace com.veda.Win32Serial
             IntPtr.Zero //0// no templates file for COM port...
             );
 
-            if (m_hCommPort == null)
+            if (m_hCommPort == null || m_hCommPort.IsInvalid)
             {
                 int err = Marshal.GetLastWin32Error();
                 string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
@@ -167,7 +167,7 @@ namespace com.veda.Win32Serial
                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 while (threadStarted)
                 {
-                    if (m_hCommPort == null) break;
+                    if (m_hCommPort == null || m_hCommPort.IsInvalid) break;
                     SerWriteInfo wi = null;
                     lock(_writeQueueLock)
                     {
