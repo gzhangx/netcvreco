@@ -49,6 +49,11 @@
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
             public async Task<bool> GetR(WebServer server, HttpListenerContext context, int id)
             {
+                if (context == null)
+                {
+                    Console.WriteLine("server not ready");
+                    return false;
+                }
                 if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
                 inProcesing = true;
                 try
@@ -67,6 +72,11 @@
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
             public async Task<bool> Drive(WebServer server, HttpListenerContext context, int id)
             {
+                if (context == null)
+                {
+                    Console.WriteLine("server not ready");
+                    return false;
+                }
                 if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
                 inProcesing = true;
                 try
