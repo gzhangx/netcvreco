@@ -160,6 +160,8 @@ namespace com.veda.Win32Serial
             new Thread(() =>
             {
                 bool inWrite = false;
+                uint writeErr = 0;
+                uint writeOk = 0;
                 NativeOverlapped ov = new System.Threading.NativeOverlapped();
                 while (threadStarted)
                 {
@@ -186,15 +188,13 @@ namespace com.veda.Win32Serial
                     }
                     inWrite = true;
                     ResetOverlapped(ov);
-                    if (!GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
+                    var writeRes = GWin32.WriteFileEx(m_hCommPort, wi.buf, (uint)wi.buf.Length, ref ov, (uint err, uint b, ref NativeOverlapped c) =>
                     {
-                        if (err != 0)
-                        {
-                            if (wi.Done != null) try { wi.Done(err, "Write come done " + err); } catch { };
-                        }
-                        else if (wi.Done != null) try { wi.Done(b, "OK"); } catch { }
+                        writeErr = err;
+                        writeOk = b;
                         inWrite = false;
-                    }))
+                    });
+                    if (!writeRes)
                     {
                         //Console.WriteLine("failed write comm " + getWinErr());
                         if (wi.Done != null) try { wi.Done(255, "failed write comm " + getWinErr()); } catch { };
@@ -202,6 +202,10 @@ namespace com.veda.Win32Serial
                     }
                     // IOCompletion routine is only called once this thread is in an alertable wait state.
                     gwait(); //only with thread
+                    if (writeRes)
+                    {
+                        if (wi.Done != null) try { wi.Done(writeErr, writeErr == 0 ? writeOk.ToString() : "WriteError"); } catch { }
+                    }
                 }
                 Console.WriteLine("Com Write Queue done");
             }).Start();
