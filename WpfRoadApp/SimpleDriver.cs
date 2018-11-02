@@ -7,6 +7,7 @@ using netCvLib;
 using System.Net;
 using System.IO;
 using com.veda.Win32Serial;
+using static com.veda.Win32Serial.SerialControlWin32;
 
 namespace WpfRoadApp
 {

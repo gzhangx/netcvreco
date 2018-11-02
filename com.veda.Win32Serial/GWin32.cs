@@ -87,6 +87,8 @@ namespace com.veda.Win32Serial
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool ClearCommError(SafeFileHandle hFile, ref int lpErrors, ref Comstat lpStat);
 
         public const uint INFINITE = 0xffffffff;
         public struct COMMTIMEOUTS
@@ -96,6 +98,14 @@ namespace com.veda.Win32Serial
             public UInt32 ReadTotalTimeoutConstant;
             public UInt32 WriteTotalTimeoutMultiplier;
             public UInt32 WriteTotalTimeoutConstant;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Comstat
+        {
+            public readonly uint Flags;
+            public readonly uint cbInQue;
+            public readonly uint cbOutQue;
         }
 
         public enum DtrControl : int

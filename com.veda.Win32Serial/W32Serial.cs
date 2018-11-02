@@ -60,6 +60,7 @@ namespace com.veda.Win32Serial
 
             if (m_hCommPort == null || m_hCommPort.IsInvalid)
             {
+                m_hCommPort = null;
                 int err = Marshal.GetLastWin32Error();
                 string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
                 if (onErr != null)
