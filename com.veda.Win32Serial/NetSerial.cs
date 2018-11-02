@@ -177,16 +177,4 @@ namespace com.veda.Win32Serial
 
         #endregion
     }
-
-    internal class Program
-    {
-        private static void Main(string[] args)
-        {
-            SerialPortFixer.Execute("COM3");
-            using (SerialPort port = new SerialPort("COM1"))
-            {
-                port.Write("test");
-            }
-        }
-    }
 }

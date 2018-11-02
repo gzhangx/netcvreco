@@ -32,7 +32,7 @@ namespace WpfRoadApp
             return await WriteComm($"D{v}\n");
         }
     }
-    public class SimpleDriver : IDriver
+    public class SimpleDriver : IDriver, IDisposable
     {
         public static DriverSerialControl comm = new DriverSerialControl();
         public SimpleDriver()
@@ -48,6 +48,7 @@ namespace WpfRoadApp
             Drive(0);
             //Drive($"steer/100/400");            
         }
+
         public Task Track(VidLoc.RealTimeTrackLoc realTimeTrack)
         {
 
@@ -79,6 +80,10 @@ namespace WpfRoadApp
             return comm.Drive(level);
         }
 
+        public void Dispose()
+        {
+            comm.Stop();
+        }
 
         class Capp : IComApp
         {

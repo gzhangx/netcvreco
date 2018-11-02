@@ -63,6 +63,7 @@ namespace WpfRoadApp
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
+            cmpWin.driver.Dispose();
         }
              
         private void start_Click(object sender, RoutedEventArgs e)
