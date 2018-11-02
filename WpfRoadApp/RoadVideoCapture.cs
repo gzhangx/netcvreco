@@ -15,7 +15,7 @@ namespace WpfRoadApp
         void Recorded();
         Task Tracked();
     }
-    public class RoadVideoCapture
+    public class RoadVideoCapture : IDisposable
     {
         protected GZVideoCapture gv;
         bool inGrab = false;
@@ -102,6 +102,11 @@ namespace WpfRoadApp
                 }
             });
             
+        }
+
+        public void Dispose()
+        {
+            gv.Dispose();
         }
     }
 }

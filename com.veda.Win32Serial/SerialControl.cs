@@ -16,90 +16,108 @@ namespace com.veda.Win32Serial
         private List<W32Serial.SerWriteInfo> _writeQueue = new List<W32Serial.SerWriteInfo>();
         private object _writeQueueLock = new object();
         private bool running = false;
+
+        private Func<string> restartFunc;
         protected string init(IComApp app, string portName, int baudRate)
         {
             if (serial != null) return "Already Open";
             SerialPortFixer.Execute(portName);
-            serial = new SerialPort(portName, baudRate);
-            running = true;
-            serial.Open();
-            new Thread(() =>
+            restartFunc = () =>
             {
+                serial = new SerialPort(portName, baudRate);
+                running = true;
                 try
                 {
-                    var inWrite = false;
-                    while (running)
-                    {
-                        if (serial == null || !serial.IsOpen) break;
-                        W32Serial.SerWriteInfo wi = null;
-                        lock (_writeQueueLock)
-                        {
-                            if (!running) break;
-                            if (_writeQueue.Count == 0)
-                                Monitor.Wait(_writeQueueLock);
-                            while (inWrite)
-                            {
-                                Thread.Sleep(100);
-                                Console.WriteLine("in write wait");
-                            }
-                            wi = _writeQueue[0];
-                            _writeQueue.RemoveAt(0);
-                        }
-                        //if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
-                        //continue;
-                        if (wi == null || wi.buf == null || wi.buf.Length == 0)
-                        {
-                            if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
-                            continue;
-                        }
-                        inWrite = true;
-
-                        serial.Write(wi.buf, 0, wi.buf.Length);
-                        try
-                        {
-                            if (wi.Done != null) wi.Done(0, "");
-                        }
-                        catch { }
-                        inWrite = false;
-                    }
-                }
-                catch (Exception exc)
-                {
-                    if (running)
-                        Console.WriteLine(exc.Message);
-                    else
-                        Console.WriteLine("serial write thread done");
-                }
-                Console.WriteLine("serial write thread end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            }).Start();
-
-
-            new Thread(() =>
-            {
-                byte[] buf = new byte[2048];
-                try
-                {
-                    while (running)
-                    {
-                        var readLen = serial.BaseStream.Read(buf, 0, buf.Length);
-                        if (readLen <= 0)
-                        {
-                            Console.WriteLine("end of stream");
-                            break;
-                        }
-                        var data = new byte[readLen];
-                        Array.Copy(buf, data, readLen);
-                        app.OnData(data);
-                    }
+                    serial.Open();
                 } catch (Exception exc)
                 {
-                    if (running)
-                        Console.WriteLine(exc.Message);
-                    else
-                        Console.WriteLine("serial read thread done");
+                    Console.WriteLine(exc.Message);
+                    Thread.Sleep(2000);
+                    Restart();
                 }
-            }).Start();
-            return "";
+                new Thread(() =>
+                {
+                    try
+                    {
+                        var inWrite = false;
+                        while (running)
+                        {
+                            if (serial == null || !serial.IsOpen) break;
+                            W32Serial.SerWriteInfo wi = null;
+                            lock (_writeQueueLock)
+                            {
+                                if (!running) break;
+                                if (_writeQueue.Count == 0)
+                                    Monitor.Wait(_writeQueueLock);
+                                while (inWrite)
+                                {
+                                    Thread.Sleep(100);
+                                    Console.WriteLine("in write wait");
+                                }
+                                wi = _writeQueue[0];
+                                _writeQueue.RemoveAt(0);
+                            }
+                            //if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                            //continue;
+                            if (wi == null || wi.buf == null || wi.buf.Length == 0)
+                            {
+                                if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                                continue;
+                            }
+                            inWrite = true;
+
+                            serial.Write(wi.buf, 0, wi.buf.Length);
+                            try
+                            {
+                                if (wi.Done != null) wi.Done(0, "");
+                            }
+                            catch { }
+                            inWrite = false;
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        if (running)
+                            Console.WriteLine(exc.Message);
+                        else
+                            Console.WriteLine("serial write thread done");
+                    }
+                    Console.WriteLine("serial write thread end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                }).Start();
+
+
+                new Thread(() =>
+                {
+                    byte[] buf = new byte[2048];
+                    try
+                    {
+                        while (running)
+                        {
+                            var readLen = serial.BaseStream.Read(buf, 0, buf.Length);
+                            if (readLen <= 0)
+                            {
+                                Console.WriteLine("end of stream");
+                                break;
+                            }
+                            var data = new byte[readLen];
+                            Array.Copy(buf, data, readLen);
+                            app.OnData(data);
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        if (running)
+                        {
+                            Console.WriteLine(exc.Message);
+                            Restart();
+                        }
+                        else
+                            Console.WriteLine("serial read thread done");
+                    }
+                }).Start();
+                return "";
+            };
+            return restartFunc();
         }
 
         public int WriteQueueLength
@@ -111,6 +129,12 @@ namespace com.veda.Win32Serial
                     return _writeQueue.Count;
                 }
             }
+        }
+
+        public string Restart()
+        {
+            Stop();
+            return restartFunc();
         }
         public void WriteComm(W32Serial.SerWriteInfo wi)
         {

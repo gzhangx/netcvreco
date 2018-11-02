@@ -64,6 +64,7 @@ namespace WpfRoadApp
         {
             System.Windows.Application.Current.Shutdown();
             cmpWin.driver.Dispose();
+            rc.Dispose();
         }
              
         private void start_Click(object sender, RoutedEventArgs e)
