@@ -34,6 +34,7 @@ namespace com.veda.Win32Serial
                         W32Serial.SerWriteInfo wi = null;
                         lock (_writeQueueLock)
                         {
+                            if (!running) break;
                             if (_writeQueue.Count == 0)
                                 Monitor.Wait(_writeQueueLock);
                             while (inWrite)
@@ -69,6 +70,7 @@ namespace com.veda.Win32Serial
                     else
                         Console.WriteLine("serial write thread done");
                 }
+                Console.WriteLine("serial write thread end");
             }).Start();
 
 
@@ -141,7 +143,8 @@ namespace com.veda.Win32Serial
         public virtual void Stop()
         {
             running = false;
-            if(serial != null)
+            WriteComm(new W32Serial.SerWriteInfo());
+            if (serial != null)
             {
                 try { serial.Close(); } catch { }
             }
