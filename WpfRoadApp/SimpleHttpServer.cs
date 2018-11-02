@@ -15,7 +15,7 @@
         /// <param name="args">The arguments.</param>
         public void Start()
         {
-            var url = "http://localhost:80/";
+            var url = "http://+:80/";
 
             // Our web server is disposable.
             var server = new WebServer(url, Unosquare.Labs.EmbedIO.Constants.RoutingStrategy.Regex);
