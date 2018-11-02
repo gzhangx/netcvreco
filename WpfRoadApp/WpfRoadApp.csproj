@@ -90,7 +90,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Unosquare.Swan.Lite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unosquare.Swan.Lite.0.34.0\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
+      <HintPath>..\packages\Unosquare.Swan.Lite.0.34.3\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />

@@ -70,7 +70,7 @@ namespace com.veda.Win32Serial
                     else
                         Console.WriteLine("serial write thread done");
                 }
-                Console.WriteLine("serial write thread end");
+                Console.WriteLine("serial write thread end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }).Start();
 
 
