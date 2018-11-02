@@ -65,6 +65,12 @@
     <Compile Include="W32Serial.cs" />
     <Compile Include="X4Tran.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\com.veda.Win32Serial\com.veda.Win32Serial.csproj">
+      <Project>{474455B2-CA77-4713-A68E-25979EAD4814}</Project>
+      <Name>com.veda.Win32Serial</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

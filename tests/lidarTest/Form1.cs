@@ -29,7 +29,7 @@ namespace cser
             this.panelRadar.SetShowInfo(this);
         }
 
-        W32Serial comm = new W32Serial();
+        LidarSerialControl comm = new LidarSerialControl();
         object lockobj = new object();
 
         X4Tran tran;
@@ -37,7 +37,6 @@ namespace cser
         {
             try
             {
-                comm.Open();
                 //comm.Open();
 
             } catch (Exception err)
@@ -72,7 +71,7 @@ namespace cser
                     }
                 });
             }
-            comm.Start(tran);
+            comm.Init(tran);
         }
 
         private void Stop_Click(object sender, EventArgs e)
@@ -93,13 +92,13 @@ namespace cser
 
         private void button3_Click(object sender, EventArgs e)
         {
-            comm.Close();
+            comm.Stop();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            comm.Close();
+            comm.Stop();
         }
 
         public void SetTextInfo(string text)

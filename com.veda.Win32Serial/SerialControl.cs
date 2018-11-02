@@ -11,7 +11,7 @@ namespace com.veda.Win32Serial
         W32Serial _comm = new W32Serial();
         IComApp _app;
         protected bool started = false;
-        public void init(IComApp app, string portName = "COM3", int baudRate = 9600)
+        protected void init(IComApp app, string portName = "COM3", int baudRate = 9600)
         {
             started = true;
             this._app = app;
@@ -27,7 +27,7 @@ namespace com.veda.Win32Serial
             }
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             started = false;
             _comm.Close();

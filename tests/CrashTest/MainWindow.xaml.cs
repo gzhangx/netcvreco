@@ -27,7 +27,7 @@ namespace CrashTest
     /// </summary>
     public partial class MainWindow : Window, ISaveVideoReport
     {
-        public static SerialControl comm = new SerialControl();
+         static SimpleSerialControl comm = new SimpleSerialControl();
         void TDispatch(Action act)
         {
             Dispatcher.BeginInvoke(new Action(act));
@@ -36,7 +36,7 @@ namespace CrashTest
         public MainWindow()
         {
             InitializeComponent();
-            comm.init(new SimpleComApp());
+            comm.Init(new SimpleComApp());
 
             bool showing = false;
             var videoSaver = new StdVideoSaver("testtestimg", this, true);
@@ -111,6 +111,14 @@ namespace CrashTest
 
         public void ShowProg(int i, string s)
         {
+        }
+    }
+
+    class SimpleSerialControl : SerialControl
+    {
+        public void Init(IComApp app)
+        {
+            base.init(app, "COM3", 9600);
         }
     }
 }

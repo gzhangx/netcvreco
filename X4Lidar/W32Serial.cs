@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.veda.Win32Serial;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -11,7 +12,49 @@ using System.Threading.Tasks;
 
 namespace com.veda.X4Lidar
 {
-    public class W32Serial
+
+    public class LidarSerialControl: SerialControl
+    {
+        LidarComApp app = new LidarComApp();
+        public void Init(IX4Tran tran)
+        {
+            app.SetTran(tran);
+            this.init(app, "COM3", 128000);
+        }
+        public void Info()
+        {
+            WriteComm(new byte[] { 0xA5, 0x90 });
+        }
+
+        public override void Stop()
+        {
+            WriteComm(new byte[] { 0xA5, 0x65 });
+            base.Stop();
+        }
+    }
+
+    public class LidarComApp : IComApp
+    {
+        IX4Tran tran;
+        public void SetTran(IX4Tran trans)
+        {
+            tran = trans;
+        }
+        public void OnData(byte[] buf)
+        {
+            //Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
+            tran.Translate(buf);
+        }
+
+        public void OnStart(W32Serial ser)
+        {
+            ser.WriteComm(new W32Serial.SerWriteInfo
+            {
+                buf = new byte[] { 0xA5, 0x60 }
+            });
+        }
+    }
+    public class W32Serial1
     {
         protected Thread _thread;
         protected bool threadStarted = false;

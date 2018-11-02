@@ -13,6 +13,10 @@ namespace WpfRoadApp
 
     public class DriverSerialControl : SerialControl
     {
+        public void Init(IComApp app)
+        {
+            base.init(app, "COM3", 9600);
+        }
         public async Task<SerialRes> Turn(int v)
         {
             if (v < 10) v = 10;
@@ -32,7 +36,7 @@ namespace WpfRoadApp
         public static DriverSerialControl comm = new DriverSerialControl();
         public SimpleDriver()
         {
-            comm.init(new Capp());
+            comm.Init(new Capp());
         }
         public bool sendCommand;
         public static string url = "http://192.168.168.100";

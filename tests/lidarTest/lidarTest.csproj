@@ -100,6 +100,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\com.veda.Win32Serial\com.veda.Win32Serial.csproj">
+      <Project>{474455b2-ca77-4713-a68e-25979ead4814}</Project>
+      <Name>com.veda.Win32Serial</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\X4Lidar\X4Lidar.csproj">
       <Project>{368ad5b6-55f8-4c80-9d14-ccce88c4c83a}</Project>
       <Name>X4Lidar</Name>
