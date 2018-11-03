@@ -58,8 +58,14 @@
                 inProcesing = true;
                 try
                 {
-                    id = id * 180 / 200;
-                    Console.WriteLine("Rotate " + id);
+                    var max = 15;
+                    var center = 90;
+                    var low = center - max;
+                    var high = center + max;
+                    Console.Write($"GOT {id} => ");
+                    if (id > high) id = high;
+                    else if (id < low) id = low;
+                    Console.WriteLine(id);
                     if (SimpleDriver.comm.WriteQueueLength == 0)
                         await SimpleDriver.comm.Turn(id);
                     return context.JsonResponse(new resp { msg = "r " + id });
