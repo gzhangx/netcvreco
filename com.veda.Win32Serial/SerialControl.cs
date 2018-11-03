@@ -44,9 +44,13 @@ namespace com.veda.Win32Serial
                         }
                         //if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
                         //continue;
+                        Action<uint,string> notifyDone = (code, msg) =>
+                        {
+                            if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "no buf"); } catch { }; });
+                        };
                         if (wi == null || wi.buf == null || wi.buf.Length == 0)
                         {
-                            if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                            notifyDone(0, "no buf");
                             continue;
                         }
                         inWrite = true;
@@ -54,7 +58,7 @@ namespace com.veda.Win32Serial
                         serial.Write(wi.buf, 0, wi.buf.Length);
                         try
                         {
-                            if (wi.Done != null) wi.Done(0, "");
+                           notifyDone(0, "");
                         }
                         catch { }
                         inWrite = false;
