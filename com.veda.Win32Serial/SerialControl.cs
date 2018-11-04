@@ -114,13 +114,14 @@ namespace com.veda.Win32Serial
         protected string init(IComApp app, string portName, int baudRate)
         {
             if (serial != null) return "Already Open";
-            SerialPortFixer.Execute(portName);
             restartFunc = () =>
             {
-                serial = new SerialPort(portName, baudRate);
-                running = true;
                 try
                 {
+                    SerialPortFixer.Execute(portName);
+                    serial = new SerialPort(portName, baudRate);
+                    running = true;
+               
                     serial.Open();
                 } catch (Exception exc)
                 {

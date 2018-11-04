@@ -16,7 +16,7 @@ namespace WpfRoadApp
     {
         public void Init(IComApp app)
         {
-            base.init(app, "COM3", 9600);
+            base.init(app, "COM5", 9600);
         }
         public async Task<SerialRes> Turn(int v)
         {
