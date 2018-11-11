@@ -1,10 +1,12 @@
-﻿using DisplayLib;
+﻿using com.veda.Win32Serial;
+using DisplayLib;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using log4net;
 using netCvLib;
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WpfCvReco;
 
 namespace WpfRoadApp
 {
@@ -26,7 +29,8 @@ namespace WpfRoadApp
     {
         VideoProvider vidProvider = null;
         VideoProvider vidProviderNewVid = new VideoProvider("newvid");
-        public SimpleDriver driver = new SimpleDriver();
+        public IComApp comApp = new SimpleDriver.Capp();
+        public SimpleDriver driver;
         static ILog Logger = LogManager.GetLogger("ShWin");
 
         ICamTrackable camTrack = new VideoLockCamTrack();
@@ -61,6 +65,15 @@ namespace WpfRoadApp
         public SimpleHttpServer httpServer = new SimpleHttpServer();
         public WindowShiftCompare()
         {
+            var portNames = SerialPort.GetPortNames();
+            if (portNames.Length == 0)
+            {
+                MessageBox.Show("No serial port found");
+            }else
+            {
+                comApp.PortName = portNames[0];
+            }
+            driver = new SimpleDriver(comApp);
             //detailWind.Show();
             InitializeComponent();
             LoadOrig();            

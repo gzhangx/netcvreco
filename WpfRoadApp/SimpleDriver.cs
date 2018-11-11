@@ -16,7 +16,7 @@ namespace WpfRoadApp
     {
         public void Init(IComApp app)
         {
-            base.init(app, "COM5", 9600);
+            base.init(app, 9600);
         }
         public async Task<SerialRes> Turn(int v)
         {
@@ -35,9 +35,9 @@ namespace WpfRoadApp
     public class SimpleDriver : IDriver, IDisposable
     {
         public static DriverSerialControl comm = new DriverSerialControl();
-        public SimpleDriver()
+        public SimpleDriver(IComApp app)
         {
-            comm.Init(new Capp());
+            comm.Init(app);
         }
         public bool sendCommand;
         public static string url = "http://192.168.168.100";
@@ -85,13 +85,14 @@ namespace WpfRoadApp
             comm.Stop();
         }
 
-        class Capp : IComApp
+        public class Capp : IComApp
         {
             public void OnData(byte[] buf)
             {
                 Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
             }
 
+            public string PortName { get; set; }
             public void OnStart(W32Serial ser)
             {
 

@@ -10,6 +10,7 @@ namespace AdurinoTest
 {
     class Capp : IComApp
     {
+        public string PortName { get; set; }
         public void OnData(byte[] buf)
         {
             Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));

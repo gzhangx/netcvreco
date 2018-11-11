@@ -111,13 +111,14 @@ namespace com.veda.Win32Serial
             return thread;
         }
         private Func<string> restartFunc;
-        protected string init(IComApp app, string portName, int baudRate)
+        protected string init(IComApp app, int baudRate)
         {
             if (serial != null) return "Already Open";
             restartFunc = () =>
             {
                 try
                 {
+                    var portName = app.PortName;
                     SerialPortFixer.Execute(portName);
                     serial = new SerialPort(portName, baudRate);
                     running = true;
@@ -288,6 +289,7 @@ namespace com.veda.Win32Serial
             Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
         }
 
+        public string PortName { get; set; }
         public void OnStart(W32Serial ser)
         {
 

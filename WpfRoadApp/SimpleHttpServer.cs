@@ -40,21 +40,17 @@
         }
 
         public class SteerController: WebApiController {
-           
+
+            public SteerController(IHttpContext context) :base(context) { }
             public class resp
             {
                 public string msg { get; set; }
             }
             public bool inProcesing = false;
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
-            public async Task<bool> GetR(WebServer server, HttpListenerContext context, int id)
-            {
-                if (context == null)
-                {
-                    Console.WriteLine("server not ready");
-                    return false;
-                }
-                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
+            public async Task<bool> GetR(int id)
+            {                
+                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
                 inProcesing = true;
                 try
                 {
@@ -68,7 +64,7 @@
                     Console.WriteLine(id);
                     if (SimpleDriver.comm.WriteQueueLength == 0)
                         await SimpleDriver.comm.Turn(id);
-                    return context.JsonResponse(new resp { msg = "r " + id });
+                    return this.JsonResponse(new resp { msg = "r " + id });
                 } finally
                 {
                     inProcesing = false;
@@ -76,21 +72,16 @@
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
-            public async Task<bool> Drive(WebServer server, HttpListenerContext context, int id)
-            {
-                if (context == null)
-                {
-                    Console.WriteLine("server not ready");
-                    return false;
-                }
-                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
+            public async Task<bool> Drive(int id)
+            {                
+                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
                 inProcesing = true;
                 try
                 {
                     Console.WriteLine("Drive " + id);
                     if (SimpleDriver.comm.WriteQueueLength == 0)
                         await SimpleDriver.comm.Drive(id);
-                    return context.JsonResponse(new resp { msg = "d " + id });
+                    return this.JsonResponse(new resp { msg = "d " + id });
                 }
                 finally
                 {

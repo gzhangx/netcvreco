@@ -85,12 +85,11 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Unosquare.Labs.EmbedIO, Version=1.16.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EmbedIO.1.16.1\lib\net46\Unosquare.Labs.EmbedIO.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Unosquare.Labs.EmbedIO">
+      <HintPath>..\packages\EmbedIO.2.0.0-rc4\lib\net452\Unosquare.Labs.EmbedIO.dll</HintPath>
     </Reference>
     <Reference Include="Unosquare.Swan.Lite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unosquare.Swan.Lite.0.34.3\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
+      <HintPath>..\packages\Unosquare.Swan.Lite.0.35.0\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
@@ -176,6 +175,10 @@
     <ProjectReference Include="..\netCvLib\netCvLib.csproj">
       <Project>{1bd5985e-8fbb-4915-a643-8f9313689480}</Project>
       <Name>netCvLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfCvReco\WpfCvReco.csproj">
+      <Project>{9B0D91C1-0F49-4E77-AFB5-9BF45E53129C}</Project>
+      <Name>WpfCvReco</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

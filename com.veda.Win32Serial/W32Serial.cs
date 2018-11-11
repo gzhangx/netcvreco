@@ -14,6 +14,7 @@ namespace com.veda.Win32Serial
 {
     public interface IComApp
     {
+        string PortName { get; set; }
         void OnStart(W32Serial ser);
         void OnData(byte[] buf);
     }
