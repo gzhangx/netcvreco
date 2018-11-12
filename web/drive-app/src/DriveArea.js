@@ -27,7 +27,7 @@ class DriveArea extends Component{
 
     sendCmd(xx,yy) {
         let y = parseInt((100-yy)/20);
-        let x = (xx/200*20)+90;
+        let x = parseInt((xx/200*20)+90);
         api.cmdReq(`api/r/${x}`);
         api.cmdReq(`api/d/${y}`);
         this.setState({displayX: x, displayY:y});
