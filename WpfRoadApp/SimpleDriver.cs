@@ -23,6 +23,7 @@ namespace WpfRoadApp
     }
     public class DriverSerialControl : SerialControl
     {
+        private int currentV = -1, currentR = -1;
         public void Init(IComApp app)
         {
             base.init(app, 9600);
@@ -31,14 +32,36 @@ namespace WpfRoadApp
         {
             if (v < 10) v = 10;
             if (v > 170) v = 170;
-            return await WriteComm($"R{v}\n", new SimpleDriveCompar { Oper = "R" });
+            if (v == currentR)
+            {
+                //Console.WriteLine("skip R");
+                return new SerialRes();
+            }
+            var res =  await WriteComm($"R{v}\n", new SimpleDriveCompar { Oper = "R" });
+            if (res.OK == 0)
+            {
+                Console.WriteLine("SER RSPR:" + res.Err);
+                currentR = v;
+            }
+            return res;
         }
 
         public async Task<SerialRes> Drive(int v)
         {
+            if (v == currentV)
+            {
+                //Console.WriteLine("skip V");
+                return new SerialRes();
+            }
             if (v < 0) v = 0;
             if (v > 5) v = 5;
-            return await WriteComm($"D{v}\n", new SimpleDriveCompar { Oper = "D" });
+            var res = await WriteComm($"D{v}\n", new SimpleDriveCompar { Oper = "D" });
+            if (res.OK == 0)
+            {
+                Console.WriteLine("SER RSPV:" + res.Err);
+                currentV = v;
+            }
+            return res;
         }
     }
     public class SimpleDriver : IDriver, IDisposable
@@ -112,7 +135,7 @@ namespace WpfRoadApp
                         int ind = curstr.IndexOf("\n");
                         if (ind >= 0)
                         {
-                            curResponse.Add(curstr.Substring(0, ind - 1));
+                            curResponse.Add(curstr.Substring(0, ind));
                             curLine.Length = 0;
                             curLine.Append(curstr.Substring(ind + 1));
                             Monitor.Pulse(syncObj);

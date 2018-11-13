@@ -45,6 +45,7 @@
             public class resp
             {
                 public string msg { get; set; }
+                public uint ok { get; set; }
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/r/{id}")]
@@ -58,8 +59,8 @@
                 if (id > high) id = high;
                 else if (id < low) id = low;
                 Console.WriteLine(id);                
-                await SimpleDriver.comm.Turn(id);
-                return this.JsonResponse(new resp { msg = "r " + id });
+                var res = await SimpleDriver.comm.Turn(id);
+                return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
@@ -67,7 +68,7 @@
             {
                 Console.WriteLine("Drive " + id);
                 await SimpleDriver.comm.Drive(id);
-                return this.JsonResponse(new resp { msg = "d " + id });
+                return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
         }
     }

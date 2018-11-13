@@ -71,11 +71,11 @@ namespace com.veda.Win32Serial
                         //continue;
                         Action<uint,string> notifyDone = (code, msg) =>
                         {
-                            if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "no buf"); } catch { }; });
+                            if (wi.Done != null) Task.Run(() => { try { wi.Done(code, msg); } catch { }; });
                         };
                         if (wi == null || wi.buf == null || wi.buf.Length == 0)
                         {
-                            notifyDone(0, "no buf");
+                            notifyDone(255, "no buf");
                             continue;
                         }
                         inWrite = true;
