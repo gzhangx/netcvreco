@@ -17,7 +17,31 @@ namespace com.veda.Win32Serial
         private object _writeQueueLock = new object();
         private bool running = false;
 
-
+        protected virtual void PreProcessQueue(List<W32Serial.SerWriteInfo> queue)
+        {
+            if (queue.Count > 1)
+            {
+                var last = queue.Last();
+                List<W32Serial.SerWriteInfo> bad = new List<W32Serial.SerWriteInfo>();
+                queue.ForEach(q =>
+                {
+                    if (q != last)
+                    {
+                        if (last.canOverRide(q))
+                            bad.Add(q);
+                    }
+                });
+                if (bad.Count > 0)
+                {
+                    Console.WriteLine("Removing duplicates =============>" + bad.Count);                                        
+                    bad.ForEach(wi =>
+                    {
+                        queue.Remove(wi);
+                        if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "no buf"); } catch { }; });
+                    });
+                }                
+            }
+        }
         private Thread CreateSerialWriteThread()
         {
             var thread = new Thread(() =>
@@ -34,11 +58,12 @@ namespace com.veda.Win32Serial
                             if (!running) break;
                             if (_writeQueue.Count == 0)
                                 Monitor.Wait(_writeQueueLock);
+                            PreProcessQueue(_writeQueue);
                             while (inWrite)
                             {
                                 Thread.Sleep(100);
                                 Console.WriteLine("in write wait");
-                            }
+                            }                            
                             wi = _writeQueue[0];
                             _writeQueue.RemoveAt(0);
                         }
@@ -165,16 +190,17 @@ namespace com.veda.Win32Serial
                 Monitor.Pulse(_writeQueueLock);
             }
         }
-        public Task<SerialRes> WriteComm(string s)
+        public Task<SerialRes> WriteComm(string s, W32Serial.SerWriteInfoCmpareInfo ovInf = null)
         {
-            return WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s));
+            return WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s), ovInf);
         }
-        public Task<SerialRes> WriteComm(byte[] buff)
+        public Task<SerialRes> WriteComm(byte[] buff, W32Serial.SerWriteInfoCmpareInfo ovInf = null)
         {
             TaskCompletionSource<SerialRes> ts = new TaskCompletionSource<SerialRes>();
 
             WriteComm(new W32Serial.SerWriteInfo
             {
+                OverRideInfo = ovInf,
                 buf = buff,
                 Done = (stat, err) =>
                 {
@@ -286,6 +312,7 @@ namespace com.veda.Win32Serial
     {
         public void OnData(byte[] buf)
         {
+            Console.Write('~');
             Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
         }
 

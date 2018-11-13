@@ -46,47 +46,28 @@
             {
                 public string msg { get; set; }
             }
-            public bool inProcesing = false;
-            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
+
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/r/{id}")]
             public async Task<bool> GetR(int id)
-            {                
-                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
-                inProcesing = true;
-                try
-                {
-                    var max = 15;
-                    var center = 90;
-                    var low = center - max;
-                    var high = center + max;
-                    Console.Write($"GOT {id} => ");
-                    if (id > high) id = high;
-                    else if (id < low) id = low;
-                    Console.WriteLine(id);
-                    if (SimpleDriver.comm.WriteQueueLength == 0)
-                        await SimpleDriver.comm.Turn(id);
-                    return this.JsonResponse(new resp { msg = "r " + id });
-                } finally
-                {
-                    inProcesing = false;
-                }
+            {
+                var max = 15;
+                var center = 90;
+                var low = center - max;
+                var high = center + max;
+                Console.Write($"GOT {id} => ");
+                if (id > high) id = high;
+                else if (id < low) id = low;
+                Console.WriteLine(id);                
+                await SimpleDriver.comm.Turn(id);
+                return this.JsonResponse(new resp { msg = "r " + id });
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
             public async Task<bool> Drive(int id)
-            {                
-                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
-                inProcesing = true;
-                try
-                {
-                    Console.WriteLine("Drive " + id);
-                    if (SimpleDriver.comm.WriteQueueLength == 0)
-                        await SimpleDriver.comm.Drive(id);
-                    return this.JsonResponse(new resp { msg = "d " + id });
-                }
-                finally
-                {
-                    inProcesing = false;
-                }
+            {
+                Console.WriteLine("Drive " + id);
+                await SimpleDriver.comm.Drive(id);
+                return this.JsonResponse(new resp { msg = "d " + id });
             }
         }
     }

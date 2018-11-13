@@ -12,6 +12,14 @@ using static com.veda.Win32Serial.SerialControlWin32;
 namespace WpfRoadApp
 {
 
+    class SimpleDriveCompar : W32Serial.SerWriteInfoCmpareInfo
+    {
+        public string Oper { get; set; }        
+        public bool canOverRide(W32Serial.SerWriteInfoCmpareInfo a)
+        {
+            return Oper == ((SimpleDriveCompar)a).Oper;
+        }
+    }
     public class DriverSerialControl : SerialControl
     {
         public void Init(IComApp app)
@@ -22,14 +30,14 @@ namespace WpfRoadApp
         {
             if (v < 10) v = 10;
             if (v > 170) v = 170;
-            return await WriteComm($"R{v}\n");
+            return await WriteComm($"R{v}\n", new SimpleDriveCompar { Oper = "R" });
         }
 
         public async Task<SerialRes> Drive(int v)
         {
             if (v < 0) v = 0;
             if (v > 5) v = 5;
-            return await WriteComm($"D{v}\n");
+            return await WriteComm($"D{v}\n", new SimpleDriveCompar { Oper = "D" });
         }
     }
     public class SimpleDriver : IDriver, IDisposable
@@ -89,6 +97,7 @@ namespace WpfRoadApp
         {
             public void OnData(byte[] buf)
             {
+                Console.Write("*");
                 Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
             }
 
