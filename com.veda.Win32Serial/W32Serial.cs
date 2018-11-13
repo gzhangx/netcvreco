@@ -17,6 +17,7 @@ namespace com.veda.Win32Serial
         string PortName { get; set; }
         void OnStart(W32Serial ser);
         void OnData(byte[] buf);
+        string waitSerialResponse();
     }
 
     public interface IComError

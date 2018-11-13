@@ -83,7 +83,7 @@ namespace com.veda.Win32Serial
                         serial.Write(wi.buf, 0, wi.buf.Length);
                         try
                         {
-                           notifyDone(0, "");
+                           notifyDone(0, comApp.waitSerialResponse());
                         }
                         catch { }
                         inWrite = false;
@@ -136,8 +136,10 @@ namespace com.veda.Win32Serial
             return thread;
         }
         private Func<string> restartFunc;
+        private IComApp comApp;
         protected string init(IComApp app, int baudRate)
         {
+            this.comApp = app;
             if (serial != null) return "Already Open";
             restartFunc = () =>
             {
@@ -316,6 +318,10 @@ namespace com.veda.Win32Serial
             Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
         }
 
+        public virtual string waitSerialResponse()
+        {
+            return "";
+        }
         public string PortName { get; set; }
         public void OnStart(W32Serial ser)
         {

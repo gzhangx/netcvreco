@@ -8,6 +8,7 @@ using System.Net;
 using System.IO;
 using com.veda.Win32Serial;
 using static com.veda.Win32Serial.SerialControlWin32;
+using System.Threading;
 
 namespace WpfRoadApp
 {
@@ -95,12 +96,50 @@ namespace WpfRoadApp
 
         public class Capp : IComApp
         {
+            private object syncObj = new object();
+            private List<string> curResponse = new List<string>();
+            private StringBuilder curLine = new StringBuilder();
             public void OnData(byte[] buf)
             {
-                Console.Write("*");
-                Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
+                string cur = System.Text.ASCIIEncoding.ASCII.GetString(buf);
+                Console.Write(cur);
+                curLine.Append(cur);
+                lock (syncObj)
+                {
+                    while (true)
+                    {
+                        var curstr = curLine.ToString();
+                        int ind = curstr.IndexOf("\n");
+                        if (ind >= 0)
+                        {
+                            curResponse.Add(curstr.Substring(0, ind - 1));
+                            curLine.Length = 0;
+                            curLine.Append(curstr.Substring(ind + 1));
+                            Monitor.Pulse(syncObj);
+                        }
+                        else break;
+                    }
+                }
             }
-
+            public virtual string waitSerialResponse()
+            {
+                string rsp = "";
+                lock(syncObj)
+                {
+                    Console.Write("?");
+                    if (curResponse.Count == 0)
+                    {
+                        Monitor.Wait(syncObj, 3000);
+                    }
+                    Console.Write("$");
+                    if (curResponse.Count != 0)
+                    {
+                        rsp = curResponse.Last();
+                        curResponse.Clear();
+                    }
+                }
+                return rsp;
+            }
             public string PortName { get; set; }
             public void OnStart(W32Serial ser)
             {
