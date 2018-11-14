@@ -16,21 +16,29 @@ class DriveArea extends Component{
         //200->180
         //const boundingRect = this.refs.drawArea.getBoundingClientRect(); //left top
         //e.screenX - boundingRect.left, y: e.screenY - boundingRect.top
-        const x = e.nativeEvent.offsetX;
-        const y = e.nativeEvent.offsetY;
+        let x = e.nativeEvent.offsetX;
+        let y = e.nativeEvent.offsetY;
+        if (x > 200) x = 200;
+        if (x < 0) x = 0;
         const me = this;
-        debounce(()=>{
-            me.setState({ x, y });
-            me.sendCmd(x,y);
-        }, 100)();
+        //debounce(()=>{
+            //me.setState({ x, y });
+        me.sendCmd(x,y);
+        //}, 100)();
     }
 
     sendCmd(xx,yy) {
-        let y = parseInt((100-yy)/20);
-        let x = parseInt((xx/200*20)+90);
-        api.cmdReq(`api/r/${x}`);
-        api.cmdReq(`api/d/${y}`);
-        this.setState({displayX: x, displayY:y});
+        const me = this;
+        const y = parseInt((100-yy)/20);
+        const x = parseInt(((xx-100)/10)+90);
+        api.cmdReq(`api/r/${x}`).then(()=>{
+          return api.cmdReq(`api/d/${y}`);
+        }).then(()=>{
+            me.setState({ x:xx, y:yy });
+        }).catch(exc=>{
+            me.setState({ x:xx, y:yy });
+        });
+        //this.setState({displayX: x, displayY:y});
     }
 
     render() {
