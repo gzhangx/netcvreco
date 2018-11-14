@@ -20,6 +20,11 @@ namespace AdurinoTest
         {
          
         }
+
+        public string waitSerialResponse()
+        {
+            return "";
+        }
     }
     class Program
     {

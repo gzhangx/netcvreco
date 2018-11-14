@@ -67,7 +67,7 @@
             public async Task<bool> Drive(int id)
             {
                 Console.WriteLine("Drive " + id);
-                await SimpleDriver.comm.Drive(id);
+                var res = await SimpleDriver.comm.Drive(id);
                 return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
         }

@@ -55,6 +55,11 @@ namespace com.veda.X4Lidar
                 buf = new byte[] { 0xA5, 0x60 }
             });
         }
+
+        public string waitSerialResponse()
+        {
+            return "";
+        }
     }
     //public class W32Serial1
     //{
