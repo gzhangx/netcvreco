@@ -37,7 +37,7 @@ namespace com.veda.Win32Serial
                     bad.ForEach(wi =>
                     {
                         queue.Remove(wi);
-                        if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "no buf"); } catch { }; });
+                        if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "overriden"); } catch { }; });
                     });
                 }                
             }
