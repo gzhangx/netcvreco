@@ -6,7 +6,7 @@
 Servo myservo;  // create servo object to control a servo
 // twelve servo objects can be created on most boards
 
-int pos = 90;    // variable to store the servo position
+int spos = 90;    // variable to store the servo position
 int speed = 0;
 int driveCount = 0;
 void setup() {
@@ -53,8 +53,15 @@ void drive() {
     digitalWrite(2, LOW);
     digitalWrite(3, LOW);
   }else {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, HIGH);
+    if (spos < 90)
+      digitalWrite(2, LOW);
+    else
+      digitalWrite(2, HIGH);
+
+    if (spos > 90)
+      digitalWrite(3, LOW);
+    else
+      digitalWrite(3, HIGH);
     driveDebug();
   }
   driveCount++;
@@ -72,7 +79,7 @@ void loop() {
     Serial.print("\n");
     char cmd = serialBuffer[0];
     if (cmd == 'R') {
-       int spos = readIntVal();
+       spos = readIntVal();
        if (spos<0) spos = 0;
        else if (spos > 180) spos = 180;
        Serial.print("servo to ");
