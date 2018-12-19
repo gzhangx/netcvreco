@@ -23,7 +23,7 @@ class DriveArea extends Component{
         const me = this;
         //debounce(()=>{
             //me.setState({ x, y });
-        me.sendCmd(x,y);
+        //me.sendCmd(x,y);
         //}, 100)();
     }
 
@@ -35,16 +35,58 @@ class DriveArea extends Component{
           return api.cmdReq(`api/d/${y}`);
         }).then(()=>{
             me.setState({ x:xx, y:yy });
-        }).catch(exc=>{
-            me.setState({ x:xx, y:yy });
+        }).catch(e=>{
+            console.log(e);
+            me.setState({ error:e });
         });
         //this.setState({displayX: x, displayY:y});
     }
 
+    goleft() {
+        const me = this;
+        api.cmdReq(`api/r/0`).then(()=>{
+            me.setState({ x:0 });
+        }).catch(e=>{
+            console.log(e);
+            me.setState({ error:e });
+        });
+    }
+    goright() {
+        const me = this;
+        api.cmdReq(`api/r/180`).then(()=>{
+            me.setState({ x:180 });
+        }).catch(e=>{
+            console.log(e);
+            me.setState({ error:e });
+        })
+    }
+    forward() {
+        const me = this;
+        api.cmdReq(`api/r/90`).then(()=>{
+            api.cmdReq(`api/d/5`);
+            me.setState({ x:100, y: 0 });
+        }).catch(e=>{
+            console.log(e);
+            me.setState({ error:e });
+        });
+    }
+
+    stop() {
+        const me = this;
+        api.cmdReq(`api/d/0`).then(()=>{
+            me.setState({ x:100, y:200 });
+        });
+    }
     render() {
         const { x, y, displayX, displayY } = this.state;
         return <div ref="drawArea" onMouseMove={this._onMouseMove.bind(this)} className="App-work-area">
             <p>Mouse coordinates: { x },{ y } ({ displayX}, {displayY})</p>
+            <button onClick={()=>this.goleft()}>Left</button>
+            <button onClick={()=>this.forward()}>Forward</button>
+            <button onClick={()=>this.goright()}>Right</button>
+            <div>
+                <button onClick={()=>this.stop()}>Stop</button>
+            </div>
             <svg>
                 <line
                     x1={100}

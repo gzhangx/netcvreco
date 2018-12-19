@@ -27,11 +27,16 @@ void falling() {
   Serial.println(pwm_value);
 }
 
-
+int servo1Value = 0;
 void loop() {
   pin1Val = pulseIn(PWM_PIN1, HIGH);
-  Serial.println(pin1Val);
-  Serial.println(pwm_value);
+  //Serial.println(pin1Val);
+  //Serial.println(pwm_value);
 
-  servo1.write((int)(pin1Val/100*100)); 
+  int newServo1Val = (int)(pin1Val/10*10);
+  if (servo1Value != newServo1Val) {
+    servo1.write(newServo1Val); 
+    servo1Value = newServo1Val;
+    Serial.println(newServo1Val);
+  }
 }
