@@ -91,17 +91,18 @@
                 return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
 
-            bool cancelReplay = false;
+
+            bool cancelReplay = true;
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/replay")]
             public async Task<bool> Replay()
             {
                 Console.WriteLine("Replay");
-                cancelReplay = true;
+                cancelReplay = false;
                 TrackingStats.CmdRecorder.Load();
 
                 foreach (var cmd in TrackingStats.CmdRecorder.Commands)
                 {
-                    if (!cancelReplay) break;
+                    if (cancelReplay) break;
                     DateTime now = DateTime.Now;
                     if (cmd.Command == "D")
                     {
@@ -125,6 +126,12 @@
                 }
 
                 return this.JsonResponse(new resp { msg = "OK", ok = 0 });
+            }
+
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/cancelReplay")]
+            public void CancelReplay()
+            {
+                cancelReplay = true;
             }
         }
     }
