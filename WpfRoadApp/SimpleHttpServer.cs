@@ -58,7 +58,12 @@
                 Console.Write($"GOT {id} => ");
                 if (id > high) id = high;
                 else if (id < low) id = low;
-                Console.WriteLine(id);                
+                Console.WriteLine(id);
+                TrackingStats.CmdRecorder.AddCommandInfo(new CommandInfo
+                {
+                    Command = "R",
+                    CommandParam = id,
+                });
                 var res = await SimpleDriver.comm.Turn(id);
                 return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
@@ -67,8 +72,59 @@
             public async Task<bool> Drive(int id)
             {
                 Console.WriteLine("Drive " + id);
+                if(id == 0)
+                {
+                    TrackingStats.CmdRecorder.Stop();
+                }else
+                {
+                    if (!TrackingStats.CmdRecorder.Inited)
+                    {
+                        TrackingStats.CmdRecorder.Init();
+                    }
+                }
                 var res = await SimpleDriver.comm.Drive(id);
+                TrackingStats.CmdRecorder.AddCommandInfo(new CommandInfo
+                {
+                    Command = "D",
+                    CommandParam = id,
+                });
                 return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
+            }
+
+            bool cancelReplay = false;
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/replay")]
+            public async Task<bool> Replay()
+            {
+                Console.WriteLine("Replay");
+                cancelReplay = true;
+                TrackingStats.CmdRecorder.Load();
+
+                foreach (var cmd in TrackingStats.CmdRecorder.Commands)
+                {
+                    if (!cancelReplay) break;
+                    DateTime now = DateTime.Now;
+                    if (cmd.Command == "D")
+                    {
+                        var res = await SimpleDriver.comm.Drive(cmd.CommandParam);
+                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                    }else if (cmd.Command == "R")
+                    {
+                        var res = await SimpleDriver.comm.Turn(cmd.CommandParam);
+                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                    }
+                    if (cmd.timeMs > 0)
+                    {
+                        double spent = DateTime.Now.Subtract(now).TotalMilliseconds;
+                        if (spent < cmd.timeMs)
+                        {
+                            var delay = (int)(cmd.timeMs - spent);
+                            Console.WriteLine($"Speeping {delay}");
+                            await Task.Delay(delay);
+                        }
+                    }
+                }
+
+                return this.JsonResponse(new resp { msg = "OK", ok = 0 });
             }
         }
     }
