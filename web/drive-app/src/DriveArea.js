@@ -77,6 +77,13 @@ class DriveArea extends Component{
             me.setState({ x:100, y:200 });
         });
     }
+
+    replay() {
+        return api.cmdReq(`api/replay`)
+    }
+    cancelReplay() {
+        return api.cmdReq(`api/cancelReplay`)
+    }
     render() {
         const { x, y, displayX, displayY } = this.state;
         return <div ref="drawArea" onMouseMove={this._onMouseMove.bind(this)} className="App-work-area">
@@ -86,6 +93,10 @@ class DriveArea extends Component{
             <button onClick={()=>this.goright()}>Right</button>
             <div>
                 <button onClick={()=>this.stop()}>Stop</button>
+            </div>
+            <div>
+                <button onClick={()=>this.replay()}>Replay</button>
+                <button onClick={()=>this.cancelReplay()}>Cancel</button>
             </div>
             <svg>
                 <line
