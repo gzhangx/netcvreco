@@ -109,11 +109,11 @@
                     if (cmd.Command == "D")
                     {
                         var res = await SimpleDriver.comm.Drive(cmd.CommandParam);
-                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err} {cancelReplay}");
+                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err}");
                     }else if (cmd.Command == "R")
                     {
                         var res = await SimpleDriver.comm.Turn(cmd.CommandParam);
-                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err} {cancelReplay}");
+                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err}");
                     }
                     if (cmd.timeMs > 0)
                     {
@@ -122,7 +122,7 @@
                         {
                             if (cancelReplay) break;
                             var delay = (int)(cmd.timeMs - spent);
-                            Console.WriteLine($"Speeping {delay} {cancelReplay}");
+                            Console.WriteLine($"Speeping {delay}");
                             await Task.Delay(delay);
                         }
                     }
