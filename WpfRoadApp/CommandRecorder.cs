@@ -28,8 +28,8 @@ namespace WpfRoadApp
             if (parts[off] != "CMD") throw new ArgumentException("bad format");
             Command = parts[off+1];
             CommandParam = Convert.ToInt32(parts[off+2]);
-            timePositionMs = Convert.ToInt64(parts[off+3]);
-            timeMs = Convert.ToInt64(parts[off+4]);
+            timePositionMs = Convert.ToDouble(parts[off+3]);
+            timeMs = Convert.ToDouble(parts[off+4]);
         }
     }
     public class CommandRecorder
@@ -58,6 +58,7 @@ namespace WpfRoadApp
         public void Stop()
         {
             Inited = false;
+            Save();
         }
         public void AddCommandInfo(CommandInfo info)
         {

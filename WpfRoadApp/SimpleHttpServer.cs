@@ -72,10 +72,7 @@
             public async Task<bool> Drive(int id)
             {
                 Console.WriteLine("Drive " + id);
-                if(id == 0)
-                {
-                    TrackingStats.CmdRecorder.Stop();
-                }else
+                if(id != 0)
                 {
                     if (!TrackingStats.CmdRecorder.Inited)
                     {
@@ -88,6 +85,10 @@
                     Command = "D",
                     CommandParam = id,
                 });
+                if (id == 0)
+                {
+                    TrackingStats.CmdRecorder.Stop();
+                }
                 return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
 
@@ -129,9 +130,10 @@
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/cancelReplay")]
-            public void CancelReplay()
+            public bool CancelReplay()
             {
                 cancelReplay = true;
+                return true;
             }
         }
     }
