@@ -77,6 +77,7 @@
                     if (!TrackingStats.CmdRecorder.Inited)
                     {
                         TrackingStats.CmdRecorder.Init();
+                        await GetR(90);
                     }
                 }
                 var res = await SimpleDriver.comm.Drive(id);
@@ -93,7 +94,7 @@
             }
 
 
-            bool cancelReplay = true;
+            static bool cancelReplay = true;
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/replay")]
             public async Task<bool> Replay()
             {
@@ -108,30 +109,36 @@
                     if (cmd.Command == "D")
                     {
                         var res = await SimpleDriver.comm.Drive(cmd.CommandParam);
-                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err} {cancelReplay}");
                     }else if (cmd.Command == "R")
                     {
                         var res = await SimpleDriver.comm.Turn(cmd.CommandParam);
-                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err} {cancelReplay}");
                     }
                     if (cmd.timeMs > 0)
                     {
                         double spent = DateTime.Now.Subtract(now).TotalMilliseconds;
                         if (spent < cmd.timeMs)
                         {
+                            if (cancelReplay) break;
                             var delay = (int)(cmd.timeMs - spent);
-                            Console.WriteLine($"Speeping {delay}");
+                            Console.WriteLine($"Speeping {delay} {cancelReplay}");
                             await Task.Delay(delay);
                         }
                     }
                 }
 
+                if (cancelReplay)
+                {
+                    await SimpleDriver.comm.Drive(0);
+                }
                 return this.JsonResponse(new resp { msg = "OK", ok = 0 });
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/cancelReplay")]
             public bool CancelReplay()
             {
+                Console.WriteLine("Canceled");
                 cancelReplay = true;
                 return true;
             }
