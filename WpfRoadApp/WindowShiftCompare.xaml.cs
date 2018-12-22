@@ -351,6 +351,11 @@ namespace WpfRoadApp
 
         void ISaveVideoReport.ShowProg(int i, string s)
         {
+            TrackingStats.CmdRecorder.AddCommandInfo(new CommandInfo
+            {
+                 Command = "V",
+                 CommandParam = i,
+            });
             TDispatch(() => {
                 info.Text = s;                
             });
