@@ -5,7 +5,7 @@ namespace WpfRoadApp
 {
     public class TrackingStats
     {
-        public static CommandRecorder CmdRecorder = new CommandRecorder();
+        public static CommandRecorder CmdRecorder;
         protected static RealTimeTrackLoc realTimeTrack = new RealTimeTrackLoc();
         public static bool StayAtSamePlace
         {

@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace WpfRoadApp
 {
+    public interface IRecordStarter
+    {
+        void StartRecord();
+        void EndRecord();
+    }
     public class CommandInfo
     {
         public double timePositionMs { get; set; }
@@ -34,9 +39,11 @@ namespace WpfRoadApp
     }
     public class CommandRecorder
     {
-        public CommandRecorder(string saveDir = "orig")
+        IRecordStarter recorder = null;
+        public CommandRecorder(IRecordStarter r, string saveDir = "orig")
         {
             DefaultSaveDir = saveDir;
+            recorder = r;
         }
         public string DefaultSaveDir
         {
@@ -51,19 +58,27 @@ namespace WpfRoadApp
         }
         public void Init()
         {
-            startTime = new DateTime();
+            startTime = DateTime.Now;
+            recorder.StartRecord();
             Commands = new List<CommandInfo>();
             Inited = true;
         }
         public void Stop()
         {
             Inited = false;
+            recorder.EndRecord();
             Save();
         }
+        private Dictionary<string, bool> isDriveCmd = new Dictionary<string, bool>
+        {
+            {"D",true },
+            {"R",true },
+            {"V",false },
+        };
         public void AddCommandInfo(CommandInfo info)
         {
             info.timePositionMs = DateTime.Now.Subtract(startTime).TotalMilliseconds;
-            var prior = Commands.LastOrDefault();
+            var prior = Commands.LastOrDefault(c=>isDriveCmd[c.Command]);
             if (prior != null)
             {
                 prior.timeMs = info.timePositionMs - prior.timePositionMs;

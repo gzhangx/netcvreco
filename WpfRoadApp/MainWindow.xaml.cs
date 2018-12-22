@@ -15,7 +15,7 @@ namespace WpfRoadApp
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, RVReporter
+    public partial class MainWindow : Window, RVReporter, IRecordStarter
     {
         ILog Logger = LogManager.GetLogger("mainwin");
         public static bool DebugMode
@@ -37,6 +37,7 @@ namespace WpfRoadApp
         public MainWindow()
         {
             InitializeComponent();
+            TrackingStats.CmdRecorder = new CommandRecorder(this);
             cmpWin.Show();
             this.Left = 0;
             this.Top = 0;
@@ -73,7 +74,7 @@ namespace WpfRoadApp
             StartRecord();
         }
 
-        protected void StartRecord()
+        public void StartRecord()
         {
             recordCount = 0;            
             rc.StartRecording();
@@ -85,10 +86,13 @@ namespace WpfRoadApp
         }
 
         
-        protected void EndRecord()
+        public void EndRecord()
         {
             rc.EndRecording();
-            start.IsEnabled = true;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                start.IsEnabled = true;
+            }));            
         }
 
         private static object imageLock = new object();
