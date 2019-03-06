@@ -41,20 +41,20 @@
 
         public class SteerController: WebApiController {
            
+            public SteerController(IHttpContext context) : base(context)
+            {
+
+            }
             public class resp
             {
                 public string msg { get; set; }
             }
             public bool inProcesing = false;
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
-            public async Task<bool> GetR(WebServer server, HttpListenerContext context, int id)
+            public async Task<bool> GetR(int id)
             {
-                if (context == null)
-                {
-                    Console.WriteLine("server not ready");
-                    return false;
-                }
-                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
+     
+                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
                 inProcesing = true;
                 try
                 {
@@ -62,7 +62,7 @@
                     Console.WriteLine("Rotate " + id);
                     if (SimpleDriver.comm.WriteQueueLength == 0)
                         await SimpleDriver.comm.Turn(id);
-                    return context.JsonResponse(new resp { msg = "r " + id });
+                    return this.JsonResponse(new resp { msg = "r " + id });
                 } finally
                 {
                     inProcesing = false;
