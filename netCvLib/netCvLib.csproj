@@ -69,6 +69,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="calib3d\Calib.cs" />
+    <Compile Include="calib3d\Depth.cs" />
     <Compile Include="harrc.cs" />
     <Compile Include="HarrCascadeCamTrack.cs" />
     <Compile Include="ICamTrackable.cs" />
