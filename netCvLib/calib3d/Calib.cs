@@ -17,10 +17,10 @@ namespace netCvLib.calib3d
         const int height = 3;//6 // heght of chess board no. squares in heigth - 1
         public const int buffer_length = 100; //define the aquasition length of the buffer 
 
-        const string saveFilePath = @"C:\test\StereoImaging\StereoImaging\";
+        const string saveFilePath = @"C:\test\netCvReco\data\";
         const string saveFileName_corners = saveFilePath + "corners.txt";
         const string saveFileName_mat = saveFilePath + "mat.txt";
-        public Calib()
+        static Calib()
         {
             Random R = new Random();
             for (int i = 0; i < line_colour_array.Length; i++)
@@ -101,8 +101,8 @@ namespace netCvLib.calib3d
                     {
                         var saveStr = cornerToString(cfg.corners_points_Left) + cornerToString(cfg.corners_points_Right);
                         File.AppendAllText(saveFileName_corners, saveStr);
-                    }
-                    cfg.done = true;
+                        cfg.done = true;
+                    }                    
                     //Show state of Buffer                        
                 }
 
@@ -116,9 +116,11 @@ namespace netCvLib.calib3d
         }
 
 
-        Bgr[] line_colour_array = new Bgr[width * height]; // just for displaying coloured lines of detected chessboard
-        public void DrawChessFound(Image<Bgr, Byte> frame_S1, Image<Bgr, Byte> frame_S2, CornersStepCfg cfg)
+        static Bgr[] line_colour_array = new Bgr[width * height]; // just for displaying coloured lines of detected chessboard
+        public static void DrawChessFound(Image<Bgr, Byte> frame_S1, Image<Bgr, Byte> frame_S2, CornersStepCfg cfg)
         {
+            if (cfg.corners_Left == null) return;
+            if (cfg.corners_Right == null) return;
             //draw the results
             frame_S1.Draw(new CircleF(cfg.corners_Left[0], 3), new Bgr(Color.Yellow), 1);
             frame_S2.Draw(new CircleF(cfg.corners_Right[0], 3), new Bgr(Color.Yellow), 1);
@@ -177,6 +179,7 @@ namespace netCvLib.calib3d
 
         public class CalibOutput
         {
+            public Size size;
             public Matrix<double> IntrinsicCam1IntrinsicMatrix = new Matrix<double>(3, 3);
             public Matrix<double> IntrinsicCam2IntrinsicMatrix = new Matrix<double>(3, 3);
             public Matrix<double> IntrinsicCam1DistortionCoeffs = new Matrix<double>(8, 1);
@@ -193,13 +196,14 @@ namespace netCvLib.calib3d
             public Matrix<double> R2 = new Matrix<double>(3, 3); //rectification transforms (rotation matrices) for Camera 1.
             public Matrix<double> P1 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 1.
             public Matrix<double> P2 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 2.
+            public bool rectified = false;
         }
         public static CalibOutput Caluculating_Stereo_Intrinsics(PointF[][] corners_points_Left,PointF[][] corners_points_Right, Size size)
         {
             if (File.Exists(saveFileName_mat))
             {
                 return stringToCalibOutput(File.ReadAllLines(saveFileName_mat));
-            }
+            }            
             MCvPoint3D32f[][] corners_object_Points = new MCvPoint3D32f[buffer_length][]; //stores the calculated size for the chessboard
             for (int k = 0; k < corners_points_Left.Length; k++)
             {
@@ -216,6 +220,7 @@ namespace netCvLib.calib3d
             }
 
             CalibOutput output = new CalibOutput();
+            output.size = size;
             CvInvoke.StereoCalibrate(corners_object_Points, corners_points_Left, corners_points_Right, 
                 output.IntrinsicCam1IntrinsicMatrix, 
                 output.IntrinsicCam1DistortionCoeffs,
@@ -261,6 +266,7 @@ namespace netCvLib.calib3d
             var e = matrixToString("essential", output.essential);
 
             var res = new List<string>();
+            res.Add($"{output.size.Width},{output.size.Height}");
             res.AddRange(c1);
             res.AddRange(c1d);
             res.AddRange(c2);
@@ -274,9 +280,10 @@ namespace netCvLib.calib3d
         public static CalibOutput stringToCalibOutput(string[] lines)
         {
             CalibOutput output = new CalibOutput();
-            int pos = 0;
-
-
+            
+            var sizeStr = lines[0].Split(',');
+            output.size = new Size(Int32.Parse(sizeStr[0]), Int32.Parse(sizeStr[1]));
+            int pos = 1;
             output.IntrinsicCam1IntrinsicMatrix = stringToMatrix(lines, ref pos);
             output.IntrinsicCam1DistortionCoeffs = stringToMatrix(lines, ref pos);
             output.IntrinsicCam2IntrinsicMatrix = stringToMatrix(lines, ref pos);
@@ -307,7 +314,7 @@ namespace netCvLib.calib3d
                 var curData = curLine.Split(',');
                 for (var x = 0; x <w; x++)
                 {
-                    data[y, x] = Convert.ToInt32(curData[x]);
+                    data[y, x] = Convert.ToDouble(curData[x]);
                 }
             }
             pos += h;
@@ -330,6 +337,21 @@ namespace netCvLib.calib3d
             //Toolbox.XmlSerialize(fundamental).Save(saveFilePath + "fundamental.xml");
             //Toolbox.XmlSerialize(essential).Save(saveFilePath + "essential.xml");
 
+        }
+
+
+        public static void Rectify(CalibOutput co)
+        {
+            CvInvoke.StereoRectify(co.IntrinsicCam1IntrinsicMatrix,
+                                             co.IntrinsicCam1DistortionCoeffs,
+                                             co.IntrinsicCam2IntrinsicMatrix,
+                                             co.IntrinsicCam2DistortionCoeffs,
+                                             co.size,
+                                             co.EX_ParamRotationVector.RotationMatrix, co.EX_ParamTranslationVector,
+                                             co.R1, co.R2, co.P1, co.P2, co.Q,
+                                             Emgu.CV.CvEnum.StereoRectifyType.Default, 0,
+                                             co.size, ref co.Rec1, ref co.Rec2);
+            co.rectified = true;
         }
     }
 }
