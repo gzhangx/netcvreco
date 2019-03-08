@@ -85,11 +85,12 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Unosquare.Labs.EmbedIO">
-      <HintPath>..\packages\EmbedIO.2.0.0-rc4\lib\net452\Unosquare.Labs.EmbedIO.dll</HintPath>
+    <Reference Include="Unosquare.Labs.EmbedIO, Version=2.2.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmbedIO.2.2.9\lib\net452\Unosquare.Labs.EmbedIO.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Unosquare.Swan.Lite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unosquare.Swan.Lite.0.35.0\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
+      <HintPath>..\packages\Unosquare.Swan.Lite.0.38.1\lib\net452\Unosquare.Swan.Lite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
