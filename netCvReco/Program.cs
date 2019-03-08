@@ -104,11 +104,11 @@ namespace netCvReco
             for (var i = 0; i < lines.Rows; i++)
             {
                 var v4i = lines.Row(i);
-                var data = v4i.GetData(new int[] { 0});
+                var data = v4i.GetData();
                 var ints = new int[4];
                 for (var index = 0; index < ints.Length; index++)
                 {
-                    ints[index] = BitConverter.ToInt32(data, index * sizeof(int));
+                    ints[index] = (int)data.GetValue(index); //BitConverter.ToInt32(data, index * sizeof(int));
                 }
 
                 CvInvoke.Line(img, new System.Drawing.Point(ints[0], ints[1]),

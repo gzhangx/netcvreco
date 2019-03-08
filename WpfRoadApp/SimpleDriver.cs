@@ -8,36 +8,68 @@ using System.Net;
 using System.IO;
 using com.veda.Win32Serial;
 using static com.veda.Win32Serial.SerialControlWin32;
+using System.Threading;
 
 namespace WpfRoadApp
 {
 
+    class SimpleDriveCompar : W32Serial.SerWriteInfoCmpareInfo
+    {
+        public string Oper { get; set; }        
+        public bool canOverRide(W32Serial.SerWriteInfoCmpareInfo a)
+        {
+            return Oper == ((SimpleDriveCompar)a).Oper;
+        }
+    }
     public class DriverSerialControl : SerialControl
     {
+        private int currentV = -1, currentR = -1;
         public void Init(IComApp app)
         {
-            base.init(app, "COM3", 9600);
+            base.init(app, 9600);
         }
         public async Task<SerialRes> Turn(int v)
         {
             if (v < 10) v = 10;
             if (v > 170) v = 170;
-            return await WriteComm($"R{v}\n");
+            if (v == currentR)
+            {
+                //Console.WriteLine("skip R");
+                return new SerialRes();
+            }
+            var res =  await WriteComm($"R{v}\n", new SimpleDriveCompar { Oper = "R" });
+            if (res.OK == 0)
+            {
+                Console.WriteLine("SER RSPR:" + res.Err);
+                currentR = v;
+            }
+            return res;
         }
 
         public async Task<SerialRes> Drive(int v)
         {
+            if (v == currentV)
+            {
+                //Console.WriteLine("skip V");
+                return new SerialRes();
+            }
             if (v < 0) v = 0;
             if (v > 5) v = 5;
-            return await WriteComm($"D{v}\n");
+            var res = await WriteComm($"D{v}\n", new SimpleDriveCompar { Oper = "D" });
+            if (res.OK == 0)
+            {
+                Console.WriteLine("SER RSPV:" + res.Err);
+                currentV = v;
+            }
+            return res;
         }
     }
     public class SimpleDriver : IDriver, IDisposable
     {
         public static DriverSerialControl comm = new DriverSerialControl();
-        public SimpleDriver()
+        public SimpleDriver(IComApp app)
         {
-            comm.Init(new Capp());
+            comm.Init(app);
         }
         public bool sendCommand;
         public static string url = "http://192.168.168.100";
@@ -85,13 +117,53 @@ namespace WpfRoadApp
             comm.Stop();
         }
 
-        class Capp : IComApp
+        public class Capp : IComApp
         {
+            private object syncObj = new object();
+            private List<string> curResponse = new List<string>();
+            private StringBuilder curLine = new StringBuilder();
             public void OnData(byte[] buf)
             {
-                Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
+                string cur = System.Text.ASCIIEncoding.ASCII.GetString(buf);
+                Console.Write(cur);
+                curLine.Append(cur);
+                lock (syncObj)
+                {
+                    while (true)
+                    {
+                        var curstr = curLine.ToString();
+                        int ind = curstr.IndexOf("\n");
+                        if (ind >= 0)
+                        {
+                            curResponse.Add(curstr.Substring(0, ind));
+                            curLine.Length = 0;
+                            curLine.Append(curstr.Substring(ind + 1));
+                            Monitor.Pulse(syncObj);
+                        }
+                        else break;
+                    }
+                }
             }
-
+            public virtual string waitSerialResponse()
+            {
+                string rsp = "";
+                lock(syncObj)
+                {
+                    Console.Write("?");
+                    if (curResponse.Count == 0)
+                    {
+                        Monitor.Wait(syncObj, 3000);
+                    }
+                    Console.Write("$");
+                    if (curResponse.Count != 0)
+                    {
+                        rsp = curResponse.Last();
+                        curResponse.Clear();
+                    }
+                }
+                return rsp;
+            }
+            public string PortName { get; set; }
             public void OnStart(W32Serial ser)
             {
 

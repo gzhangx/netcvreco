@@ -118,7 +118,8 @@ namespace CrashTest
     {
         public void Init(IComApp app)
         {
-            base.init(app, "COM3", 9600);
+            app.PortName = "COM3";
+            base.init(app, 9600);
         }
     }
 }

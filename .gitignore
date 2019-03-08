@@ -12,3 +12,5 @@
 /tests/CrashTest/bin
 /netCvReco.VC.db
 /netCvReco.VC.VC.opendb
+/tests/StImgTest/bin/*
+/tests/StImgTest/obj/*

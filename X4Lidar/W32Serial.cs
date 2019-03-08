@@ -19,7 +19,8 @@ namespace com.veda.X4Lidar
         public string Init(IX4Tran tran)
         {
             app.SetTran(tran);
-            return this.init(app, "COM4", 128000);
+            app.PortName = "COM4";
+            return this.init(app, 128000);
         }
         public void Info()
         {
@@ -36,6 +37,7 @@ namespace com.veda.X4Lidar
     public class LidarComApp : IComApp
     {
         IX4Tran tran;
+        public string PortName { get; set; }
         public void SetTran(IX4Tran trans)
         {
             tran = trans;
@@ -52,6 +54,11 @@ namespace com.veda.X4Lidar
             {
                 buf = new byte[] { 0xA5, 0x60 }
             });
+        }
+
+        public string waitSerialResponse()
+        {
+            return "";
         }
     }
     //public class W32Serial1

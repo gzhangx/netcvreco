@@ -102,6 +102,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CommandRecorder.cs" />
     <Compile Include="DetailsWindow.xaml.cs">
       <DependentUpon>DetailsWindow.xaml</DependentUpon>
     </Compile>
@@ -176,6 +177,10 @@
     <ProjectReference Include="..\netCvLib\netCvLib.csproj">
       <Project>{1bd5985e-8fbb-4915-a643-8f9313689480}</Project>
       <Name>netCvLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfCvReco\WpfCvReco.csproj">
+      <Project>{9B0D91C1-0F49-4E77-AFB5-9BF45E53129C}</Project>
+      <Name>WpfCvReco</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

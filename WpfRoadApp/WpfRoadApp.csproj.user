@@ -4,7 +4,7 @@
     <ReferencePath>..\dlls\</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <StartWorkingDirectory>C:\test\netcvreco.run</StartWorkingDirectory>
+    <StartWorkingDirectory>c:\test\netCvReco.run</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartWorkingDirectory>C:\test\netcvreco.run</StartWorkingDirectory>

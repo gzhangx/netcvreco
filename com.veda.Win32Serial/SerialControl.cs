@@ -16,14 +16,35 @@ namespace com.veda.Win32Serial
         private List<W32Serial.SerWriteInfo> _writeQueue = new List<W32Serial.SerWriteInfo>();
         private object _writeQueueLock = new object();
         private bool running = false;
-        protected string init(IComApp app, string portName, int baudRate)
+
+        protected virtual void PreProcessQueue(List<W32Serial.SerWriteInfo> queue)
         {
-            if (serial != null) return "Already Open";
-            SerialPortFixer.Execute(portName);
-            serial = new SerialPort(portName, baudRate);
-            running = true;
-            serial.Open();
-            new Thread(() =>
+            if (queue.Count > 1)
+            {
+                var last = queue.Last();
+                List<W32Serial.SerWriteInfo> bad = new List<W32Serial.SerWriteInfo>();
+                queue.ForEach(q =>
+                {
+                    if (q != last)
+                    {
+                        if (last.canOverRide(q))
+                            bad.Add(q);
+                    }
+                });
+                if (bad.Count > 0)
+                {
+                    Console.WriteLine("Removing duplicates =============>" + bad.Count);                                        
+                    bad.ForEach(wi =>
+                    {
+                        queue.Remove(wi);
+                        if (wi.Done != null) Task.Run(() => { try { wi.Done(0, "overriden"); } catch { }; });
+                    });
+                }                
+            }
+        }
+        private Thread CreateSerialWriteThread()
+        {
+            var thread = new Thread(() =>
             {
                 try
                 {
@@ -37,19 +58,24 @@ namespace com.veda.Win32Serial
                             if (!running) break;
                             if (_writeQueue.Count == 0)
                                 Monitor.Wait(_writeQueueLock);
+                            PreProcessQueue(_writeQueue);
                             while (inWrite)
                             {
                                 Thread.Sleep(100);
                                 Console.WriteLine("in write wait");
-                            }
+                            }                            
                             wi = _writeQueue[0];
                             _writeQueue.RemoveAt(0);
                         }
                         //if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
                         //continue;
+                        Action<uint,string> notifyDone = (code, msg) =>
+                        {
+                            if (wi.Done != null) Task.Run(() => { try { wi.Done(code, msg); } catch { }; });
+                        };
                         if (wi == null || wi.buf == null || wi.buf.Length == 0)
                         {
-                            if (wi.Done != null) try { wi.Done(0, "no buf"); } catch { };
+                            notifyDone(255, "no buf");
                             continue;
                         }
                         inWrite = true;
@@ -57,7 +83,7 @@ namespace com.veda.Win32Serial
                         serial.Write(wi.buf, 0, wi.buf.Length);
                         try
                         {
-                            if (wi.Done != null) wi.Done(0, "");
+                           notifyDone(0, comApp.waitSerialResponse());
                         }
                         catch { }
                         inWrite = false;
@@ -71,10 +97,13 @@ namespace com.veda.Win32Serial
                         Console.WriteLine("serial write thread done");
                 }
                 Console.WriteLine("serial write thread end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            }).Start();
-
-
-            new Thread(() =>
+            });
+            thread.Name = "SerialWriteThread";
+            return thread;
+        }
+        private Thread CreateSerialReadThread(IComApp app)
+        {
+            var thread = new Thread(() =>
             {
                 byte[] buf = new byte[2048];
                 try
@@ -91,15 +120,51 @@ namespace com.veda.Win32Serial
                         Array.Copy(buf, data, readLen);
                         app.OnData(data);
                     }
-                } catch (Exception exc)
+                }
+                catch (Exception exc)
                 {
                     if (running)
+                    {
                         Console.WriteLine(exc.Message);
+                        Restart();
+                    }
                     else
                         Console.WriteLine("serial read thread done");
                 }
-            }).Start();
-            return "";
+            });
+            thread.Name = "SerialReadThread";
+            return thread;
+        }
+        private Func<string> restartFunc;
+        private IComApp comApp;
+        protected string init(IComApp app, int baudRate)
+        {
+            this.comApp = app;
+            if (serial != null) return "Already Open";
+            restartFunc = () =>
+            {
+                try
+                {
+                    var portName = app.PortName;
+                    SerialPortFixer.Execute(portName);
+                    serial = new SerialPort(portName, baudRate);
+                    running = true;
+               
+                    serial.Open();
+                } catch (Exception exc)
+                {
+                    Console.WriteLine(exc.Message);
+                    Thread.Sleep(2000);
+                    Restart();
+                }
+                var writeThread = CreateSerialWriteThread();
+                writeThread.Start();
+
+
+                CreateSerialReadThread(app).Start();
+                return "";
+            };
+            return restartFunc();
         }
 
         public int WriteQueueLength
@@ -112,6 +177,12 @@ namespace com.veda.Win32Serial
                 }
             }
         }
+
+        public string Restart()
+        {
+            Stop();
+            return restartFunc();
+        }
         public void WriteComm(W32Serial.SerWriteInfo wi)
         {
             if (wi == null) return;
@@ -121,16 +192,17 @@ namespace com.veda.Win32Serial
                 Monitor.Pulse(_writeQueueLock);
             }
         }
-        public Task<SerialRes> WriteComm(string s)
+        public Task<SerialRes> WriteComm(string s, W32Serial.SerWriteInfoCmpareInfo ovInf = null)
         {
-            return WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s));
+            return WriteComm(System.Text.ASCIIEncoding.ASCII.GetBytes(s), ovInf);
         }
-        public Task<SerialRes> WriteComm(byte[] buff)
+        public Task<SerialRes> WriteComm(byte[] buff, W32Serial.SerWriteInfoCmpareInfo ovInf = null)
         {
             TaskCompletionSource<SerialRes> ts = new TaskCompletionSource<SerialRes>();
 
             WriteComm(new W32Serial.SerWriteInfo
             {
+                OverRideInfo = ovInf,
                 buf = buff,
                 Done = (stat, err) =>
                 {
@@ -242,9 +314,15 @@ namespace com.veda.Win32Serial
     {
         public void OnData(byte[] buf)
         {
+            Console.Write('~');
             Console.Write(System.Text.ASCIIEncoding.ASCII.GetString(buf));
         }
 
+        public virtual string waitSerialResponse()
+        {
+            return "";
+        }
+        public string PortName { get; set; }
         public void OnStart(W32Serial ser)
         {
 

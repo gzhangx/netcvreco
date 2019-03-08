@@ -14,8 +14,10 @@ namespace com.veda.Win32Serial
 {
     public interface IComApp
     {
+        string PortName { get; set; }
         void OnStart(W32Serial ser);
         void OnData(byte[] buf);
+        string waitSerialResponse();
     }
 
     public interface IComError
@@ -137,10 +139,23 @@ namespace com.veda.Win32Serial
             GWin32.SetCommTimeouts(m_hCommPort, ref commTimeouts);
         }
 
+        public interface SerWriteInfoCmpareInfo
+        {
+            bool canOverRide(SerWriteInfoCmpareInfo a);
+        }
         public class SerWriteInfo
         {
+            public SerWriteInfoCmpareInfo OverRideInfo { get; set; }
             public byte[] buf { get; set; }
             public Action<uint, string> Done { get; set; }
+            public bool canOverRide(SerWriteInfo wr)
+            {
+                if (OverRideInfo != null && wr.OverRideInfo!= null)
+                {
+                    return OverRideInfo.canOverRide(wr.OverRideInfo);
+                }
+                return false;
+            }
         }
         private List<SerWriteInfo> _writeQueue = new List<SerWriteInfo>();
         private object _writeQueueLock = new object();

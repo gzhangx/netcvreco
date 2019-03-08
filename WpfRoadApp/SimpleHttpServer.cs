@@ -40,56 +40,107 @@
         }
 
         public class SteerController: WebApiController {
-           
-            public SteerController(IHttpContext context) : base(context)
-            {
 
-            }
+            public SteerController(IHttpContext context) :base(context) { }
             public class resp
             {
                 public string msg { get; set; }
+                public uint ok { get; set; }
             }
-            public bool inProcesing = false;
-            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get,"/api/r/{id}")]
+
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/r/{id}")]
             public async Task<bool> GetR(int id)
             {
-     
-                if (inProcesing) return this.JsonResponse(new resp { msg = "busy" });
-                inProcesing = true;
-                try
+                var max = 15;
+                var center = 90;
+                var low = center - max;
+                var high = center + max;
+                Console.Write($"GOT {id} => ");
+                if (id > high) id = high;
+                else if (id < low) id = low;
+                Console.WriteLine(id);
+                TrackingStats.CmdRecorder.AddCommandInfo(new CommandInfo
                 {
-                    id = id * 180 / 200;
-                    Console.WriteLine("Rotate " + id);
-                    if (SimpleDriver.comm.WriteQueueLength == 0)
-                        await SimpleDriver.comm.Turn(id);
-                    return this.JsonResponse(new resp { msg = "r " + id });
-                } finally
-                {
-                    inProcesing = false;
-                }
+                    Command = "R",
+                    CommandParam = id,
+                });
+                var res = await SimpleDriver.comm.Turn(id);
+                return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
             }
 
             [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/d/{id}")]
-            public async Task<bool> Drive(WebServer server, HttpListenerContext context, int id)
+            public async Task<bool> Drive(int id)
             {
-                if (context == null)
+                Console.WriteLine("Drive " + id);
+                if(id != 0)
                 {
-                    Console.WriteLine("server not ready");
-                    return false;
+                    if (!TrackingStats.CmdRecorder.Inited)
+                    {
+                        TrackingStats.CmdRecorder.Init();
+                        await GetR(90);
+                    }
                 }
-                if (inProcesing) return context.JsonResponse(new resp { msg = "busy" });
-                inProcesing = true;
-                try
+                var res = await SimpleDriver.comm.Drive(id);
+                TrackingStats.CmdRecorder.AddCommandInfo(new CommandInfo
                 {
-                    Console.WriteLine("Drive " + id);
-                    if (SimpleDriver.comm.WriteQueueLength == 0)
-                        await SimpleDriver.comm.Drive(id);
-                    return context.JsonResponse(new resp { msg = "d " + id });
-                }
-                finally
+                    Command = "D",
+                    CommandParam = id,
+                });
+                if (id == 0)
                 {
-                    inProcesing = false;
+                    TrackingStats.CmdRecorder.Stop();
                 }
+                return this.JsonResponse(new resp { msg = res.Err, ok = res.OK });
+            }
+
+
+            static bool cancelReplay = true;
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/replay")]
+            public async Task<bool> Replay()
+            {
+                Console.WriteLine("Replay");
+                cancelReplay = false;
+                TrackingStats.CmdRecorder.Load();
+
+                foreach (var cmd in TrackingStats.CmdRecorder.Commands)
+                {
+                    if (cancelReplay) break;
+                    DateTime now = DateTime.Now;
+                    if (cmd.Command == "D")
+                    {
+                        var res = await SimpleDriver.comm.Drive(cmd.CommandParam);
+                        Console.WriteLine($"D {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                    }else if (cmd.Command == "R")
+                    {
+                        var res = await SimpleDriver.comm.Turn(cmd.CommandParam);
+                        Console.WriteLine($"R {cmd.CommandParam} doe with {res.OK} {res.Err}");
+                    }
+                    if (cmd.timeMs > 0)
+                    {
+                        double spent = DateTime.Now.Subtract(now).TotalMilliseconds;
+                        if (spent < cmd.timeMs)
+                        {
+                            if (cancelReplay) break;
+                            var delay = (int)(cmd.timeMs - spent);
+                            Console.WriteLine($"Speeping {delay}");
+                            await Task.Delay(delay);
+                        }
+                    }
+                }
+
+                if (cancelReplay)
+                {
+                    await SimpleDriver.comm.Drive(0);
+                }
+                return this.JsonResponse(new resp { msg = "OK", ok = 0 });
+            }
+
+            [WebApiHandler(Unosquare.Labs.EmbedIO.Constants.HttpVerbs.Get, "/api/cancelReplay")]
+            public bool CancelReplay()
+            {
+                Console.WriteLine("Canceled");
+                cancelReplay = true;
+                return true;
             }
         }
     }
