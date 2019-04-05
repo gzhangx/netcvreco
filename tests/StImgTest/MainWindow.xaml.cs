@@ -34,6 +34,8 @@ namespace StImgTest
         Image<Bgr, Byte> frame_S2;
         Image<Gray, Byte> Gray_frame_S2;
 
+        Window3dProj projWin = new Window3dProj();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,6 +47,7 @@ namespace StImgTest
             //_Capture2.Start(); //We make sure we start Capture device 2 first
             _Capture1.Start();
             _Capture2.Start();
+            projWin.Show();
         }
 
         Calib.CornersStepCfg firstCfg = new Calib.CornersStepCfg();
@@ -123,6 +126,11 @@ namespace StImgTest
                     UIInvoke(() =>
                     {
                         disparityMap.Source = DisplayLib.Util.Convert(res.disparityMap.Bitmap);
+                        if (show)
+                        {
+                            show = false;
+                            projWin.SetData(res.points);                            
+                        }
                     });
                 }
                 
@@ -142,6 +150,12 @@ namespace StImgTest
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             save = true;
+        }
+
+        bool show = false;
+        private void btnShow_Click(object sender, RoutedEventArgs e)
+        {
+            show = true;
         }
     }
     
