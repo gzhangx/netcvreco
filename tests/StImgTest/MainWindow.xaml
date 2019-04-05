@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StImgTest"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="450" Width="525">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -14,9 +14,14 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
         <Image x:Name="video1"></Image>
         <Image x:Name="video2" Grid.Column="1"></Image>
         <Image x:Name="disparityMap" Grid.Column="0" Grid.Row="1"></Image>
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>
+            <TextBox x:Name="info" Text="                             0"></TextBox>
+        </StackPanel>
     </Grid>
 </Window>

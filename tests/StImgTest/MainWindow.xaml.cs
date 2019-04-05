@@ -3,6 +3,7 @@ using Emgu.CV.Structure;
 using netCvLib.calib3d;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -105,6 +106,20 @@ namespace StImgTest
                         dptCalc = new Depth(calibRes.Q);                        
                     }
                     var res = dptCalc.Computer3DPointsFromStereoPair(Gray_frame_S1, Gray_frame_S2);
+                    if (save)
+                    {
+                        save = false;
+                        List<String> data = new List<string>();
+                        foreach(var p in res.points)
+                        {
+                            data.Add($"{p.X},{p.Y},{p.Z}");
+                        }
+                        File.WriteAllLines("points.txt", data.ToArray());
+                        UIInvoke(() =>
+                        {
+                            info.Text = "Saved";
+                        });
+                    }
                     UIInvoke(() =>
                     {
                         disparityMap.Source = DisplayLib.Util.Convert(res.disparityMap.Bitmap);
@@ -121,6 +136,12 @@ namespace StImgTest
         private void UIInvoke(Action act)
         {
             Dispatcher.BeginInvoke(act);
+        }
+
+        bool save = false;
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            save = true;
         }
     }
     
