@@ -39,15 +39,15 @@ namespace StImgTest
         public MainWindow()
         {
             InitializeComponent();
-
+            projWin.Show();
+            return;
             _Capture1 = new VideoCapture(1);
             _Capture2 = new VideoCapture(0);
             //We will only use 1 frame ready event this is not really safe but it fits the purpose
             _Capture1.ImageGrabbed += ProcessFrame;
             //_Capture2.Start(); //We make sure we start Capture device 2 first
             _Capture1.Start();
-            _Capture2.Start();
-            projWin.Show();
+            _Capture2.Start();           
         }
 
         Calib.CornersStepCfg firstCfg = new Calib.CornersStepCfg();

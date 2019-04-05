@@ -1,6 +1,7 @@
 ﻿using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,20 @@ namespace StImgTest
         public Window3dProj()
         {
             InitializeComponent();
+            LoadFake();
+        }
+
+        private void LoadFake()
+        {
+            var lines = File.ReadAllLines(@"C:\test\netCvReco.run\points.txt");
+            List<MCvPoint3D32f> dt = new List<MCvPoint3D32f>();
+            foreach (var l in lines)
+            {
+                var xyz = l.Split(',');
+                dt.Add(new MCvPoint3D32f(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2])));
+            }
+            pts = dt.ToArray();
+            WriteData();
         }
 
         public void SetData(MCvPoint3D32f[] points)
@@ -73,6 +88,10 @@ namespace StImgTest
                 }
             }
             int discarded = 0;
+            for(var i = 0; i < data.Length; i++)
+            {
+                data[i] = 255;
+            }
             foreach (var pt in pts)
             {
                 var point = proj.proj(pt);
@@ -87,7 +106,7 @@ namespace StImgTest
                     discarded++;
                 }
             }
-            Console.WriteLine($"Discarded {discarded}");
+            Console.WriteLine($"Discarded {discarded} min =${min} max=${max}");
             bmp.CopyPixels(data, width, 0);
             img.Source = bmp;
         }
