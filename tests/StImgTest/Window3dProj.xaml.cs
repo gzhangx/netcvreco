@@ -21,7 +21,7 @@ namespace StImgTest
     /// </summary>
     public partial class Window3dProj : Window
     {
-        Simple2dProj proj = new Simple2dProj(100);
+        Simple2dProj proj = new Simple2dProj(5);
         const int width = 512;
         const int height = 512;
         const int centerX = width / 2;

@@ -15,7 +15,7 @@ namespace StImgTest
 
         public float rotX { get; set; }
         public float rotY { get; set; }     
-        public Simple2dProj(float camPlanZ, float camPointToPlan = 100)
+        public Simple2dProj(float camPlanZ, float camPointToPlan = 40)
         {            
             _camPointToPlan = camPointToPlan;
             setCamPlanZ(camPlanZ);
