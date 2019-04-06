@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static netCvLib.calib3d.Depth;
 
 namespace StImgTest
 {
@@ -53,6 +54,7 @@ namespace StImgTest
         Calib.CornersStepCfg firstCfg = new Calib.CornersStepCfg();
         Calib.CalibOutput calibRes = null;
         Depth dptCalc = null;
+        Compute3DFromStereoCfg cfg = new Compute3DFromStereoCfg();
         private void ProcessFrame(object sender, EventArgs arg)
         {
             try
@@ -108,7 +110,7 @@ namespace StImgTest
                         Calib.Rectify(calibRes);
                         dptCalc = new Depth(calibRes.Q);                        
                     }
-                    var res = dptCalc.Computer3DPointsFromStereoPair(Gray_frame_S1, Gray_frame_S2);
+                    var res = dptCalc.Computer3DPointsFromStereoPair(Gray_frame_S1, Gray_frame_S2, cfg);
                     if (save)
                     {
                         save = false;
@@ -156,6 +158,34 @@ namespace StImgTest
         private void btnShow_Click(object sender, RoutedEventArgs e)
         {
             show = true;
+        }
+
+        private void minDisp_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            cfg.minDispatities = (int)minDisp.Value;
+            lblMinDisp.Content = "minDisp " + cfg.minDispatities;
+        }
+
+        private void numDisp_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            cfg.numDisparities = (int)((int)numDisp.Value)*16;
+            lblNumDisp.Content = "numDisp " + cfg.numDisparities;
+        }
+
+        private void blockSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            cfg.SAD = (int)blockSize.Value;
+            lblBlkSize.Content = "blk " + cfg.SAD;
+        }
+
+        private void speckle_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+
+        private void speckleRange_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
         }
     }
     
