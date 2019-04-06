@@ -35,11 +35,11 @@ namespace StImgTest
 
 
 
-        float mul(MCvPoint3D32f pt, double[] mat)
+        static float mul(MCvPoint3D32f pt, double[] mat)
         {
             return (float)((pt.X * mat[0]) + (pt.Y * mat[1]) + (pt.Z * mat[2]));
         }
-        MCvPoint3D32f rot(MCvPoint3D32f pt, double[][] mat)
+        static MCvPoint3D32f rot(MCvPoint3D32f pt, double[][] mat)
         {
             return new MCvPoint3D32f(
                 mul(pt, mat[0]),
