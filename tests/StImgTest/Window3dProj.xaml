@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StImgTest"
         mc:Ignorable="d"
-        Title="Window3dProj" Height="300" Width="300">
+        Title="Window3dProj" Height="321.676" Width="457.803">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -17,6 +17,8 @@
             <TextBlock x:Name="lblZVal" Width="30"></TextBlock>
             <Slider x:Name="rotX" Minimum="0" Maximum="360" Value="0" Width="100" ValueChanged="rotX_ValueChanged" ></Slider>
             <TextBlock x:Name="lblXRot" Width="30"></TextBlock>
+            <Slider x:Name="rotY" Minimum="0" Maximum="360" Value="0" Width="100" ValueChanged="rotY_ValueChanged" ></Slider>
+            <TextBlock x:Name="lblYRot" Width="30"></TextBlock>
         </StackPanel>
     </Grid>
 </Window>

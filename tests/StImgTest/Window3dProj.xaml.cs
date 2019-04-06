@@ -64,6 +64,15 @@ namespace StImgTest
             WriteData();
         }
 
+        private void rotY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (rotY == null) return;
+            if (lblYRot == null) return;
+            lblYRot.Text = "Y" + rotY.Value.ToString("0.0");
+            proj.rotY = (float)(rotY.Value / 180 * Math.PI);
+            WriteData();
+        }
+
         private void sliderZ_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (sliderZ == null) return;
@@ -72,6 +81,7 @@ namespace StImgTest
             lblZVal.Text = "Z" + sliderZ.Value.ToString("0.0");
             WriteData();
         }
+
 
         public void WriteData()
         {
@@ -101,7 +111,7 @@ namespace StImgTest
                 int y = point.Y + centerY;
                 if (x > 0 && x < width && y > 0 && y < height)
                 {
-                    data[(y * width + x)] = (byte)z;
+                    data[(y * width + x)] = 255;
                 }else
                 {
                     discarded++;
@@ -112,5 +122,7 @@ namespace StImgTest
             bmp.WritePixels(new Int32Rect(0,0,width,height), data, width, 0);
             img.Source = bmp;
         }
+
+        
     }
 }
