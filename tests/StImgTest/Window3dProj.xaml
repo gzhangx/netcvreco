@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <Image x:Name="img"></Image>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Slider x:Name="sliderZ" Minimum="10" Maximum="2000" Value="10" Width="100" ValueChanged="sliderZ_ValueChanged"></Slider>
+            <Slider x:Name="sliderZ" Minimum="10" Maximum="4000" Value="10" Width="100" ValueChanged="sliderZ_ValueChanged"></Slider>
             <TextBlock x:Name="lblZVal" Width="30"></TextBlock>
             <Slider x:Name="rotX" Minimum="0" Maximum="360" Value="0" Width="100" ValueChanged="rotX_ValueChanged" ></Slider>
             <TextBlock x:Name="lblXRot" Width="30"></TextBlock>

@@ -40,7 +40,7 @@ namespace StImgTest
         {
             InitializeComponent();
             projWin.Show();
-            return;
+            //return;
             _Capture1 = new VideoCapture(1);
             _Capture2 = new VideoCapture(0);
             //We will only use 1 frame ready event this is not really safe but it fits the purpose
