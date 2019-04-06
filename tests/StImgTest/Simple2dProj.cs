@@ -52,15 +52,15 @@ namespace StImgTest
         {
             var ptx = rot(opt, new double[][]
             {
-                new double[]{1,0,0 },
+                new double[]{1,              0,               0 },
                 new double[]{0, Math.Cos(rotX), -Math.Sin(rotX) },
-                new double[]{0, Math.Sin(rotX), Math.Cos(rotX)},
+                new double[]{0, Math.Sin(rotX),  Math.Cos(rotX)},
             });
             var pty = rot(ptx, new double[][]
             {                
-                new double[]{Math.Cos(rotY),0, Math.Sin(rotY) },
-                new double[]{0,1,0 },
-                new double[]{-Math.Sin(rotY),0, Math.Cos(rotY)},
+                new double[]{ Math.Cos(rotY), 0, Math.Sin(rotY) },
+                new double[]{              0, 1,              0 },
+                new double[]{-Math.Sin(rotY), 0, Math.Cos(rotY)},
             });
             return new Point((int)translateOne(pty.X, pty.Z), (int)translateOne(pty.Y, pty.Z));
         }
