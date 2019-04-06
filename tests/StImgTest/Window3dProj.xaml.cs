@@ -90,8 +90,9 @@ namespace StImgTest
             int discarded = 0;
             for(var i = 0; i < data.Length; i++)
             {
-                data[i] = 255;
+                data[i] = 0;
             }
+            
             foreach (var pt in pts)
             {
                 var point = proj.proj(pt);
@@ -106,8 +107,9 @@ namespace StImgTest
                     discarded++;
                 }
             }
+            
             Console.WriteLine($"Discarded {discarded} min =${min} max=${max}");
-            bmp.CopyPixels(data, width, 0);
+            bmp.WritePixels(new Int32Rect(0,0,width,height), data, width, 0);
             img.Source = bmp;
         }
     }
