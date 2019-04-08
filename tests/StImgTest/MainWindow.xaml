@@ -26,11 +26,11 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Label x:Name="lblMinDisp">minDisp</Label>
-                <Slider x:Name="minDisp" Minimum="0" Maximum="200" Value="100" Width="100" ValueChanged="minDisp_ValueChanged"></Slider>
+                <Slider x:Name="minDisp" Minimum="0" Maximum="1000" Value="100" Width="100" ValueChanged="minDisp_ValueChanged"></Slider>
                 <Label x:Name="lblNumDisp">numDisp</Label>
                 <Slider x:Name="numDisp" Minimum="0" Maximum="100" Value="0" Width="100" ValueChanged="numDisp_ValueChanged"></Slider>
                 <Label x:Name="lblBlkSize">blkSize</Label>
-                <Slider x:Name="blockSize" Minimum="1" Maximum="20" Value="0" Width="100" ValueChanged="blockSize_ValueChanged"></Slider>
+                <Slider x:Name="blockSize" Minimum="0" Maximum="20" Value="0" Width="100" ValueChanged="blockSize_ValueChanged"></Slider>
                 <Label x:Name="lblSpeckle">blkSize</Label>
                 <Slider x:Name="speckle" Minimum="0" Maximum="5" Value="0" Width="100" ValueChanged="speckle_ValueChanged"></Slider>
                 <Label x:Name="lblSpeckleRange">blkSize</Label>

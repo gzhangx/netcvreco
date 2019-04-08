@@ -174,18 +174,22 @@ namespace StImgTest
 
         private void blockSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            cfg.SAD = (int)blockSize.Value;
+            cfg.SAD = (int)((int)(blockSize.Value)*2)+1;
             lblBlkSize.Content = "blk " + cfg.SAD;
         }
 
         private void speckle_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            int sp = ((int)speckle.Value) * 16;
+            lblSpeckle.Content = "Speckl " + sp;
+            cfg.Speckle = sp;
         }
 
         private void speckleRange_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            int sp = ((int)speckleRange.Value) * 16;
+            lblSpeckleRange.Content = "SpRange " + sp;
+            cfg.SpeckleRange = sp;
         }
     }
     
