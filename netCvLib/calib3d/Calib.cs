@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace netCvLib.calib3d
@@ -108,9 +109,11 @@ namespace netCvLib.calib3d
 
 
                 //calibrate the delay bassed on size of buffer
-                //if buffer small you want a big delay if big small delay
-                //Thread.Sleep(100);//allow the user to move the board to a different position
+                //if buffer small you want a big delay if big small delay                
+                Thread.Sleep(100);//allow the user to move the board to a different position                
             }
+            cfg.corners_Left = null;
+            cfg.corners_Right = null;
             //corners_Left = null;
             //corners_Right = null;
         }
