@@ -168,7 +168,7 @@ namespace StImgTest
 
         private void numDisp_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            cfg.numDisparities = (int)((int)numDisp.Value)*16;
+            cfg.numDisparities = (int)((int)(numDisp.Value+1))*16;
             lblNumDisp.Content = "numDisp " + cfg.numDisparities;
         }
 
