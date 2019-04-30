@@ -200,6 +200,8 @@ namespace netCvLib.calib3d
             public Matrix<double> P1 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 1.
             public Matrix<double> P2 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 2.
             public bool rectified = false;
+
+            public Matrix<short> rmap00, rmap01, rmap10, rmap11;
         }
         public static CalibOutput Caluculating_Stereo_Intrinsics(PointF[][] corners_points_Left,PointF[][] corners_points_Right, Size size)
         {
@@ -354,6 +356,16 @@ namespace netCvLib.calib3d
                                              co.R1, co.R2, co.P1, co.P2, co.Q,
                                              Emgu.CV.CvEnum.StereoRectifyType.Default, 0,
                                              co.size, ref co.Rec1, ref co.Rec2);
+
+            co.rmap00 = new Matrix<short>(co.size);
+            co.rmap01 = new Matrix<short>(co.size);
+
+            co.rmap10 = new Matrix<short>(1,1);
+            co.rmap11 = new Matrix<short>(1,1);
+            var CV_16SC2 = (Emgu.CV.CvEnum.DepthType.Cv16S + 8);
+            //var CV_16SC2 = (Emgu.CV.CvEnum.DepthType.Default );
+            CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam1IntrinsicMatrix, co.IntrinsicCam1DistortionCoeffs, co.R1, co.P1, co.size, CV_16SC2, co.rmap00, co.rmap01);
+            CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam2IntrinsicMatrix, co.IntrinsicCam2DistortionCoeffs, co.R2, co.P2, co.size, CV_16SC2, co.rmap10, co.rmap11);
             co.rectified = true;
         }
     }
