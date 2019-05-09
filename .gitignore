@@ -14,3 +14,5 @@
 /netCvReco.VC.VC.opendb
 /tests/StImgTest/bin/*
 /tests/StImgTest/obj/*
+/test/MatrixTest/bin/*
+/test/MatrixTest/obj/*
