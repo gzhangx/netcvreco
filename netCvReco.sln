@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormRoadApp", "WinFormRo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StImgTest", "tests\StImgTest\StImgTest.csproj", "{E9BFFD83-0ADD-435E-87C7-84C4C5BF4092}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTest", "test\MatrixTest\MatrixTest.csproj", "{F33E3E1E-F69E-4100-B38D-CD363D421D37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTest", "tests\MatrixTest\MatrixTest.csproj", "{F33E3E1E-F69E-4100-B38D-CD363D421D37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
