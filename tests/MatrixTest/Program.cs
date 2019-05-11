@@ -106,7 +106,7 @@ namespace MatrixTest
     {
         public static GMatrix Calc(PointF[] points1, PointF[] points2)
         {
-            double[,] storage = new double[points1.Length, 9];
+            var m1 = new GMatrix(points1.Length, 9);
             for (var i = 0; i < points1.Length; i++)
             {
                 var pp1 = points1[i];
@@ -115,25 +115,25 @@ namespace MatrixTest
                 var y2 = pp1.Y;
                 var p1 = pp2.X;
                 var p2 = pp2.Y;
-                storage[i, 0] = y1 * p1;
-                storage[i, 1] = p1 * y2;
-                storage[i, 2] = p1;
-                storage[i, 3] = p2*y1;
-                storage[i, 4] = p2 * y2;
-                storage[i, 5] = p2;
-                storage[i, 6] = y1;
-                storage[i, 7] = y2;
-                storage[i, 8] = 1;
+                var cur = m1.storage[i];
+                cur[0] = y1 * p1;
+                cur[1] = p1 * y2;
+                cur[2] = p1;
+                cur[3] = p2*y1;
+                cur[4] = p2 * y2;
+                cur[5] = p2;
+                cur[6] = y1;
+                cur[7] = y2;
+                cur[8] = 1;
             }
-            
-            var m1 = new GMatrix(storage);
+                        
             double max = 1;
             double min = -1;
             for(var i = 0; i < m1.rows;i ++)
             {
                 for (var j = 0; j < m1.cols; j++)
                 {
-                    var v = storage[i, j];
+                    var v = m1.storage[i][j];
                     if (v > max) max = v;
                     if (v < min) min = v;
                 }
@@ -143,18 +143,18 @@ namespace MatrixTest
             {
                 for (var j = 0; j < m1.cols; j++)
                 {
-                    var v = storage[i, j];
-                    storage[i, j] = v / scal;
+                    var v = m1.storage[i][j];
+                    m1.storage[i][j] = v / scal;
                 }
             }
-            var svdA = svd.SVD(storage);
-            var Fhat = new double[3, 3];
+            var svdA = svd.SVD(m1);
+            var Fhat = new GMatrix(3, 3);
             int at = 0;
             for (var i = 0; i < 3; i++)
             {
                 for (var j = 0; j < 3; j++)
                 {
-                    Fhat[i, j] = svdA.v[at++, 8];
+                    Fhat.storage[i][j] = svdA.v[at++, 8];
                 }
             }
 
@@ -181,17 +181,17 @@ namespace MatrixTest
             double max = 0;
             for (var i = 0; i < m.rows;i++)
             {
-                var v = Math.Abs(m.storage[i, pos]);
+                var v = Math.Abs(m.storage[i][pos]);
                 if (v > max) max = v;
             }
             for (var i = 0; i < m.rows; i++)
             {
-                var v = m.storage[i, pos];
+                var v = m.storage[i][pos];
                 if (v == 0) continue;
                 var scal = max / v;
                 for (var j = pos; j < m.cols; j++)
                 {
-                    m.storage[i, j]*=scal;
+                    m.storage[i][j]*=scal;
                 }
 
             }
@@ -200,27 +200,50 @@ namespace MatrixTest
 
     public class GMatrix
     {
-        public double[,] storage { get; protected set; }
-        public GMatrix(double[,] v)
+        public double[][] storage { get; protected set; }
+        public GMatrix(int r, int c)
         {
-            storage = v;
+            rows = r;
+            cols = c;
+            init();
+        }
+        public GMatrix(double[,] v)
+        {            
+            rows = v.GetLength(0);
+            cols = v.GetLength(1);
+            init();
+            for (var r = 0; r < rows; r++)
+            {
+                for (var c = 0; c<cols;c++)
+                {
+                    storage[r][c] = v[r, c];
+                }
+            }
+        }
+        public void init()
+        {
+            storage = new double[rows][];
+            for (var i = 0; i < rows; i++)
+            {
+                storage[i] = new double[cols];
+            }
         }
         public GMatrix tranpose()
         {
             var r = rows;
             var c = cols;
-            var newStorage = new double[c,r];
+            var newStorage = new GMatrix(c,r);
             for (var i = 0; i < r; i++)
             {
                 for(var j = 0; j < c;j++)
                 {
-                    newStorage[j, i] = storage[i, j];
+                    newStorage.storage[j][i] = storage[i][j];
                 }
             }
-            return new GMatrix(newStorage);
+            return newStorage;
         }
-        public int cols { get { return storage.GetLength(1);  } }
-        public int rows { get { return storage.GetLength(0); } }
+        public int cols { get; protected set; }
+        public int rows { get; protected set; }
 
         public GMatrix cross(GMatrix m)
         {
@@ -237,7 +260,7 @@ namespace MatrixTest
                     double total = 0;
                     for (var k = 0; k < c; k++)
                     {
-                        total += storage[i, k] * m.storage[k, j];
+                        total += storage[i][k] * m.storage[k][j];
                     }
                     newStorage[i, j] = total;
                 }
@@ -253,7 +276,7 @@ namespace MatrixTest
                 for (var j = 0; j < cols;j++)
                 {
                     if (j > 0) sb.Append(",");
-                    sb.Append(storage[i, j].ToString("0.00000"));                    
+                    sb.Append(storage[i][j].ToString("0.00000"));                    
                 }
                 sb.Append("\n");
             }

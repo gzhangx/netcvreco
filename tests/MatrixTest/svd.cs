@@ -45,7 +45,7 @@ namespace MatrixTest
  *    v: Represents the orthogonal matrix V (if withv is {true}, otherwise v is not used)
  *
  */
-        public static SvdResult SVD(double[,] a, bool withu = true, bool withv = true) {
+        public static SvdResult SVD(GMatrix A, bool withu = true, bool withv = true) {
             // Define default parameters
             double eps;
             double tol;
@@ -57,9 +57,10 @@ namespace MatrixTest
 
             //var n = a[0].length;
             //var m = a.length;
-            var n = a.GetLength(1);
-            var m = a.GetLength(0);
+            var n = A.cols;
+            var m = A.rows;
 
+            var a = A.storage;
             if (m < n)
             {
                 throw new Exception("Invalid matrix: m < n");
@@ -92,7 +93,7 @@ namespace MatrixTest
             {
                 for (j = 0; j < n; j++)
                 {
-                    u[i, j] = a[i, j];
+                    u[i, j] = a[i][j];
                 }
             }
 
