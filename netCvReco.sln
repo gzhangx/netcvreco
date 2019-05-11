@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StImgTest", "tests\StImgTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTest", "tests\MatrixTest\MatrixTest.csproj", "{F33E3E1E-F69E-4100-B38D-CD363D421D37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.veda.LinearAlg", "com.veda.LinearAlg\com.veda.LinearAlg.csproj", "{6490458F-D023-40A5-8F43-5681AB295FD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,14 @@ Global
 		{F33E3E1E-F69E-4100-B38D-CD363D421D37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F33E3E1E-F69E-4100-B38D-CD363D421D37}.Release|x64.ActiveCfg = Release|Any CPU
 		{F33E3E1E-F69E-4100-B38D-CD363D421D37}.Release|x64.Build.0 = Release|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Debug|x64.Build.0 = Debug|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|x64.ActiveCfg = Release|Any CPU
+		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
