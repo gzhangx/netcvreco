@@ -16,6 +16,36 @@ namespace MatrixTest
         const string saveFileName_corners = saveFilePath + "corners.txt";
         static void Main(string[] args)
         {
+            double[] A = new double[]
+            {
+                0, 0, 0.026,
+                0, 0, -0.028,
+                -0.021, 0.026, 0.999
+            };
+
+
+            double[] W = new double[3];
+            double[] Vt = new double[9];
+            JacobSvd.JacobiSVD(A, W, Vt, 3, 3);
+            for (var i = 0; i < W.Length; i++)
+            {                
+                Console.WriteLine(W[i].ToString("0.000"));
+            }
+            for (var i = 0; i < Vt.Length; i++)
+            {                
+                Console.Write(Vt[i].ToString("0.000"));
+                Console.Write(" ");
+                if ((i+1)%3 == 0) Console.Write("\n");
+            }
+            
+            var rrr = svd.SVD(new GMatrix(new double[3, 3] {
+                { -0.00001, -0.00010, 0.02616 },
+                {0.00009, -0.00001, -0.02842},
+                { -0.02087, 0.02566, 0.99871, },
+            }));
+            Console.WriteLine(new GMatrix(rrr.u));
+            Console.WriteLine(new GMatrix(rrr.v));
+            return;
             //var r = new GMatrix(new double[,] { { 1, 2 }, { 3, 4 } , { 1, 1 } }).cross(new GMatrix(new double[,] { { 1, 1 ,1}, { 3, 4 ,1} }));
             //Console.WriteLine(r);
             //new Calib().Calc(new PointF[] {
