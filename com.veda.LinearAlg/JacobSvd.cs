@@ -8,27 +8,51 @@ namespace com.veda.LinearAlg
 {
     public class JacobSvd
     {
+        protected class SvdResIntrnal
+        {
+            public double[] W;
+            public double[] Vt;
+        }
         const double DBL_EPSILON = 2.2204460492503131e-016;
-        public static void JacobiSVD(double[] At, double[] W, double[] Vt, int m, int n, int n1 = -1)
+        public class SvdRes
+        {
+            public GMatrix U;
+            public double[] W;
+            public GMatrix Vt;
+        }
+        public static SvdRes JacobiSVD(GMatrix mat)
         {
             //m rows, n cols
             //orig mxn, U mxm, W mxn V nxn
 
             //W is array of size n, Vt size nxn
-            SVD(At, W, null, Vt, m, n, n1);
+
+            var m = mat.rows;
+            var n = mat.cols;
+            var A = mat.tranpose().ToArray();
+            var res = SVD(A,  m,n);
+            return new SvdRes
+            {
+                U = new GMatrix(A, m, m).tranpose(),
+                W = res.W,
+                Vt = new GMatrix(res.Vt, n,n),
+            };
         }
 
-        static void SVD(double[] At, double[] W, double[] U, double[] Vt, int m, int n, int n1)
+        static SvdResIntrnal SVD(double[] At, int m, int n)
         {
-            JacobiSVDImpl(At, W, Vt, m, n, Vt== null ? 0 : n1 < 0 ? n : n1, Double.MinValue, DBL_EPSILON * 2);
+            return JacobiSVDImpl(At, m, n, Double.MinValue, DBL_EPSILON * 2);
         }
-        protected static void JacobiSVDImpl(double[] At, double[] _W, double[] Vt, 
-               int m, int n, int n1, double minval = Double.MinValue, double eps = 2.2204460492503131e-016*10)
+        protected static SvdResIntrnal JacobiSVDImpl(double[] At, int m, int n, 
+            double minval = Double.MinValue, double eps = 2.2204460492503131e-016*10)
         {
+
+            int n1 = n;
             //VBLAS<_Tp> vblas;
             //AutoBuffer<double> Wbuf(n);
             //double* W = Wbuf.data();
             double[] W = new double[n];
+            double[] Vt = new double[n * n];
             int i, j, k, iter, max_iter = Math.Max(m, 30);
             double c, s;
             double sd;
@@ -153,11 +177,11 @@ namespace com.veda.LinearAlg
                 }
             }
 
-            for (i = 0; i < n; i++)
-                _W[i] = W[i];
+            //for (i = 0; i < n; i++)
+            //    _W[i] = W[i];
 
-            if (Vt == null)
-                return;
+            //if (Vt == null)
+            //    return;
 
             //RNG rng(0x12345678);
             var rng = new Random(0x12345678);
@@ -208,6 +232,12 @@ namespace com.veda.LinearAlg
                 for (k = 0; k < m; k++)
                     At[i * astep + k] *= s;
             }
+
+            return new SvdResIntrnal
+            {
+                W = W,
+                Vt = Vt,
+            };
         }
 
         protected static void swap(double[] a, int i, int j)

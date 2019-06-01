@@ -24,33 +24,23 @@ namespace MatrixTest
             };
 
 
-            double[] W = new double[3];
-            double[] Vt = new double[9];
-            JacobSvd.JacobiSVD(A, W, Vt, 3, 3);
-            for (var i = 0; i < W.Length; i++)
-            {                
-                Console.WriteLine(W[i].ToString("0.000"));
-            }
-            for (var i = 0; i < Vt.Length; i++)
-            {                
-                Console.Write(Vt[i].ToString("0.000"));
-                Console.Write(" ");
-                if ((i+1)%3 == 0) Console.Write("\n");
-            }
-            GMatrix u = new GMatrix(A, 3, 3);
+            var jres = JacobSvd.JacobiSVD(new GMatrix(A, 3, 3));
+           
             GMatrix s = new GMatrix(new double[] {
-                W[0], 0 ,0,
-                0, W[1], 0,
-                0,0,W[2]
+                jres.W[0], 0 ,0,
+                0, jres.W[1], 0,
+                0,0,jres.W[2]
             }, 3, 3);
-            GMatrix v = new GMatrix(Vt, 3, 3);
+          
             Console.WriteLine("U");
-            Console.WriteLine(u);
+            Console.WriteLine(jres.U);
+            Console.WriteLine(jres.U.cross(jres.U.tranpose()));
             Console.WriteLine("S");
             Console.WriteLine(s);
             Console.WriteLine("V");
-            Console.WriteLine(v);
-            Console.WriteLine(u.cross(s).cross(v));
+            Console.WriteLine(jres.Vt);
+            Console.WriteLine(jres.Vt.cross(jres.Vt.tranpose()));
+            Console.WriteLine(jres.U.cross(s).cross(jres.Vt));
             return;
             
             var rrr = svd.SVD(new GMatrix(new double[3, 3] {
