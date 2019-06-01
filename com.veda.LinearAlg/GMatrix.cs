@@ -77,7 +77,7 @@ namespace com.veda.LinearAlg
         public int cols { get; protected set; }
         public int rows { get; protected set; }
 
-        public GMatrix cross(GMatrix m)
+        public GMatrix dot(GMatrix m)
         {
             var r = rows;
             var mc = m.cols;
