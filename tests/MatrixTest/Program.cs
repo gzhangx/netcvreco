@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
 using System.IO;
 using com.veda.LinearAlg;
 
@@ -42,16 +40,7 @@ namespace MatrixTest
             Console.WriteLine(jres.Vt);
             Console.WriteLine(jres.Vt.cross(jres.Vt.tranpose()));
             Console.WriteLine(jres.U.cross(s).cross(jres.Vt));
-            return;
-            
-            var rrr = svd.SVD(new GMatrix(new double[3, 3] {
-                { -0.00001, -0.00010, 0.02616 },
-                {0.00009, -0.00001, -0.02842},
-                { -0.02087, 0.02566, 0.99871, },
-            }));
-            Console.WriteLine(new GMatrix(rrr.u));
-            Console.WriteLine(new GMatrix(rrr.v));
-            return;
+
             //var r = new GMatrix(new double[,] { { 1, 2 }, { 3, 4 } , { 1, 1 } }).cross(new GMatrix(new double[,] { { 1, 1 ,1}, { 3, 4 ,1} }));
             //Console.WriteLine(r);
             //new Calib().Calc(new PointF[] {
@@ -184,28 +173,22 @@ namespace MatrixTest
                     m1.storage[i][j] = v / scal;
                 }
             }
-            var svdA = svd.SVD(m1);
+            var svdA = JacobSvd.JacobiSVD(m1);
             var Fhat = new GMatrix(3, 3);
             int at = 0;
             for (var i = 0; i < 3; i++)
             {
                 for (var j = 0; j < 3; j++)
                 {
-                    Fhat.storage[i][j] = svdA.v[at++, 8];
+                    Fhat.storage[i][j] = svdA.Vt.storage[at++][8];
                 }
             }
 
-            var FhatSvd = svd.SVD(Fhat);
-            var mm = FhatSvd.q.Select(x => Math.Abs(x)).Min();
-            var d = new double[3, 3];
-            d[0, 0] = FhatSvd.q[0];
-            d[1, 1] = FhatSvd.q[1];
-            d[2, 2] = FhatSvd.q[2];
-            for (var i =0; i < 3; i++)
-            {
-                if (Math.Abs(d[i, i]) == mm) d[i, i] = 0;
-            }
-            var res = new GMatrix(FhatSvd.u).cross(new GMatrix(d)).cross(new GMatrix(FhatSvd.v).tranpose());
+            var FhatSvd = JacobSvd.JacobiSVD(Fhat);
+            var d = FhatSvd.getWMat();
+            d.storage[2][2] = 0;
+            
+            var res = FhatSvd.U.cross(d).cross(FhatSvd.Vt);
             return res;
         }
 
