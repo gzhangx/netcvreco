@@ -43,7 +43,7 @@ namespace com.veda.LinearAlg
             var res = SVD(A,  m,n);
             return new SvdRes
             {
-                U = new GMatrix(A, m, m).tranpose(),
+                U = new GMatrix(A, n, m).tranpose(), //or nxm or mxn?
                 W = res.W,
                 Vt = new GMatrix(res.Vt, n,n),
             };
