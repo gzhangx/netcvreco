@@ -25,12 +25,13 @@ namespace MatrixTest
 
 
             var jres = JacobSvd.JacobiSVD(new GMatrix(A, 3, 3));
-           
-            GMatrix s = new GMatrix(new double[] {
-                jres.W[0], 0 ,0,
-                0, jres.W[1], 0,
-                0,0,jres.W[2]
-            }, 3, 3);
+
+            GMatrix s = jres.getWMat();
+            //new GMatrix(new double[] {
+            //    jres.W[0], 0 ,0,
+            //    0, jres.W[1], 0,
+            //    0,0,jres.W[2]
+            //}, 3, 3);
           
             Console.WriteLine("U");
             Console.WriteLine(jres.U);

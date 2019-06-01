@@ -19,6 +19,16 @@ namespace com.veda.LinearAlg
             public GMatrix U;
             public double[] W;
             public GMatrix Vt;
+            public GMatrix getWMat()
+            {
+                var mat = new GMatrix(U.rows, Vt.cols);
+                int at = 0;
+                for (var i = 0; i < Vt.cols; i++)
+                {
+                    mat.storage[i][i] = W[at++];
+                }
+                return mat;
+            }
         }
         public static SvdRes JacobiSVD(GMatrix mat)
         {
