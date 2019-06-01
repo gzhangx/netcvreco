@@ -18,9 +18,9 @@ namespace MatrixTest
         {
             double[] A = new double[]
             {
-                0, 0, 0.026,
-                0, 0, -0.028,
-                -0.021, 0.026, 0.999
+                1,1,2,
+               3,2,1,
+               4,2,1
             };
 
 
@@ -37,6 +37,21 @@ namespace MatrixTest
                 Console.Write(" ");
                 if ((i+1)%3 == 0) Console.Write("\n");
             }
+            GMatrix u = new GMatrix(A, 3, 3);
+            GMatrix s = new GMatrix(new double[] {
+                W[0], 0 ,0,
+                0, W[1], 0,
+                0,0,W[2]
+            }, 3, 3);
+            GMatrix v = new GMatrix(Vt, 3, 3);
+            Console.WriteLine("U");
+            Console.WriteLine(u);
+            Console.WriteLine("S");
+            Console.WriteLine(s);
+            Console.WriteLine("V");
+            Console.WriteLine(v);
+            Console.WriteLine(u.cross(s).cross(v));
+            return;
             
             var rrr = svd.SVD(new GMatrix(new double[3, 3] {
                 { -0.00001, -0.00010, 0.02616 },

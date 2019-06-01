@@ -12,6 +12,20 @@ namespace com.veda.LinearAlg
             cols = c;
             init();
         }
+        public GMatrix(double[] val, int r, int c)
+        {
+            rows = r;
+            cols = c;
+            init();
+            int at = 0;
+            for (int rr = 0; rr < rows; rr++)
+            {
+                for (int cc = 0; cc < cols; cc++)
+                {
+                    storage[rr][cc] = val[at++];
+                }
+            }
+        }
         public GMatrix(double[,] v)
         {
             rows = v.GetLength(0);
