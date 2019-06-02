@@ -19,11 +19,10 @@ namespace MatrixTest
                 1,1,2,
                3,2,1,
                4,2,1,
-               5,1,5
             };
 
 
-            var jres = JacobSvd.JacobiSVD(new GMatrix(A, 4, 3));
+            var jres = JacobSvd.JacobiSVD(new GMatrix(A, 3, 3));
 
             GMatrix s = jres.getWMat();
             //new GMatrix(new double[] {
@@ -41,7 +40,7 @@ namespace MatrixTest
             Console.WriteLine(jres.Vt);
             Console.WriteLine(jres.Vt.dot(jres.Vt.tranpose()));
             Console.WriteLine(jres.U.dot(s).dot(jres.Vt));
-            return;
+            //return;
             //var r = new GMatrix(new double[,] { { 1, 2 }, { 3, 4 } , { 1, 1 } }).cross(new GMatrix(new double[,] { { 1, 1 ,1}, { 3, 4 ,1} }));
             //Console.WriteLine(r);
             //new Calib().Calc(new PointF[] {
