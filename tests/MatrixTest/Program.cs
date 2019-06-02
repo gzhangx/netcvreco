@@ -75,12 +75,14 @@ namespace MatrixTest
 
 
             var lines = File.ReadAllLines(saveFileName_corners);
+            var resa = stringToCorner(lines);
             for (int i = 0; i < 10; i++)
             {
-                var resa = stringToCorner(lines);
                 var res = Calib.Calc(resa[0][i], resa[1][i]);
                 Console.WriteLine(res);
             }
+
+            Console.WriteLine(Calib.Calc(resa[0].Take(10).SelectMany(x=>x).ToArray(), resa[1].Take(10).SelectMany(x => x).ToArray()));
         }
 
         static string cornerToString(PointF[][] corner)
