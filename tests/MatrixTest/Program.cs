@@ -31,15 +31,15 @@ namespace MatrixTest
             //    0,0,jres.W[2]
             //}, 3, 3);
           
-            Console.WriteLine("U");
-            Console.WriteLine(jres.U);
-            Console.WriteLine(jres.U.dot(jres.U.tranpose()));
-            Console.WriteLine("S");
-            Console.WriteLine(s);
-            Console.WriteLine("V");
-            Console.WriteLine(jres.Vt);
-            Console.WriteLine(jres.Vt.dot(jres.Vt.tranpose()));
-            Console.WriteLine(jres.U.dot(s).dot(jres.Vt));
+            //Console.WriteLine("U");
+            //Console.WriteLine(jres.U);
+            //Console.WriteLine(jres.U.dot(jres.U.tranpose()));
+            //Console.WriteLine("S");
+            //Console.WriteLine(s);
+            //Console.WriteLine("V");
+            //Console.WriteLine(jres.Vt);
+            //Console.WriteLine(jres.Vt.dot(jres.Vt.tranpose()));
+            //Console.WriteLine(jres.U.dot(s).dot(jres.Vt));
             //return;
             //var r = new GMatrix(new double[,] { { 1, 2 }, { 3, 4 } , { 1, 1 } }).cross(new GMatrix(new double[,] { { 1, 1 ,1}, { 3, 4 ,1} }));
             //Console.WriteLine(r);
@@ -75,12 +75,12 @@ namespace MatrixTest
 
 
             var lines = File.ReadAllLines(saveFileName_corners);
-            var resa = stringToCorner(lines);
-            var res = Calib.Calc(resa[0].SelectMany(x=>x).ToArray(), resa[1].SelectMany(x=>x).ToArray());
-
-            
-
-            Console.WriteLine(res);
+            for (int i = 0; i < 10; i++)
+            {
+                var resa = stringToCorner(lines);
+                var res = Calib.Calc(resa[0][i], resa[1][i]);
+                Console.WriteLine(res);
+            }
         }
 
         static string cornerToString(PointF[][] corner)
