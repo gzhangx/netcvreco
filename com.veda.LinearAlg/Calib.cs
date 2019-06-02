@@ -5,8 +5,13 @@ namespace com.veda.LinearAlg
 {
     public class PointFloat
     {
-        public float X;
-        public float Y;
+        public PointFloat(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+        public float X { get; protected set; }
+        public float Y { get; protected set; }
     }
     public class Calib
     {
