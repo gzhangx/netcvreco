@@ -90,6 +90,10 @@ namespace MatrixTest
             {
                 var res = Calib.EstimateHomography(resa[0][i]);
                 Console.WriteLine(res);
+
+                var res2 = Calib.EstimateHomography(resa[1][i]);
+                Console.WriteLine(res2);
+                Console.WriteLine("====================================");
             }
         }
 
