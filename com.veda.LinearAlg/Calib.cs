@@ -82,6 +82,45 @@ namespace com.veda.LinearAlg
             return res;
         }
 
+
+        public static GMatrix EstimateHomography(PointFloat[] points, PointFloat[] checkBoardLoc)
+        {
+            var m1 = new GMatrix(points.Length*2, 9);
+            for (var i = 0; i < points.Length; i+=2)
+            {
+                var xy = points[i];
+                var x = xy.X;
+                var y = xy.Y;
+                var X = checkBoardLoc[i].X;
+                var Y = checkBoardLoc[i].Y;
+                var cur = m1.storage[i];
+                cur[0] = -X;
+                cur[1] = -Y;
+                cur[2] = -1;
+                cur[3] = 0;
+                cur[4] = 0;
+                cur[5] = 0;
+                cur[6] = x*X;
+                cur[7] = x*Y;
+                cur[8] = x;
+
+                cur = m1.storage[i+1];
+                cur[0] = 0;
+                cur[1] = 0;
+                cur[2] = 0;
+                cur[3] = -X;
+                cur[4] = -Y;
+                cur[5] = -1;
+                cur[6] = y * X;
+                cur[7] = y * Y;
+                cur[8] = y;
+            }
+
+            var res = SolveSvd(m1);
+
+            
+            return res;
+        }
         public void Solve(GMatrix m)
         {
             MaxApply(m, 0);
