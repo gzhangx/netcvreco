@@ -15,7 +15,22 @@ namespace com.veda.LinearAlg
     }
     public class Calib
     {
-        public static GMatrix SolveSvd(GMatrix m1)
+        public static GMatrix SolveSvd3x3(GMatrix m1)
+        {
+            JacobSvd.SvdRes svdA = SolveSvd(m1);
+            var Fhat = new GMatrix(3, 3);
+            int at = 0;
+            for (var i = 0; i < 3; i++)
+            {
+                for (var j = 0; j < 3; j++)
+                {
+                    Fhat.storage[i][j] = svdA.Vt.storage[at++][8];
+                }
+            }
+            return Fhat;
+        }
+
+        private static JacobSvd.SvdRes SolveSvd(GMatrix m1)
         {
             double max = 1;
             double min = -1;
@@ -38,17 +53,9 @@ namespace com.veda.LinearAlg
                 }
             }
             var svdA = JacobSvd.JacobiSVD(m1);
-            var Fhat = new GMatrix(3, 3);
-            int at = 0;
-            for (var i = 0; i < 3; i++)
-            {
-                for (var j = 0; j < 3; j++)
-                {
-                    Fhat.storage[i][j] = svdA.Vt.storage[at++][8];
-                }
-            }
-            return Fhat;
+            return svdA;
         }
+
         public static GMatrix Calc(PointFloat[] points1, PointFloat[] points2)
         {
             var m1 = new GMatrix(points1.Length, 9);
@@ -72,7 +79,7 @@ namespace com.veda.LinearAlg
                 cur[8] = 1;
             }
             
-            var Fhat = SolveSvd(m1);
+            var Fhat = SolveSvd3x3(m1);
 
             var FhatSvd = JacobSvd.JacobiSVD(Fhat);
             var d = FhatSvd.getWMat();
@@ -129,11 +136,28 @@ namespace com.veda.LinearAlg
                 cur[8] = y;
             }
 
-            var res = SolveSvd(m1);
+            var res = SolveSvd3x3(m1);
 
             
             return res;
         }
+
+        public static void EstimateIntranics(PointFloat[] points, int w = 6, int h = 3)
+        {
+            /*
+             *   hij
+             *            h12  h22  h32
+             *            
+             *   h11      b11  b12  b13
+             *   h21      b12  b22  b23
+             *   h31      b13  b23  b33
+             * 
+             * 
+             */
+            var homo = EstimateHomography(points, w, h);
+            Func<int,int,double> Vij = (i, j) => i + j;
+        }
+
         public void Solve(GMatrix m)
         {
             MaxApply(m, 0);
