@@ -83,6 +83,19 @@ namespace com.veda.LinearAlg
         }
 
 
+        public static GMatrix EstimateHomography(PointFloat[] points, int w = 6, int h = 3)
+        {
+            var pos = new PointFloat[w * h];
+            int at = 0;
+            for (var j = 0; j < h; j++) 
+            {
+                for (var i = 0; i < w; i++)
+                {
+                    pos[at++] = new PointFloat(w * 20, h * 20);
+                }
+            }
+            return EstimateHomography(points, pos);
+        }
         public static GMatrix EstimateHomography(PointFloat[] points, PointFloat[] checkBoardLoc)
         {
             var m1 = new GMatrix(points.Length*2, 9);

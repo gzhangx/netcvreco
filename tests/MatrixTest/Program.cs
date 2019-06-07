@@ -83,6 +83,14 @@ namespace MatrixTest
             }
 
             Console.WriteLine(Calib.Calc(resa[0].Take(10).SelectMany(x=>x).ToArray(), resa[1].Take(10).SelectMany(x => x).ToArray()));
+
+
+            Console.WriteLine("\nHomo\n");
+            for (int i = 0; i < 10; i++)
+            {
+                var res = Calib.EstimateHomography(resa[0][i]);
+                Console.WriteLine(res);
+            }
         }
 
         static string cornerToString(PointF[][] corner)
