@@ -95,6 +95,8 @@ namespace MatrixTest
                 Console.WriteLine(res2);
                 Console.WriteLine("====================================");
             }
+
+            Calib.EstimateIntranics(resa[0][0]);
         }
 
         static string cornerToString(PointF[][] corner)

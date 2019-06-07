@@ -98,7 +98,7 @@ namespace com.veda.LinearAlg
             {
                 for (var i = 0; i < w; i++)
                 {
-                    pos[at++] = new PointFloat(w * 20, h * 20);
+                    pos[at++] = new PointFloat(i * 20, j * 20);
                 }
             }
             return EstimateHomography(points, pos);
@@ -153,9 +153,42 @@ namespace com.veda.LinearAlg
              *   h31      b13  b23  b33
              * 
              * 
+             *   h11 h12 t1
+             *   h21 h22 t2
+             *   h31 h32 t3
+             * 
              */
             var homo = EstimateHomography(points, w, h);
-            Func<int,int,double> Vij = (i, j) => i + j;
+            Action<int, int, double[]> FillV = (i, j, cur) =>
+              {
+                  Func<int, int, double> hval = (hcol, hrow) =>
+                  {
+                      return homo.storage[hrow][hcol];
+                  };
+                  cur[0] = hval(0, i) * hval(0, j);
+                  cur[1] = (hval(0, i) * hval(1, j)) + (hval(1, i) * hval(0, j));
+                  cur[2] = (hval(2, i) * hval(0, j)) + (hval(0, i) * hval(2, j));
+                  cur[3] = hval(1, i) * hval(1, j);
+                  cur[4] = (hval(2, i) * hval(1, j)) + (hval(1, i) * hval(2, j));
+                  cur[5] = hval(2, i) * hval(2, j);
+              };
+
+            GMatrix m = new GMatrix(points.Length*2, 6);
+            for (var i = 0; i < points.Length; i+=2)
+            {
+                FillV(0, 1, m.storage[i]);
+                var v00 = new double[6];
+                FillV(0, 0, v00);
+                var v11 = new double[6];
+                FillV(1, 1, v11);
+                var r2 = m.storage[i + 1];
+                for (var j = 0; j < 6; j++)
+                {
+                    r2[j] = v00[j] - v11[j];
+                }
+            }
+            var svdr = SolveSvd(m);
+            Console.WriteLine(svdr);
         }
 
         public void Solve(GMatrix m)
