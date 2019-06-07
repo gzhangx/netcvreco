@@ -188,7 +188,36 @@ namespace com.veda.LinearAlg
                 }
             }
             var svdr = SolveSvd(m);
-            Console.WriteLine(svdr);
+
+            var b = new GMatrix(3, 3);
+            b.storage[0][0] = svdr.Vt.storage[0][5];
+            b.storage[0][1] = b.storage[1][0] = svdr.Vt.storage[1][5]; //b12
+            b.storage[0][2] = b.storage[2][0] = svdr.Vt.storage[2][5]; //b13
+            b.storage[1][1] = svdr.Vt.storage[3][5]; //b22
+            b.storage[1][2] = b.storage[2][1] = svdr.Vt.storage[4][5]; //b23
+            b.storage[2][2] = svdr.Vt.storage[5][5]; //b33
+            //b= K-t*K-1
+            Console.WriteLine(b);
+            var A1 = Cholesky3x3(b);
+            Console.WriteLine(A1);
+        }
+
+        protected static GMatrix Cholesky3x3(GMatrix m)
+        {
+            var l11 = Math.Sqrt(m.storage[0][0]);
+            var l21 = m.storage[0][1] / l11;
+            var l31 = m.storage[0][2] / l11;
+            var l22 = Math.Sqrt(m.storage[1][1] - (l21 * l21));
+            var l32 = (m.storage[1][2] - (l31 * l21)) / l22;
+            var l33 = Math.Sqrt(m.storage[2][2] - ((l31*l31) + (l32*l32)));
+            GMatrix rm = new GMatrix(3, 3);
+            rm.storage[0][0] = l11;
+            rm.storage[0][1] = l21;
+            rm.storage[0][2] = l31;
+            rm.storage[1][1] = l22;
+            rm.storage[1][2] = l32;
+            rm.storage[2][2] = l33;
+            return rm;
         }
 
         public void Solve(GMatrix m)
