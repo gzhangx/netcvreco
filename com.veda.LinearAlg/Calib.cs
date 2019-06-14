@@ -189,7 +189,25 @@ namespace com.veda.LinearAlg
             }
             var svdr = SolveSvd(m);
 
-            var b = new GMatrix(3, 3);
+            var a = new GMatrix(3, 3);
+            Func<int, double> gb = i=> svdr.Vt.storage[0][i];
+            var gb0_4 = gb(0) * gb(4);
+            var gb0_2 = gb(0) * gb(2);
+            var vc = ((gb(1) * gb(3)) - gb0_4) / (gb0_2 - (gb(1) * gb(1)));
+            var l = gb(5) - ((gb(3)*gb(3) + vc*(gb(1)*gb(2)-gb0_4)) / gb(0));
+            var alpha = Math.Sqrt(l / gb(0));
+            var beta = Math.Sqrt((l * gb(0)) / (gb0_2 - gb(1) * gb(1)));
+            var gamma = -1 * (gb(1) * alpha * alpha) * beta / l;
+            var uc = gamma * vc / beta - (gb(3) * alpha * alpha / l);
+            a.storage[0][0] = alpha;
+            a.storage[1][1] = beta;
+            a.storage[0][1] = gamma;
+            a.storage[0][2] = uc;
+            a.storage[1][2] = vc;
+            a.storage[2][2] = 1;
+            Console.WriteLine(a);
+            return;
+             var b = new GMatrix(3, 3);
             b.storage[0][0] = svdr.Vt.storage[0][5];
             b.storage[0][1] = b.storage[1][0] = svdr.Vt.storage[1][5]; //b12
             b.storage[0][2] = b.storage[2][0] = svdr.Vt.storage[2][5]; //b13
