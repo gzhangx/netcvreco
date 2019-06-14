@@ -193,10 +193,11 @@ namespace com.veda.LinearAlg
             Func<int, double> gb = i=> svdr.Vt.storage[0][i];
             var gb0_4 = gb(0) * gb(4);
             var gb0_2 = gb(0) * gb(2);
-            var vc = ((gb(1) * gb(3)) - gb0_4) / (gb0_2 - (gb(1) * gb(1)));
+            var gb1x1 = gb(1) * gb(1);
+            var vc = ((gb(1) * gb(3)) - gb0_4) / (gb0_2 - gb1x1);
             var l = gb(5) - ((gb(3)*gb(3) + vc*(gb(1)*gb(2)-gb0_4)) / gb(0));
             var alpha = Math.Sqrt(l / gb(0));
-            var beta = Math.Sqrt((l * gb(0)) / (gb0_2 - gb(1) * gb(1)));
+            var beta = Math.Sqrt((l * gb(0)) / (gb0_2 - gb1x1));
             var gamma = -1 * (gb(1) * alpha * alpha) * beta / l;
             var uc = gamma * vc / beta - (gb(3) * alpha * alpha / l);
             a.storage[0][0] = alpha;
