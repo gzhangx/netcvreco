@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -14,6 +13,8 @@ namespace MatrixTest
         const string saveFileName_corners = saveFilePath + "corners.txt";
         static void Main(string[] args)
         {
+            TestData();
+            return;
             double[] A = new double[]
             {
                 1,1,2,
@@ -100,7 +101,25 @@ namespace MatrixTest
             Calib.EstimateIntranics(resa[0][1]);
         }
 
-        static string cornerToString(PointF[][] corner)
+        static void TestData()
+        {
+            var pts = readTestPoints();
+            var res = Calib.EstimateHomography(pts, 9,6);
+            Console.WriteLine(res);
+        }
+        static PointFloat[] readTestPoints()
+        {
+            var lines = File.ReadAllLines(@"c:\test\netCvReco\data\test.txt");
+            var res = new List<PointFloat>();
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                var parts = line.Replace("[","").Replace("]","").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                res.Add(new PointFloat(Convert.ToSingle(parts[0]), Convert.ToSingle(parts[1])));
+            }
+            return res.ToArray();
+        }
+        static string cornerToString(PointFloat[][] corner)
         {
             var sb = new StringBuilder();
             sb.Append(corner.Length).Append("\r\n");

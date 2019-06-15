@@ -20,11 +20,12 @@ namespace com.veda.LinearAlg
             JacobSvd.SvdRes svdA = SolveSvd(m1);
             var Fhat = new GMatrix(3, 3);
             int at = 0;
+            var ms = svdA.Vt.storage[8];
             for (var i = 0; i < 3; i++)
             {
                 for (var j = 0; j < 3; j++)
                 {
-                    Fhat.storage[i][j] = svdA.Vt.storage[at++][8];
+                    Fhat.storage[i][j] = ms[at++];
                 }
             }
             return Fhat;
@@ -98,7 +99,7 @@ namespace com.veda.LinearAlg
             {
                 for (var i = 0; i < w; i++)
                 {
-                    pos[at++] = new PointFloat(i * 20, j * 20);
+                    pos[at++] = new PointFloat(i , j );
                 }
             }
             return EstimateHomography(points, pos);
@@ -106,14 +107,15 @@ namespace com.veda.LinearAlg
         public static GMatrix EstimateHomography(PointFloat[] points, PointFloat[] checkBoardLoc)
         {
             var m1 = new GMatrix(points.Length*2, 9);
-            for (var i = 0; i < points.Length; i+=2)
+            for (var i = 0; i < points.Length; i++)
             {
+                var ii = i * 2;
                 var xy = points[i];
                 var x = xy.X;
                 var y = xy.Y;
                 var X = checkBoardLoc[i].X;
                 var Y = checkBoardLoc[i].Y;
-                var cur = m1.storage[i];
+                var cur = m1.storage[ii];
                 cur[0] = -X;
                 cur[1] = -Y;
                 cur[2] = -1;
@@ -124,7 +126,7 @@ namespace com.veda.LinearAlg
                 cur[7] = x*Y;
                 cur[8] = x;
 
-                cur = m1.storage[i+1];
+                cur = m1.storage[ii+1];
                 cur[0] = 0;
                 cur[1] = 0;
                 cur[2] = 0;
