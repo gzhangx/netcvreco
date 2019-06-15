@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 
 namespace com.veda.LinearAlg
@@ -15,6 +16,11 @@ namespace com.veda.LinearAlg
     }
     public class Calib
     {
+        public class TandTi
+        {
+            public GMatrix t;
+            public GMatrix ti;
+        }
         public static GMatrix SolveSvd3x3(GMatrix m1)
         {
             JacobSvd.SvdRes svdA = SolveSvd(m1);
@@ -31,28 +37,42 @@ namespace com.veda.LinearAlg
             return Fhat;
         }
 
+        protected static double getMean(PointFloat[] pts, Func<PointFloat,double>get)
+        {
+            var total = pts.Sum(get);
+            return total / pts.Length;
+        }
+        protected static double getVariance(PointFloat[] pts, Func<PointFloat, double> get)
+        {
+            var mean = getMean(pts, get);
+            return pts.Sum(p =>
+            {
+                var v = get(p);
+                return v * v;
+            })/pts.Length;
+        }
         private static JacobSvd.SvdRes SolveSvd(GMatrix m1)
         {
-            double max = 1;
-            double min = -1;
-            for (var i = 0; i < m1.rows; i++)
-            {
-                for (var j = 0; j < m1.cols; j++)
-                {
-                    var v = m1.storage[i][j];
-                    if (v > max) max = v;
-                    if (v < min) min = v;
-                }
-            }
-            var scal = Math.Max(Math.Abs(min), max);
-            for (var i = 0; i < m1.rows; i++)
-            {
-                for (var j = 0; j < m1.cols; j++)
-                {
-                    var v = m1.storage[i][j];
-                    m1.storage[i][j] = v / scal;
-                }
-            }
+            //double max = 1;
+            //double min = -1;
+            //for (var i = 0; i < m1.rows; i++)
+            //{
+            //    for (var j = 0; j < m1.cols; j++)
+            //    {
+            //        var v = m1.storage[i][j];
+            //        if (v > max) max = v;
+            //        if (v < min) min = v;
+            //    }
+            //}
+            //var scal = Math.Max(Math.Abs(min), max);
+            //for (var i = 0; i < m1.rows; i++)
+            //{
+            //    for (var j = 0; j < m1.cols; j++)
+            //    {
+            //        var v = m1.storage[i][j];
+            //        m1.storage[i][j] = v / scal;
+            //    }
+            //}
             var svdA = JacobSvd.JacobiSVD(m1);
             return svdA;
         }
@@ -90,7 +110,33 @@ namespace com.veda.LinearAlg
             return res;
         }
 
+        static TandTi GetNormalizedMatrix(PointFloat[] pts)
+        {
+            var xmean = getMean(pts, p => p.X);
+            var ymean = getMean(pts, p => p.Y);
+            var xvar = getVariance(pts, p => p.X);
+            var yvar = getVariance(pts, p => p.Y);
 
+            var xs = Math.Sqrt(2 / xvar);
+            var ys = Math.Sqrt(2 / yvar);
+
+            var m = new GMatrix(new double[,]
+            {
+                { xs, 0, -xs*xmean },
+                { 0, ys, -ys * ymean },
+                { 0, 0, 1 }
+            });
+            var mi = new GMatrix(new double[,] {
+                {1/xs ,  0 , xmean },
+                { 0, 1/ ys, ymean},
+                { 0,0,1}
+            });
+            return new TandTi
+            {
+                t = m,
+                ti = mi,
+            };
+        }
         public static GMatrix EstimateHomography(PointFloat[] points, int w = 6, int h = 3)
         {
             var pos = new PointFloat[w * h];
@@ -106,9 +152,12 @@ namespace com.veda.LinearAlg
         }
         public static GMatrix EstimateHomography(PointFloat[] points, PointFloat[] checkBoardLoc)
         {
+            var nu = GetNormalizedMatrix(points);
+            var nx = GetNormalizedMatrix(checkBoardLoc);
             var m1 = new GMatrix(points.Length*2, 9);
             for (var i = 0; i < points.Length; i++)
             {
+                var pts = nu.t.dot()
                 var ii = i * 2;
                 var xy = points[i];
                 var x = xy.X;
