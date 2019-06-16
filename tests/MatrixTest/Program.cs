@@ -100,6 +100,10 @@ namespace MatrixTest
             var intrinc1 = Calib.EstimateIntranics(resa[0]);
             Console.WriteLine("==================================== INCTRINS 1");
             Console.WriteLine(intrinc1);
+
+            var intrinc2 = Calib.EstimateIntranics(resa[1]);
+            Console.WriteLine("==================================== INCTRINS 2");
+            Console.WriteLine(intrinc2);
         }
 
         static void TestData()
