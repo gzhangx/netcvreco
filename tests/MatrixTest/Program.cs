@@ -13,8 +13,8 @@ namespace MatrixTest
         const string saveFileName_corners = saveFilePath + "corners.txt";
         static void Main(string[] args)
         {
-            //TestData();
-            //return;
+            TestData();
+            return;
             double[] A = new double[]
             {
                 1,1,2,
@@ -97,27 +97,34 @@ namespace MatrixTest
                 Console.WriteLine("====================================");
             }
 
-            Calib.EstimateIntranics(resa[0][0]);
-            Calib.EstimateIntranics(resa[0][1]);
+            Calib.EstimateIntranics(resa[0]);            
         }
 
         static void TestData()
         {
             var pts = readTestPoints();
-            var res = Calib.EstimateHomography(pts, 9,6);
+            var res = Calib.EstimateIntranics(pts, 9, 6);
+            //var res = Calib.EstimateHomography(pts, 9,6);
             Console.WriteLine(res);
         }
-        static PointFloat[] readTestPoints()
+        static PointFloat[][] readTestPoints()
         {
+            List<PointFloat[]> rrr = new List<PointFloat[]>();
             var lines = File.ReadAllLines(@"c:\test\netCvReco\data\test.txt");
-            var res = new List<PointFloat>();
+            var res = new List<PointFloat>();            
             for (int i = 0; i < lines.Length; i++)
             {
                 var line = lines[i];
+                if (line == "=============")
+                {
+                    rrr.Add(res.ToArray());
+                    res = new List<PointFloat>();
+                    continue;
+                }
                 var parts = line.Replace("[","").Replace("]","").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 res.Add(new PointFloat(Convert.ToSingle(parts[0]), Convert.ToSingle(parts[1])));
             }
-            return res.ToArray();
+            return rrr.ToArray();
         }
         static string cornerToString(PointFloat[][] corner)
         {

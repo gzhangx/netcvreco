@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 
@@ -199,7 +200,13 @@ namespace com.veda.LinearAlg
             return denormed;
         }
 
-        public static void EstimateIntranics(PointFloat[] points, int w = 6, int h = 3)
+        class HomoPts
+        {
+            public GMatrix homo;
+            public PointFloat[] points;
+            public Action<int, int, double[], GMatrix> FillV;
+        };
+        public static GMatrix EstimateIntranics(PointFloat[][] allPoints, int w = 6, int h = 3)
         {
             /*
              *   hij
@@ -215,34 +222,47 @@ namespace com.veda.LinearAlg
              *   h31 h32 t3
              * 
              */
-            var homo = EstimateHomography(points, w, h);
-            Action<int, int, double[]> FillV = (i, j, cur) =>
-              {
-                  Func<int, int, double> hval = (hcol, hrow) =>
-                  {
-                      return homo.storage[hrow][hcol];
-                  };
-                  cur[0] = hval(0, i) * hval(0, j);
-                  cur[1] = (hval(0, i) * hval(1, j)) + (hval(1, i) * hval(0, j));
-                  cur[2] = (hval(2, i) * hval(0, j)) + (hval(0, i) * hval(2, j));
-                  cur[3] = hval(1, i) * hval(1, j);
-                  cur[4] = (hval(2, i) * hval(1, j)) + (hval(1, i) * hval(2, j));
-                  cur[5] = hval(2, i) * hval(2, j);
-              };
-
-            GMatrix m = new GMatrix(points.Length*2, 6);
-            for (var i = 0; i < points.Length; i+=2)
+            var allHomos = allPoints.GetLength(0);
+            var homopts = new List<HomoPts>();
+            for (var c= 0; c < allHomos; c++)
             {
-                FillV(0, 1, m.storage[i]);
+                var p = allPoints[c];
+                var hm = EstimateHomography(p, w, h);
+                Action<int, int, double[], GMatrix> fillV = (i, j, cur, homo) =>
+                {
+                    Func<int, int, double> hval = (hrow, hcol) =>
+                    {
+                        return homo.storage[hrow][hcol];
+                    };
+                    cur[0] = hval(0, i) * hval(0, j);
+                    cur[1] = (hval(0, i) * hval(1, j)) + (hval(1, i) * hval(0, j));
+                    cur[2] = hval(1, i) * hval(1, j);
+                    cur[3] = (hval(2, i) * hval(0, j)) + (hval(0, i) * hval(2, j));                    
+                    cur[4] = (hval(2, i) * hval(1, j)) + (hval(1, i) * hval(2, j));
+                    cur[5] = hval(2, i) * hval(2, j);
+                };
+                homopts.Add(new HomoPts { homo = hm, points = p, FillV = fillV });
+            }
+
+
+            var pointsLength = w * h;
+            GMatrix m = new GMatrix(allHomos * 2, 6);
+            int at = 0;
+            for (var c = 0; c < homopts.Count; c++)
+            {
+                var hp = homopts[c];
+                var FillV = hp.FillV;
+                FillV(0, 1, m.storage[at], hp.homo);
                 var v00 = new double[6];
-                FillV(0, 0, v00);
+                FillV(0, 0, v00, hp.homo);
                 var v11 = new double[6];
-                FillV(1, 1, v11);
-                var r2 = m.storage[i + 1];
+                FillV(1, 1, v11, hp.homo);
+                var r2 = m.storage[at + 1];
                 for (var j = 0; j < 6; j++)
                 {
                     r2[j] = v00[j] - v11[j];
                 }
+                at += 2;
             }
             var svdr = SolveSvd(m);
 
@@ -264,19 +284,19 @@ namespace com.veda.LinearAlg
             a.storage[0][2] = uc;
             a.storage[1][2] = vc;
             a.storage[2][2] = 1;
-            Console.WriteLine(a);
-            return;
-             var b = new GMatrix(3, 3);
-            b.storage[0][0] = svdr.Vt.storage[0][5];
-            b.storage[0][1] = b.storage[1][0] = svdr.Vt.storage[1][5]; //b12
-            b.storage[0][2] = b.storage[2][0] = svdr.Vt.storage[2][5]; //b13
-            b.storage[1][1] = svdr.Vt.storage[3][5]; //b22
-            b.storage[1][2] = b.storage[2][1] = svdr.Vt.storage[4][5]; //b23
-            b.storage[2][2] = svdr.Vt.storage[5][5]; //b33
-            //b= K-t*K-1
-            Console.WriteLine(b);
-            var A1 = Cholesky3x3(b);
-            Console.WriteLine(Inverse3x3(A1));
+            //Console.WriteLine(a);
+            return a;
+            // var b = new GMatrix(3, 3);
+            //b.storage[0][0] = svdr.Vt.storage[0][5];
+            //b.storage[0][1] = b.storage[1][0] = svdr.Vt.storage[1][5]; //b12
+            //b.storage[0][2] = b.storage[2][0] = svdr.Vt.storage[2][5]; //b13
+            //b.storage[1][1] = svdr.Vt.storage[3][5]; //b22
+            //b.storage[1][2] = b.storage[2][1] = svdr.Vt.storage[4][5]; //b23
+            //b.storage[2][2] = svdr.Vt.storage[5][5]; //b33
+            ////b= K-t*K-1
+            //Console.WriteLine(b);
+            //var A1 = Cholesky3x3(b);
+            //Console.WriteLine(Inverse3x3(A1));
         }
 
         protected static GMatrix Cholesky3x3(GMatrix m)
