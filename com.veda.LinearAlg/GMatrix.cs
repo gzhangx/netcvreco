@@ -81,7 +81,7 @@ namespace com.veda.LinearAlg
         {
             var r = rows;
             var mc = m.cols;
-            if (r != mc) throw new InvalidOperationException($"Cross: row {r} and col {mc} must equal");
+            //if (r != mc) throw new InvalidOperationException($"Cross: row {r} and col {mc} must equal");
             if (cols != m.rows) throw new InvalidOperationException($"Cross: col {cols} and row {m.rows} must equal");
             var newStorage = new double[r, mc];
             var c = cols;
@@ -100,6 +100,30 @@ namespace com.veda.LinearAlg
             return new GMatrix(newStorage);
         }
 
+        public GMatrix div(double v)
+        {
+            var r = rows;
+            var c = cols;
+            var newStorage = new GMatrix(r,c);
+            for (var i = 0; i < r; i++)
+            {
+                for (var j = 0; j < c; j++)
+                {
+                    newStorage.storage[i][j] = storage[i][j]/v;
+                }
+            }
+            return newStorage;
+        }
+
+        public double last()
+        {
+            return storage[rows - 1][cols - 1];
+        }
+
+        public GMatrix noramByLast()
+        {
+            return div(last());
+        }
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -108,7 +132,7 @@ namespace com.veda.LinearAlg
                 for (var j = 0; j < cols; j++)
                 {
                     if (j > 0) sb.Append(",");
-                    sb.Append(storage[i][j].ToString("0.000"));
+                    sb.Append(storage[i][j].ToString(" 0.000"));
                 }
                 sb.Append("\n");
             }

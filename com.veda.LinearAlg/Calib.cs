@@ -13,6 +13,10 @@ namespace com.veda.LinearAlg
         }
         public float X { get; protected set; }
         public float Y { get; protected set; }
+        public GMatrix ToVect()
+        {
+            return new GMatrix(new double[,] { { X }, { Y }, { 1 } });
+        }
     }
     public class Calib
     {
@@ -47,8 +51,8 @@ namespace com.veda.LinearAlg
             var mean = getMean(pts, get);
             return pts.Sum(p =>
             {
-                var v = get(p);
-                return v * v;
+                var v = get(p) - mean;
+                return (v * v);
             })/pts.Length;
         }
         private static JacobSvd.SvdRes SolveSvd(GMatrix m1)
@@ -157,13 +161,14 @@ namespace com.veda.LinearAlg
             var m1 = new GMatrix(points.Length*2, 9);
             for (var i = 0; i < points.Length; i++)
             {
-                var pts = nu.t.dot()
+                var pts = nu.t.dot(points[i].ToVect()).noramByLast();
+                var obj = nx.t.dot(checkBoardLoc[i].ToVect()).noramByLast();
                 var ii = i * 2;
-                var xy = points[i];
-                var x = xy.X;
-                var y = xy.Y;
-                var X = checkBoardLoc[i].X;
-                var Y = checkBoardLoc[i].Y;
+                //var xy = points[i];
+                var x = pts.storage[0][0];
+                var y = pts.storage[1][0];
+                var X = obj.storage[0][0];
+                var Y = obj.storage[1][0];
                 var cur = m1.storage[ii];
                 cur[0] = -X;
                 cur[1] = -Y;
@@ -189,8 +194,9 @@ namespace com.veda.LinearAlg
 
             var res = SolveSvd3x3(m1);
 
+            var denormed = nu.ti.dot(res).dot(nx.t).noramByLast();
             
-            return res;
+            return denormed;
         }
 
         public static void EstimateIntranics(PointFloat[] points, int w = 6, int h = 3)
