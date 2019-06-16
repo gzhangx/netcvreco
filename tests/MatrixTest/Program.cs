@@ -13,8 +13,8 @@ namespace MatrixTest
         const string saveFileName_corners = saveFilePath + "corners.txt";
         static void Main(string[] args)
         {
-            TestData();
-            return;
+            //TestData();
+            //return;
             double[] A = new double[]
             {
                 1,1,2,

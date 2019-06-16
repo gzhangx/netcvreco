@@ -247,7 +247,8 @@ namespace com.veda.LinearAlg
             var svdr = SolveSvd(m);
 
             var a = new GMatrix(3, 3);
-            Func<int, double> gb = i=> svdr.Vt.storage[0][i];
+            var vtl = svdr.Vt.storage[5];
+            Func<int, double> gb = i=> vtl[i];
             var gb0_4 = gb(0) * gb(4);
             var gb0_2 = gb(0) * gb(2);
             var gb1x1 = gb(1) * gb(1);
