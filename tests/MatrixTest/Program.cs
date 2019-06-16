@@ -13,8 +13,8 @@ namespace MatrixTest
         const string saveFileName_corners = saveFilePath + "corners.txt";
         static void Main(string[] args)
         {
-            TestData();
-            return;
+            //TestData();
+            //return;
             double[] A = new double[]
             {
                 1,1,2,
@@ -97,7 +97,9 @@ namespace MatrixTest
                 Console.WriteLine("====================================");
             }
 
-            Calib.EstimateIntranics(resa[0]);            
+            var intrinc1 = Calib.EstimateIntranics(resa[0]);
+            Console.WriteLine("==================================== INCTRINS 1");
+            Console.WriteLine(intrinc1);
         }
 
         static void TestData()
