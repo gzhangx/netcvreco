@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using com.veda.LinearAlg;
+using Emgu.CV;
 using Emgu.CV.Structure;
 using netCvLib.calib3d;
 using System;
@@ -36,20 +37,39 @@ namespace StImgTest
         const string imageDir = @"C:\test\netCvReco\data\images";
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
 
+            var al = new List<PointFloat>();
+            var ar = new List<PointFloat>();
             foreach (var iii in images)
             {
                 var left = CvInvoke.Imread($"{imageDir}\\Left_{iii}.jpg");
                 var right = CvInvoke.Imread($"{imageDir}\\Right_{iii}.jpg");
-                var corl = Calib.findConers(left.ToImage<Gray, Byte>());
-                var corr = Calib.findConers(right.ToImage<Gray, Byte>());
+                var corl = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+                al.AddRange(corl);
+                var corr = convertToPF(netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));
+                ar.AddRange(corr);
                 File.WriteAllLines($"{imageDir}\\Left_{iii}.txt", cornerToString(corl));
                 File.WriteAllLines($"{imageDir}\\Right_{iii}.txt", cornerToString(corr));
+                var ff = com.veda.LinearAlg.Calib.CalcFundm((corl), (corr));
+                Console.WriteLine(ff);
+
             }
+            var f = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
+            Console.WriteLine(f);
         }
 
-        static string[] cornerToString(PointF[] corner)
+        static PointFloat[] convertToPF(PointF[] p)
+        {
+            var res = new PointFloat[p.Length];
+            for(int i = 0; i < p.Length; i++)
+            {
+                res[i] = new PointFloat(p[i].X, p[i].Y);
+            }
+            return res;
+        }
+
+        static string[] cornerToString(PointFloat[] corner)
         {
 
             var res = new string[corner.Length];
