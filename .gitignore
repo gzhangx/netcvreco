@@ -16,3 +16,5 @@
 /tests/StImgTest/obj/*
 /tests/MatrixTest/bin/*
 /tests/MatrixTest/obj/*
+/tests/StaticImgTest/bin/*
+/tests/StaticImgTest/obj/*

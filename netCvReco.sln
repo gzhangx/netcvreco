@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTest", "tests\MatrixT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.veda.LinearAlg", "com.veda.LinearAlg\com.veda.LinearAlg.csproj", "{6490458F-D023-40A5-8F43-5681AB295FD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticImgTest", "tests\StaticImgTest\StaticImgTest.csproj", "{801B7EFC-5896-41F0-A8AB-9E2355F55FED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,14 @@ Global
 		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|x64.ActiveCfg = Release|Any CPU
 		{6490458F-D023-40A5-8F43-5681AB295FD4}.Release|x64.Build.0 = Release|Any CPU
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Debug|x64.ActiveCfg = Debug|x64
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Debug|x64.Build.0 = Debug|x64
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Release|x64.ActiveCfg = Release|x64
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,5 +183,6 @@ Global
 		{1A53FBC6-4D7E-446B-857B-D7652F9B3514} = {A5EA897C-8CB7-44AB-8DC6-CCDAC0021D3D}
 		{E9BFFD83-0ADD-435E-87C7-84C4C5BF4092} = {A5EA897C-8CB7-44AB-8DC6-CCDAC0021D3D}
 		{F33E3E1E-F69E-4100-B38D-CD363D421D37} = {A5EA897C-8CB7-44AB-8DC6-CCDAC0021D3D}
+		{801B7EFC-5896-41F0-A8AB-9E2355F55FED} = {A5EA897C-8CB7-44AB-8DC6-CCDAC0021D3D}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,47 @@
+﻿<Window x:Class="StImgTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StImgTest"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="782.062">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+        <Image x:Name="video1"></Image>
+        <Image x:Name="video2" Grid.Column="1"></Image>
+        <Image x:Name="disparityMap" Grid.Column="0" Grid.Row="1"></Image>
+        <Grid Grid.Row="2" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Label x:Name="lblMinDisp">minDisp</Label>
+                <Slider x:Name="minDisp" Minimum="0" Maximum="1000" Value="100" Width="100" ValueChanged="minDisp_ValueChanged"></Slider>
+                <Label x:Name="lblNumDisp">numDisp</Label>
+                <Slider x:Name="numDisp" Minimum="0" Maximum="16" Value="0" Width="100" ValueChanged="numDisp_ValueChanged"></Slider>
+                <Label x:Name="lblBlkSize">blkSize</Label>
+                <Slider x:Name="blockSize" Minimum="0" Maximum="20" Value="0" Width="100" ValueChanged="blockSize_ValueChanged"></Slider>
+                <Label x:Name="lblSpeckle">blkSize</Label>
+                <Slider x:Name="speckle" Minimum="0" Maximum="5" Value="0" Width="100" ValueChanged="speckle_ValueChanged"></Slider>
+                <Label x:Name="lblSpeckleRange">blkSize</Label>
+                <Slider x:Name="speckleRange" Minimum="0" Maximum="5" Value="0" Width="100" ValueChanged="speckleRange_ValueChanged"></Slider>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>
+                <TextBox x:Name="info" Text="                             0"></TextBox>
+                <Button x:Name="btnShow" Click="btnShow_Click"  Width="50" Margin="2,2,2,2">Show</Button>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+</Window>
