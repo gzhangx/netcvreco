@@ -79,11 +79,11 @@ namespace MatrixTest
             var resa = stringToCorner(lines);
             for (int i = 0; i < 10; i++)
             {
-                var res = Calib.Calc(resa[0][i], resa[1][i]);
+                var res = Calib.CalcFundm(resa[0][i], resa[1][i]);
                 Console.WriteLine(res);
             }
 
-            Console.WriteLine(Calib.Calc(resa[0].Take(10).SelectMany(x=>x).ToArray(), resa[1].Take(10).SelectMany(x => x).ToArray()));
+            Console.WriteLine(Calib.CalcFundm(resa[0].Take(10).SelectMany(x=>x).ToArray(), resa[1].Take(10).SelectMany(x => x).ToArray()));
 
 
             Console.WriteLine("\nHomo\n");

@@ -82,7 +82,7 @@ namespace com.veda.LinearAlg
             return svdA;
         }
 
-        public static GMatrix Calc(PointFloat[] points1, PointFloat[] points2)
+        public static GMatrix CalcFundm(PointFloat[] points1, PointFloat[] points2)
         {
             var m1 = new GMatrix(points1.Length, 9);
             for (var i = 0; i < points1.Length; i++)
