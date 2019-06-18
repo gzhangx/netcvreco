@@ -57,6 +57,17 @@ namespace netCvLib.calib3d
             public PointF[] corners_Right = null;
         }
 
+        public static PointF[] findConers(Image<Gray, Byte> Gray_frame_S1)
+        {
+            Size patternSize = new Size(width, height); //size of chess board to be detected
+
+            //Find the chessboard in bothe images
+            var corners = FindChessboardCorners(Gray_frame_S1, patternSize, Emgu.CV.CvEnum.CalibCbType.AdaptiveThresh);
+            if (corners == null) return null;
+            Gray_frame_S1.FindCornerSubPix(new PointF[1][] { corners }, new Size(11, 11), new Size(-1, -1), new MCvTermCriteria(30, 0.01));
+            return corners;
+        }
+
         /// <summary>
         /// Call with new CornesStepCfg, keep calling with images till cfg.done == true
         /// </summary>
