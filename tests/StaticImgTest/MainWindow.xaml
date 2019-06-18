@@ -25,16 +25,7 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Label x:Name="lblMinDisp">minDisp</Label>
-                <Slider x:Name="minDisp" Minimum="0" Maximum="1000" Value="100" Width="100" ValueChanged="minDisp_ValueChanged"></Slider>
-                <Label x:Name="lblNumDisp">numDisp</Label>
-                <Slider x:Name="numDisp" Minimum="0" Maximum="16" Value="0" Width="100" ValueChanged="numDisp_ValueChanged"></Slider>
-                <Label x:Name="lblBlkSize">blkSize</Label>
-                <Slider x:Name="blockSize" Minimum="0" Maximum="20" Value="0" Width="100" ValueChanged="blockSize_ValueChanged"></Slider>
-                <Label x:Name="lblSpeckle">blkSize</Label>
-                <Slider x:Name="speckle" Minimum="0" Maximum="5" Value="0" Width="100" ValueChanged="speckle_ValueChanged"></Slider>
-                <Label x:Name="lblSpeckleRange">blkSize</Label>
-                <Slider x:Name="speckleRange" Minimum="0" Maximum="5" Value="0" Width="100" ValueChanged="speckleRange_ValueChanged"></Slider>
+               
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>
