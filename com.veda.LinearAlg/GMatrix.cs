@@ -131,8 +131,8 @@ namespace com.veda.LinearAlg
             {
                 for (var j = 0; j < cols; j++)
                 {
-                    if (j > 0) sb.Append(",");
-                    sb.Append(storage[i][j].ToString(" 0.000"));
+                    if (j > 0) sb.Append(", ");
+                    sb.Append(storage[i][j].ToString("0.000").PadLeft(7));
                 }
                 sb.Append("\n");
             }
