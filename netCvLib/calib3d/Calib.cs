@@ -95,8 +95,9 @@ namespace netCvLib.calib3d
                     //save the calculated points into an array
                     cfg.corners_points_Left[cfg.buffer_savepoint] = cfg.corners_Left;
                     cfg.corners_points_Right[cfg.buffer_savepoint] = cfg.corners_Right;
-                    cfg.buffer_savepoint++;//increase buffer positon
-
+                    Gray_frame_S1.Save($"{saveFilePath}images\\Left_{cfg.buffer_savepoint}.jpg");
+                    Gray_frame_S2.Save($"{saveFilePath}images\\Right_{cfg.buffer_savepoint}.jpg");
+                    cfg.buffer_savepoint++;//increase buffer positon                    
                     //check the state of buffer
                     if (cfg.buffer_savepoint == buffer_length)
                     {
