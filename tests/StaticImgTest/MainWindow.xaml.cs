@@ -105,13 +105,52 @@ namespace StImgTest
             var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
 
             var leftPts = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+            var rnd = new Random();
+            Func<int> nextClr = () => (int)(rnd.NextDouble() * 255);
             foreach (var pts in leftPts)
             {
-                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2,2), new MCvScalar(0,0,255), 2);
+                var clr = new MCvScalar(nextClr(), nextClr(), nextClr());
+                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2,2), clr, 2);
+                var gm = new GMatrix(new double[1, 3] { { pts.X, pts.Y, 1 } }).dot(F);
+                DrawEpl(right, gm, clr);                
             }
 
             imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
+        }
+
+        private void DrawEpl(Mat img, GMatrix m, MCvScalar clr)
+        {
+            var ms = m.storage[0];
+            var a = ms[0];
+            var b = ms[1];
+            var c = ms[2];
+            Console.WriteLine(m);
+            if (Math.Abs(a) > Math.Abs(b))
+            {
+                Func<System.Drawing.Point, System.Drawing.Point> fixv = vv =>
+                 {
+                     //vv.X = Math.Abs(vv.X);
+                     return vv;
+                 };
+                Func<int, System.Drawing.Point> toX = y=> new System.Drawing.Point((int)((c - (b * y)) / a), y);
+                var p1 = fixv(toX(0));
+                var p2 = fixv(toX(img.Height));                
+                Console.WriteLine($"Drawinga {p1.X},{p1.Y}      {p2.X},{p2.Y}");
+                CvInvoke.Line(img, p1, p2, clr, 2);                
+            }else
+            {
+                Func<System.Drawing.Point, System.Drawing.Point> fixv = vv =>
+                {
+                    //vv.Y = Math.Abs(vv.Y);
+                    return vv;
+                };
+                Func<int, System.Drawing.Point> toY = x => new System.Drawing.Point(x,(int)((c - (a * x)) / b));
+                var p1 = fixv(toY(0));
+                var p2 = fixv(toY(img.Width));
+                CvInvoke.Line(img, p1, p2, clr, 2);
+                Console.WriteLine($"Drawingb {p1.X},{p1.Y}      {p2.X},{p2.Y}");
+            }
         }
     }
     
