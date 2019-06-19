@@ -105,21 +105,24 @@ namespace StImgTest
             var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
 
             var leftPts = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+            var rightPts = convertToPF(netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));
             var rnd = new Random();
             Func<int> nextClr = () => (int)(rnd.NextDouble() * 255);
-            foreach (var pts in leftPts)
+            for (var i = 0; i < leftPts.Length; i++)
             {
+                var pts = leftPts[i];
+                var rpts = rightPts[i];
                 var clr = new MCvScalar(nextClr(), nextClr(), nextClr());
                 CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2,2), clr, 2);
                 var gm = new GMatrix(new double[1, 3] { { pts.X, pts.Y, 1 } }).dot(F);
-                DrawEpl(right, gm, clr);                
+                DrawEpl(right, gm, clr, rpts);                
             }
 
             imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
 
-        private void DrawEpl(Mat img, GMatrix m, MCvScalar clr)
+        private void DrawEpl(Mat img, GMatrix m, MCvScalar clr, PointFloat rpts)
         {
             var ms = m.storage[0];
             var a = ms[0];
@@ -135,8 +138,9 @@ namespace StImgTest
                  };
                 Func<int, System.Drawing.Point> toX = y=> new System.Drawing.Point((int)((c - (b * y)) / a), y);
                 var p1 = fixv(toX(0));
-                var p2 = fixv(toX(img.Height));                
-                Console.WriteLine($"Drawinga {p1.X},{p1.Y}      {p2.X},{p2.Y}");
+                var p2 = fixv(toX(img.Height));
+                var sum = (rpts.X * a) + (rpts.Y * b) + c;
+                Console.WriteLine($"Drawinga {p1.X},{p1.Y}      {p2.X},{p2.Y}     {sum}");
                 CvInvoke.Line(img, p1, p2, clr, 2);                
             }else
             {
@@ -148,8 +152,9 @@ namespace StImgTest
                 Func<int, System.Drawing.Point> toY = x => new System.Drawing.Point(x,(int)((c - (a * x)) / b));
                 var p1 = fixv(toY(0));
                 var p2 = fixv(toY(img.Width));
+                var sum = (rpts.X * a) + (rpts.Y * b) + c;
                 CvInvoke.Line(img, p1, p2, clr, 2);
-                Console.WriteLine($"Drawingb {p1.X},{p1.Y}      {p2.X},{p2.Y}");
+                Console.WriteLine($"Drawingb {p1.X},{p1.Y}      {p2.X},{p2.Y}         {sum}");
             }
         }
     }
