@@ -16,8 +16,8 @@
             <RowDefinition/>
             <RowDefinition Height="160"/>
         </Grid.RowDefinitions>
-        <Image x:Name="video1"></Image>
-        <Image x:Name="video2" Grid.Column="1"></Image>
+        <Image x:Name="imgLeft"></Image>
+        <Image x:Name="imgRight" Grid.Column="1"></Image>
         <Image x:Name="disparityMap" Grid.Column="0" Grid.Row="1"></Image>
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
@@ -25,7 +25,7 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-               
+                <Slider x:Name="imgSel" Value="0" Maximum="8" ValueChanged="imgSel_ValueChanged" Width="300"></Slider>
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>

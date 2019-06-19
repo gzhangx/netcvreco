@@ -28,13 +28,10 @@ namespace StImgTest
     public partial class MainWindow : Window
     {
         
-        Image<Bgr, Byte> frame_S1;
-        Image<Gray, Byte> Gray_frame_S1;
-        Image<Bgr, Byte> frame_S2;
-        Image<Gray, Byte> Gray_frame_S2;
 
         string[] images = new string[] { "7","9","17","19","47","49","57","59" };
         const string imageDir = @"C:\test\netCvReco\data\images";
+        GMatrix F;
         public MainWindow()
         {
             InitializeComponent();
@@ -55,8 +52,9 @@ namespace StImgTest
                 Console.WriteLine(ff);
 
             }
-            var f = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
-            Console.WriteLine(f);
+            Console.WriteLine("F");
+            F = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
+            Console.WriteLine(F);
         }
 
         static PointFloat[] convertToPF(PointF[] p)
@@ -100,6 +98,14 @@ namespace StImgTest
             show = true;
         }
 
+        private void imgSel_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            var who = images[(int)imgSel.Value];
+            var left = CvInvoke.Imread($"{imageDir}\\Left_{who}.jpg");
+            var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
+            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
+            imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
+        }
     }
     
 }
