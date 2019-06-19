@@ -103,6 +103,13 @@ namespace StImgTest
             var who = images[(int)imgSel.Value];
             var left = CvInvoke.Imread($"{imageDir}\\Left_{who}.jpg");
             var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
+
+            var leftPts = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+            foreach (var pts in leftPts)
+            {
+                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2,2), new MCvScalar(0,0,255), 2);
+            }
+
             imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
