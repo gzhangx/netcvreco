@@ -96,3 +96,4 @@ if __name__ == '__main__':
     cv2.imshow('frameR', imgR)
     cv2.imshow('frameL', imgL)
     cv2.waitKey(-1)
+    print(F)
