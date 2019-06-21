@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 PATTERN_SIZE = (6, 3)
 # find object corners from chessboard pattern  and create a correlation with image corners
 def getCorners(images, chessboard_size, show=True):
@@ -81,19 +82,45 @@ if __name__ == '__main__':
             imgpointsR[0],
             cv2.FM_RANSAC
         )
+
+
+
+    print("ptsR")
+    print(ptsR)
     # find epilines corresponding to points in right image and draw them on the left image
-    epilinesR = cv2.computeCorrespondEpilines(ptsR.reshape(-1, 1, 2), 2, F)
+    epilinesR = cv2.computeCorrespondEpilines(ptsR.reshape(-1, 1, 2), 2, F)    
     epilinesR = epilinesR.reshape(-1, 3)    
+    print("epilinesR reshaped")
+    print(epilinesR)
     drawLines(imgL, epilinesR, colors[0:3])
 
     # find epilines corresponding to points in left image and draw them on the right image
-    epilinesL = cv2.computeCorrespondEpilines(ptsL.reshape(-1, 1, 2), 1, F)
+    epilinesL = cv2.computeCorrespondEpilines(ptsL.reshape(-1, 1, 2), 1, F)    
     epilinesL = epilinesL.reshape(-1, 3)
+    print("epilinesL")
+    print(epilinesL)
     drawLines(imgR, epilinesL, colors[3:6])
 
     # combine the corresponding images into one and display them
     #combineSideBySide(imgL, imgR, "epipolar_lines", save=True)
     cv2.imshow('frameR', imgR)
     cv2.imshow('frameL', imgL)
-    cv2.waitKey(-1)
+    cv2.waitKey(1)
+    print("F")
     print(F)
+    
+    x,y = ptsL.reshape(-1, 1, 2)[0][0]
+    print(x) 
+    print(y)    
+    a = F[0][0]*x + (F[0][1]*y) + (F[0][2]);
+    b = F[1][0]*x + (F[1][1]*y) + (F[1][2]);
+    c = F[2][0]*x + (F[2][1]*y) + (F[2][2]);
+    print(a)
+    print(b)
+    print(c)
+
+    u = math.sqrt(a*a+b*b)
+    print(a/u)
+    print(b/u)
+    print(c/u)
+    
