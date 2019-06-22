@@ -33,6 +33,8 @@ namespace StImgTest
         const string imageDir = @"C:\test\netCvReco\data\images";
         GMatrix F;
         CheckBox[] cbs = new CheckBox[9];
+        bool[] onChecks = new bool[9];
+        int who = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -57,14 +59,18 @@ namespace StImgTest
             F = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
             Console.WriteLine(F);
 
-            imgSelFunc(images[0]);
+            who = 0;
+            imgSelFunc();
 
             for (int i = 0; i < cbs.Length; i++)
             {
                 var cb = new CheckBox();
                 cb.Name = "chkEpl_" + i;                
                 cb.IsChecked = true;
-                cb.Checked += Cb_Checked;               
+                cb.Checked += Cb_Checked;
+                cb.Unchecked += Cb_Checked;               
+                cbs[i] = cb;
+                onChecks[i] = true;
             }
             foreach (var cb in cbs)
                 stkEpoles.Children.Add(cb);
@@ -73,8 +79,10 @@ namespace StImgTest
         private void Cb_Checked(object sender, RoutedEventArgs e)
         {
             var cb = (CheckBox)sender;
-            var nu = cb.Name.Substring(6);
+            var nu = cb.Name.Substring(7);
+            onChecks[Convert.ToInt32(nu)] = cb.IsChecked.Value;
 
+            imgSelFunc();
         }
 
         static PointFloat[] convertToPF(PointF[] p)
@@ -120,11 +128,12 @@ namespace StImgTest
 
         private void imgSel_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var who = images[(int)imgSel.Value];
-            imgSelFunc(who);
+            who = (int)imgSel.Value;
+            imgSelFunc();
         }
-        private void imgSelFunc(string who)
+        private void imgSelFunc()
         {
+            var who = images[this.who];
             //var who = images[(int)imgSel.Value];
             var left = CvInvoke.Imread($"{imageDir}\\Left_{who}.jpg");
             var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
@@ -135,6 +144,8 @@ namespace StImgTest
             Func<int> nextClr = () => (int)(rnd.NextDouble() * 255);
             for (var i = 0; i < leftPts.Length; i++)
             {
+                if (i >= onChecks.Length) continue;
+                if (!onChecks[i]) continue;
                 var pts = leftPts[i];
                 var rpts = rightPts[i];
                 var clr = new MCvScalar(nextClr(), nextClr(), nextClr());
@@ -165,7 +176,7 @@ namespace StImgTest
                 var p1 = fixv(toX(0));
                 var p2 = fixv(toX(img.Height));
                 var sum = (rpts.X * a) + (rpts.Y * b) + c;
-                Console.WriteLine($"Drawinga {p1.X},{p1.Y}      {p2.X},{p2.Y}     {sum}");
+                //Console.WriteLine($"Drawinga {p1.X},{p1.Y}      {p2.X},{p2.Y}     {sum}");
                 CvInvoke.Line(img, p1, p2, clr, 2);                
             }else
             {
@@ -179,7 +190,7 @@ namespace StImgTest
                 var p2 = fixv(toY(img.Width));
                 var sum = (rpts.X * a) + (rpts.Y * b) + c;
                 CvInvoke.Line(img, p1, p2, clr, 2);
-                Console.WriteLine($"Drawingb {p1.X},{p1.Y}      {p2.X},{p2.Y}         {sum}");
+                //Console.WriteLine($"Drawingb {p1.X},{p1.Y}      {p2.X},{p2.Y}         {sum}");
             }
         }
     }
