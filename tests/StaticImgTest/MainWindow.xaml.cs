@@ -131,6 +131,8 @@ namespace StImgTest
             who = (int)imgSel.Value;
             imgSelFunc();
         }
+
+        MCvScalar[] colors;
         private void imgSelFunc()
         {
             var who = images[this.who];
@@ -142,28 +144,78 @@ namespace StImgTest
             var rightPts = convertToPF(netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));
             var rnd = new Random();
             Func<int> nextClr = () => (int)(rnd.NextDouble() * 255);
+            if (colors == null)
+            {
+                colors = new MCvScalar[leftPts.Length];
+                for (var i = 0; i < leftPts.Length; i++)
+                {
+                    var clr = new MCvScalar(nextClr(), nextClr(), nextClr());
+                    colors[i] = clr;
+                }
+            }
+            DrawEpl(leftPts, PointSide.Left, rightPts, left, right);
+            DrawEpl(rightPts, PointSide.Right, leftPts, right, left);
+
+
+            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
+            imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
+        }
+
+        public void DrawEpl(PointFloat[] leftPts, PointSide side, PointFloat[] rightPts, Mat left, Mat right)
+        {
             for (var i = 0; i < leftPts.Length; i++)
             {
                 if (i >= onChecks.Length) continue;
                 if (!onChecks[i]) continue;
                 var pts = leftPts[i];
                 var rpts = rightPts[i];
-                var clr = new MCvScalar(nextClr(), nextClr(), nextClr());
-                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2,2), clr, 2);
-                var gm = F.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1  } }));
-                DrawEpl(right, gm, clr, rpts);                
+                var clr = colors[i];
+                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2, 2), clr, 2);
+                var gm = GetEpLineABC(pts, side, F);
+                //var gm = F.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1  } }));
+                DrawEpl(right, gm, clr, rpts);
             }
-
-            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
-            imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
 
-        private void DrawEpl(Mat img, GMatrix m, MCvScalar clr, PointFloat rpts)
+        public enum PointSide
         {
-            var ms = m.storage;
+            Left,
+            Right
+        }
+
+        public class LineSlop
+        {
+            public double a { get; protected set; }
+            public double b { get; protected set; }
+            public double c { get; protected set; }
+            public LineSlop(double aa, double bb, double cc)
+            {
+                a = aa;
+                b = bb;
+                c = cc;
+            }
+        }
+        private LineSlop GetEpLineABC(PointFloat pts, PointSide side, GMatrix f)
+        {
+            if (side == PointSide.Right)
+            {
+                f = f.tranpose();
+            }
+            var gm = f.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1 } }));
+            var ms = gm.storage;
             var a = ms[0][0];
             var b = ms[1][0];
             var c = ms[2][0];
+            return new LineSlop(a, b, c);
+                
+        }
+        
+        private void DrawEpl(Mat img, LineSlop m, MCvScalar clr, PointFloat rpts)
+        {
+            
+            var a = m.a;
+            var b = m.b;
+            var c = m.c;
             Console.WriteLine(m);
             if (Math.Abs(a) > Math.Abs(b))
             {
