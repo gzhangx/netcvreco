@@ -26,6 +26,7 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Slider x:Name="imgSel" Value="0" Maximum="7" ValueChanged="imgSel_ValueChanged" Width="300"></Slider>
+                <StackPanel Orientation="Horizontal" x:Name="stkEpoles"></StackPanel>
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>

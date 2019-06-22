@@ -32,6 +32,7 @@ namespace StImgTest
         string[] images = new string[] { "7","9","17","19","47","49","57","59" };
         const string imageDir = @"C:\test\netCvReco\data\images";
         GMatrix F;
+        CheckBox[] cbs = new CheckBox[9];
         public MainWindow()
         {
             InitializeComponent();
@@ -55,6 +56,25 @@ namespace StImgTest
             Console.WriteLine("F");
             F = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
             Console.WriteLine(F);
+
+            imgSelFunc(images[0]);
+
+            for (int i = 0; i < cbs.Length; i++)
+            {
+                var cb = new CheckBox();
+                cb.Name = "chkEpl_" + i;                
+                cb.IsChecked = true;
+                cb.Checked += Cb_Checked;               
+            }
+            foreach (var cb in cbs)
+                stkEpoles.Children.Add(cb);
+        }
+
+        private void Cb_Checked(object sender, RoutedEventArgs e)
+        {
+            var cb = (CheckBox)sender;
+            var nu = cb.Name.Substring(6);
+
         }
 
         static PointFloat[] convertToPF(PointF[] p)
@@ -101,6 +121,11 @@ namespace StImgTest
         private void imgSel_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var who = images[(int)imgSel.Value];
+            imgSelFunc(who);
+        }
+        private void imgSelFunc(string who)
+        {
+            //var who = images[(int)imgSel.Value];
             var left = CvInvoke.Imread($"{imageDir}\\Left_{who}.jpg");
             var right = CvInvoke.Imread($"{imageDir}\\Right_{who}.jpg");
 
