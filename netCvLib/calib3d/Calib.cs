@@ -74,7 +74,7 @@ namespace netCvLib.calib3d
         /// <param name="cfg"></param>
         /// <param name="Gray_frame_S1"></param>
         /// <param name="Gray_frame_S2"></param>
-        public static void findCorners(CornersStepCfg cfg, Image<Gray, Byte> Gray_frame_S1, Image<Gray, Byte> Gray_frame_S2)
+        public static bool findCorners(CornersStepCfg cfg, Image<Gray, Byte> Gray_frame_S1, Image<Gray, Byte> Gray_frame_S2, bool shoot)
         {
             if (File.Exists(saveFileName_corners))
             {
@@ -83,7 +83,7 @@ namespace netCvLib.calib3d
                 cfg.corners_points_Left = res[0];
                 cfg.corners_points_Right = res[1];
                 cfg.done = true;
-                return;
+                return false;
             }
 
             Size patternSize = new Size(width, height); //size of chess board to be detected
@@ -106,28 +106,37 @@ namespace netCvLib.calib3d
                     //save the calculated points into an array
                     cfg.corners_points_Left[cfg.buffer_savepoint] = cfg.corners_Left;
                     cfg.corners_points_Right[cfg.buffer_savepoint] = cfg.corners_Right;
-                    Gray_frame_S1.Save($"{saveFilePath}images\\Left_{cfg.buffer_savepoint}.jpg");
-                    Gray_frame_S2.Save($"{saveFilePath}images\\Right_{cfg.buffer_savepoint}.jpg");
-                    cfg.buffer_savepoint++;//increase buffer positon                    
-                    //check the state of buffer
-                    if (cfg.buffer_savepoint == buffer_length)
+                    if (shoot)
                     {
-                        var saveStr = cornerToString(cfg.corners_points_Left) + cornerToString(cfg.corners_points_Right);
-                        File.AppendAllText(saveFileName_corners, saveStr);
-                        cfg.done = true;
-                    }                    
+                        Gray_frame_S1.Save($"{saveFilePath}images\\Left_{cfg.buffer_savepoint}.jpg");
+                        Gray_frame_S2.Save($"{saveFilePath}images\\Right_{cfg.buffer_savepoint}.jpg");
+                        cfg.buffer_savepoint++;//increase buffer positon                    
+                                               //check the state of buffer
+                        if (cfg.buffer_savepoint == buffer_length)
+                        {
+                            var saveStr = cornerToString(cfg.corners_points_Left) + cornerToString(cfg.corners_points_Right);
+                            File.AppendAllText(saveFileName_corners, saveStr);
+                            cfg.done = true;
+                        }
+                    }        
                     //Show state of Buffer                        
                 }
 
 
                 //calibrate the delay bassed on size of buffer
                 //if buffer small you want a big delay if big small delay                
-                Thread.Sleep(100);//allow the user to move the board to a different position                
+                //Thread.Sleep(100);//allow the user to move the board to a different position                
+                if (shoot)
+                {
+                    cfg.corners_Left = null;
+                    cfg.corners_Right = null;
+                    return true;
+                }
             }
-            cfg.corners_Left = null;
-            cfg.corners_Right = null;
+
             //corners_Left = null;
             //corners_Right = null;
+            return false;
         }
 
 

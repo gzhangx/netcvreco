@@ -40,6 +40,7 @@
                 <Button Click="Button_Click" Width="50" Margin="2,2,2,2">Save</Button>
                 <TextBox x:Name="info" Text="                             0"></TextBox>
                 <Button x:Name="btnShow" Click="btnShow_Click"  Width="50" Margin="2,2,2,2">Show</Button>
+                <Button x:Name="btnShoot" Click="btnShoot_Click"  Width="50" Margin="2,2,2,2">Show</Button>
             </StackPanel>
         </Grid>
         

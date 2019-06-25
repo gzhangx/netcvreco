@@ -55,6 +55,8 @@ namespace StImgTest
         Calib.CalibOutput calibRes = null;
         Depth dptCalc = null;
         Compute3DFromStereoCfg cfg = new Compute3DFromStereoCfg();
+
+        bool doShoot = false;
         private void ProcessFrame(object sender, EventArgs arg)
         {
             try
@@ -89,13 +91,6 @@ namespace StImgTest
                 return;
             }
 
-            UIInvoke(() =>
-            {
-                video1.Source = DisplayLib.Util.Convert(frame_S1.Bitmap);
-                video2.Source = DisplayLib.Util.Convert(frame_S2.Bitmap);
-            });
-            
-            
             if (firstCfg.done)
             {
                 if (calibRes == null)
@@ -138,9 +133,15 @@ namespace StImgTest
                 
             } else
             {
-                Calib.findCorners(firstCfg, Gray_frame_S1, Gray_frame_S2);
+                var foundLine = Calib.findCorners(firstCfg, Gray_frame_S1, Gray_frame_S2, doShoot);
+                if (foundLine) doShoot = false;
                 Calib.DrawChessFound(frame_S1, frame_S2, firstCfg);
             }
+            UIInvoke(() =>
+            {
+                video1.Source = DisplayLib.Util.Convert(frame_S1.Bitmap);
+                video2.Source = DisplayLib.Util.Convert(frame_S2.Bitmap);
+            });
         }
 
         private void UIInvoke(Action act)
@@ -190,6 +191,11 @@ namespace StImgTest
             int sp = ((int)speckleRange.Value) * 16;
             lblSpeckleRange.Content = "SpRange " + sp;
             cfg.SpeckleRange = sp;
+        }
+
+        private void btnShoot_Click(object sender, RoutedEventArgs e)
+        {
+            doShoot = true;
         }
     }
     
