@@ -66,11 +66,11 @@ namespace StImgTest
             {
                 var cb = new CheckBox();
                 cb.Name = "chkEpl_" + i;                
-                cb.IsChecked = true;
+                cb.IsChecked = false;
                 cb.Checked += Cb_Checked;
                 cb.Unchecked += Cb_Checked;               
                 cbs[i] = cb;
-                onChecks[i] = true;
+                onChecks[i] = false;
             }
             foreach (var cb in cbs)
                 stkEpoles.Children.Add(cb);
@@ -163,6 +163,15 @@ namespace StImgTest
 
         public void DrawEpl(PointFloat[] leftPts, PointSide side, PointFloat[] rightPts, Mat left, Mat right)
         {
+            const int PTS_SIZE = 1;
+            for (var i = 0; i < leftPts.Length; i++)
+            {                
+                var pts = leftPts[i];
+                var rpts = rightPts[i];
+                var clr = colors[i];
+                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)(pts.X- PTS_SIZE), (int)(pts.Y+ PTS_SIZE), PTS_SIZE*2, PTS_SIZE*2), clr, 2);             
+            }
+            const int EPPTS_SIZE = 2;
             for (var i = 0; i < leftPts.Length; i++)
             {
                 if (i >= onChecks.Length) continue;
@@ -170,7 +179,7 @@ namespace StImgTest
                 var pts = leftPts[i];
                 var rpts = rightPts[i];
                 var clr = colors[i];
-                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)pts.X, (int)pts.Y, 2, 2), clr, 2);
+                CvInvoke.Rectangle(left, new System.Drawing.Rectangle((int)(pts.X- EPPTS_SIZE), (int)(pts.Y- EPPTS_SIZE), EPPTS_SIZE*2, EPPTS_SIZE*2), clr, 2);
                 var gm = GetEpLineABC(pts, side, F);
                 //var gm = F.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1  } }));
                 DrawEpl(right, gm, clr, rpts);
