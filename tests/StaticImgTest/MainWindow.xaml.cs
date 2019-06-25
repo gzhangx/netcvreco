@@ -225,7 +225,7 @@ namespace StImgTest
             var a = m.a;
             var b = m.b;
             var c = m.c;
-            Console.WriteLine(m);
+            //Console.WriteLine(m);
             if (Math.Abs(a) > Math.Abs(b))
             {
                 Func<System.Drawing.Point, System.Drawing.Point> fixv = vv =>
