@@ -52,7 +52,7 @@ namespace StImgTest
                 File.WriteAllLines($"{imageDir}\\Left_{iii}.txt", cornerToString(corl));
                 File.WriteAllLines($"{imageDir}\\Right_{iii}.txt", cornerToString(corr));
                 var ff = com.veda.LinearAlg.Calib.CalcFundm((corl), (corr));
-                Console.WriteLine(ff);
+                //Console.WriteLine(ff);
 
             }
             Console.WriteLine("F");
