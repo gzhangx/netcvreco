@@ -29,7 +29,7 @@ namespace StImgTest
     {
         
 
-        string[] images = new string[] { "7","9","17","19","47","49","57","59" };
+        string[] images = new string[] { "0","1","2","3","4","5","6","8" };
         const string imageDir = @"C:\test\netCvReco\data\images";
         GMatrix F;
         CheckBox[] cbs = new CheckBox[9];
