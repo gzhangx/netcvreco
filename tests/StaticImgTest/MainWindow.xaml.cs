@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static com.veda.LinearAlg.CalibRect;
 using static netCvLib.calib3d.Depth;
 
 namespace StImgTest
@@ -157,6 +158,7 @@ namespace StImgTest
             DrawEpl(rightPts, PointSide.Right, leftPts, right, left);
 
 
+            CalibRect.FindEpipole(leftPts, PointSide.Left, F);
             imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
@@ -184,12 +186,6 @@ namespace StImgTest
                 //var gm = F.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1  } }));
                 DrawEpl(right, gm, clr, rpts);
             }
-        }
-
-        public enum PointSide
-        {
-            Left,
-            Right
         }
 
         public class LineSlop
