@@ -199,33 +199,7 @@ namespace StImgTest
             return outBmp;
         }
 
-        public GMatrix GetH2(PointFloat e, PointFloat imgSize)
-        {
-            var w2 = -imgSize.X / 2;
-            var h2 = -imgSize.Y / 2;
-            GMatrix T = new GMatrix(new double[,] {
-                {1,0, w2 },
-                 {0,1, h2 },
-                 {0,0,1 }
-            });
-            var e1 = e.X + w2;
-            var e2 = e.Y + h2;
-            var l = Math.Sqrt((e1 * e1) + (e2 * e2));
-            var alph = e1 >= 0 ? 1 : -1;
-            GMatrix R = new GMatrix(new double[,] {
-                { alph*e1/l, alph*e2/l, 0},
-                 { -1*alph*e2/l, alph*e1/l, 0 },
-                 {0,0,1 }
-            });
-            GMatrix G = new GMatrix(new double[,]
-            {
-                {1,0,0 },
-                {0,1,0 },
-                {-1/e1,0,1 }
-            });
-
-            return GMatrix.Inverse3x3(T).dot(G.dot(R.dot(T)));
-        }
+        
 
         public void DrawEpl(PointFloat[] leftPts, PointSide side, PointFloat[] rightPts, Mat left, Mat right)
         {
