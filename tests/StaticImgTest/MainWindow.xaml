@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="160"/>
         </Grid.RowDefinitions>
         <Image x:Name="imgLeft"></Image>

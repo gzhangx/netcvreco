@@ -35,7 +35,8 @@ namespace com.veda.LinearAlg
 
             var svdA = JacobSvd.JacobiSVD(lines);
             var res = svdA.Vt.storage[2];
-            Console.WriteLine($"{res[0].ToString("0.00")},{res[1].ToString("0.00")},{res[2].ToString("0.00")}");
+            Console.WriteLine($"{res[0].ToString("0.00")},{res[1].ToString("0.00")},{res[2].ToString("0.0000000")}");
+            Console.WriteLine($"{(res[0]/res[2]).ToString("0.00")},{(res[1]/res[2]).ToString("0.00")}");
         }
         
         private static GMatrix GetEpLineABC(PointFloat pts, PointSide side, GMatrix f)
