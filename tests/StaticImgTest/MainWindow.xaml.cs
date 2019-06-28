@@ -34,8 +34,8 @@ namespace StImgTest
         string[] images = new string[] { "0","1","2","3","4","5","6","8" };
         const string imageDir = @"C:\test\netCvReco\data\images";
         GMatrix F;
-        CheckBox[] cbs = new CheckBox[9];
-        bool[] onChecks = new bool[9];
+        CheckBox[] cbs = new CheckBox[17];
+        bool[] onChecks = new bool[17];
         int who = 0;
         public MainWindow()
         {
@@ -159,37 +159,43 @@ namespace StImgTest
             DrawEpl(rightPts, PointSide.Right, leftPts, right, left);
 
 
-            var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
-
-
-            var h2 = GetH2(epol, new PointFloat(left.Width, left.Height));
-            imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h2));
+            
+            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
 
-            imgRight.Source = DisplayLib.Util.Convert(left.Bitmap);
+
+            var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
+            var h2 = GetH2(epol, new PointFloat(left.Width, left.Height));
+            imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
+            imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
 
         public Bitmap TransformBmp(Bitmap bmp, GMatrix m)
         {
             Bitmap outBmp = new Bitmap(bmp);
-            for (int y = 0; y < bmp.Height; y++)
+            using (var g = Graphics.FromImage(outBmp))
             {
-                for (int x = 0; x < bmp.Width;x++)
+                g.Clear(System.Drawing.Color.White);
+            }
+                for (int y = 0; y < bmp.Height; y++)
                 {
-                    var pix = bmp.GetPixel(x, y);
-                    var res = m.dot(new GMatrix(new double[] { x, y, 1 }, 3, 1));
-                    var xt = res.storage[0][0];
-                    var yt = res.storage[1][0];
-                    var zt = res.storage[2][0];
-                    if (xt>0 && yt> 0)
+                    for (int x = 0; x < bmp.Width; x++)
                     {
-                        if (xt < bmp.Width && yt < bmp.Height)
+                        var pix = bmp.GetPixel(x, y);
+                        var res = m.dot(new GMatrix(new double[] { x, y, 1 }, 3, 1));
+                        var zt = res.storage[2][0];
+                        var xt = res.storage[0][0] / zt;
+                        var yt = res.storage[1][0] / zt;
+
+                        if (xt > 0 && yt > 0)
                         {
-                            outBmp.SetPixel((int)xt, (int)yt, pix);
+                            if (xt < bmp.Width && yt < bmp.Height)
+                            {
+                                outBmp.SetPixel((int)xt, (int)yt, pix);
+                            }
                         }
                     }
                 }
-            }
             return outBmp;
         }
 
