@@ -68,5 +68,26 @@ namespace com.veda.LinearAlg
             return GMatrix.Inverse3x3(T).dot(G.dot(R.dot(T)));
         }
 
+        public static GMatrix GetH1(PointFloat e, PointFloat imgSize, GMatrix F, GMatrix H2,
+            PointFloat[] leftPts, PointFloat[] rightPts)
+        {
+            var ex = new GMatrix(new double[,]
+            {
+                { 0, -1, e.Y },
+                { 1, 0, -e.X },
+                { -e.Y, e.X, 0}
+            });
+            var e_111 = new GMatrix(new double[,]
+            {
+                { e.X, e.X, e.X},
+                { e.Y, e.Y, e.Y},
+                { 1, 1, 1},
+            });
+            var m = ex.dot(F).add(e_111);
+
+            var h0h = H2.dot(m);
+            return null;
+        }
+
     }
 }

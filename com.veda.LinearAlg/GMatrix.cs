@@ -121,6 +121,21 @@ namespace com.veda.LinearAlg
             return newStorage;
         }
 
+        public GMatrix add(GMatrix m)
+        {
+            var r = rows;
+            var c = cols;
+            var newStorage = new GMatrix(r, c);
+            for (var i = 0; i < r; i++)
+            {
+                for (var j = 0; j < c; j++)
+                {
+                    newStorage.storage[i][j] = storage[i][j] + m.storage[i][j];
+                }
+            }
+            return newStorage;
+        }
+
         public double last()
         {
             return storage[rows - 1][cols - 1];
