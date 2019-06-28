@@ -130,6 +130,23 @@ namespace com.veda.LinearAlg
         {
             return div(last());
         }
+
+        public static GMatrix Inverse3x3(GMatrix m)
+        {
+            double det = 0;
+            var mat = m.storage;
+            for (var i = 0; i < 3; i++)
+                det = det + (mat[0][i] * (mat[1][(i + 1) % 3] * mat[2][(i + 2) % 3] - mat[1][(i + 2) % 3] * mat[2][(i + 1) % 3]));
+
+
+            var res = new GMatrix(3, 3);
+            for (var i = 0; i < 3; ++i)
+            {
+                for (var j = 0; j < 3; ++j)
+                    res.storage[i][j] = ((mat[(j + 1) % 3][(i + 1) % 3] * mat[(j + 2) % 3][(i + 2) % 3]) - (mat[(j + 1) % 3][(i + 2) % 3] * mat[(j + 2) % 3][(i + 1) % 3])) / det;
+            }
+            return res;
+        }
         public override string ToString()
         {
             var sb = new StringBuilder();

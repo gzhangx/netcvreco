@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -158,9 +159,66 @@ namespace StImgTest
             DrawEpl(rightPts, PointSide.Right, leftPts, right, left);
 
 
-            CalibRect.FindEpipole(leftPts, PointSide.Left, F);
-            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
+            var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
+
+
+            var h2 = GetH2(epol, new PointFloat(left.Width, left.Height));
+            imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h2));
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
+
+            imgRight.Source = DisplayLib.Util.Convert(left.Bitmap);
+        }
+
+        public Bitmap TransformBmp(Bitmap bmp, GMatrix m)
+        {
+            Bitmap outBmp = new Bitmap(bmp);
+            for (int y = 0; y < bmp.Height; y++)
+            {
+                for (int x = 0; x < bmp.Width;x++)
+                {
+                    var pix = bmp.GetPixel(x, y);
+                    var res = m.dot(new GMatrix(new double[] { x, y, 1 }, 3, 1));
+                    var xt = res.storage[0][0];
+                    var yt = res.storage[1][0];
+                    var zt = res.storage[2][0];
+                    if (xt>0 && yt> 0)
+                    {
+                        if (xt < bmp.Width && yt < bmp.Height)
+                        {
+                            outBmp.SetPixel((int)xt, (int)yt, pix);
+                        }
+                    }
+                }
+            }
+            return outBmp;
+        }
+
+        public GMatrix GetH2(PointFloat e, PointFloat imgSize)
+        {
+            var w2 = -imgSize.X / 2;
+            var h2 = -imgSize.Y / 2;
+            GMatrix T = new GMatrix(new double[,] {
+                {1,0, w2 },
+                 {0,1, h2 },
+                 {0,0,1 }
+            });
+            var e1 = e.X + w2;
+            var e2 = e.Y + h2;
+            var l = Math.Sqrt((e1 * e1) + (e2 * e2));
+            var alph = e1 >= 0 ? 1 : -1;
+            GMatrix R = new GMatrix(new double[,] {
+                { alph*e1/l, alph*e2/l, 0},
+                 { -1*alph*e2/l, alph*e1/l, 0 },
+                 {0,0,1 }
+            });
+            GMatrix G = new GMatrix(new double[,]
+            {
+                {1,0,0 },
+                {0,1,0 },
+                {-1/e1,0,1 }
+            });
+
+            return GMatrix.Inverse3x3(T).dot(G.dot(R.dot(T)));
         }
 
         public void DrawEpl(PointFloat[] leftPts, PointSide side, PointFloat[] rightPts, Mat left, Mat right)

@@ -14,7 +14,7 @@ namespace com.veda.LinearAlg
             Right
         }
 
-        public static void FindEpipole(PointFloat[] pts, PointSide side, GMatrix f)
+        public static PointFloat FindEpipole(PointFloat[] pts, PointSide side, GMatrix f)
         {
             if (side == PointSide.Right)
             {
@@ -37,20 +37,8 @@ namespace com.veda.LinearAlg
             var res = svdA.Vt.storage[2];
             Console.WriteLine($"{res[0].ToString("0.00")},{res[1].ToString("0.00")},{res[2].ToString("0.0000000")}");
             Console.WriteLine($"{(res[0]/res[2]).ToString("0.00")},{(res[1]/res[2]).ToString("0.00")}");
+            return new PointFloat((float)(res[0] / res[2]), (float)(res[1] / res[2]));
         }
-        
-        private static GMatrix GetEpLineABC(PointFloat pts, PointSide side, GMatrix f)
-        {
-            if (side == PointSide.Right)
-            {
-                f = f.tranpose();
-            }
-            var gm = f.dot(new GMatrix(new double[3, 1] { { pts.X }, { pts.Y }, { 1 } }));
-            //var ms = gm.storage;
-            //var a = ms[0][0];
-            //var b = ms[1][0];
-            //var c = ms[2][0];
-            return gm;
-        }
+       
     }
 }
