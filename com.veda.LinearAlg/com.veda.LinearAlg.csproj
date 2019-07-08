@@ -38,6 +38,7 @@
     <Compile Include="CalibRect.cs" />
     <Compile Include="GMatrix.cs" />
     <Compile Include="JacobSvd.cs" />
+    <Compile Include="SVBkSb.cs" />
     <Compile Include="svd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

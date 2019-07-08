@@ -68,6 +68,18 @@ namespace com.veda.LinearAlg
             return GMatrix.Inverse3x3(T).dot(G.dot(R.dot(T)));
         }
 
+
+        static PointFloat[] perspectiveTransform(PointFloat[] pts, GMatrix mat)
+        {
+            List<PointFloat> res = new List<PointFloat>();
+            foreach( var pt in pts)
+            {
+                var npt = mat.dot(pt.ToVect());
+                var w = npt.storage[2][0];
+                res.Add(new PointFloat(npt.storage[0][0] / w, npt.storage[1][0] / w));
+            }
+            return res.ToArray();
+        }
         public static GMatrix GetH1(PointFloat e, PointFloat imgSize, GMatrix F, GMatrix H2,
             PointFloat[] leftPts, PointFloat[] rightPts)
         {
@@ -86,7 +98,33 @@ namespace com.veda.LinearAlg
             var m = ex.dot(F).add(e_111);
 
             var h0h = H2.dot(m);
-            return null;
+
+            var m1 = perspectiveTransform(leftPts, h0h);
+            var m2 = perspectiveTransform(rightPts, H2);
+            var abuf = new double[leftPts.Length, 3];
+            for (var i = 0; i < leftPts.Length; i++)
+            {
+                var pt = leftPts[i];
+                abuf[i, 0] = pt.X;
+                abuf[i, 1] = pt.Y;
+                abuf[i, 2] = 1;
+            }
+            var A = new GMatrix(abuf);
+            var svcr = JacobSvd.JacobiSVD(A);
+            
+            double[] B = new double[rightPts.Length];
+            for (var i = 0; i < rightPts.Length; i++) B[i] = m2[i].X;
+            var x = Util.SVBkSb(svcr.U, svcr.W, svcr.Vt, B);
+
+            var Ha = new GMatrix(new double[,]
+            {
+                {x[0], x[1], x[2] },
+                {0,1,0 },
+                {0,0,1 }
+            });
+
+            var res = Ha.dot(h0h);
+            return res;
         }
 
     }

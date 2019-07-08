@@ -12,6 +12,11 @@ namespace com.veda.LinearAlg
             X = x;
             Y = y;
         }
+        public PointFloat(double  x, double y)
+        {
+            X = (float)x;
+            Y = (float)y;
+        }
         public float X { get; protected set; }
         public float Y { get; protected set; }
         public GMatrix ToVect()

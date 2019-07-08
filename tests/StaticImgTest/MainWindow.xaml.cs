@@ -166,6 +166,7 @@ namespace StImgTest
 
             var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
             var h2 = CalibRect.GetH2(epol, new PointFloat(left.Width, left.Height));
+            var h1 = CalibRect.GetH1(epol, new PointFloat(left.Width, left.Height), F, h2, leftPts, rightPts);
             imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
             imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
         }
