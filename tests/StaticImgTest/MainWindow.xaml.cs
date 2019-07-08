@@ -33,6 +33,7 @@ namespace StImgTest
 
         string[] images = new string[] { "0","1","2","3","4","5","6","8" };
         const string imageDir = @"C:\test\netCvReco\data\images";
+        RectifyResult calres;
         GMatrix F;
         CheckBox[] cbs = new CheckBox[17];
         bool[] onChecks = new bool[17];
@@ -67,7 +68,7 @@ namespace StImgTest
             Console.WriteLine(F);
 
 
-            var calres = CalibRect.Rectify(allPts, imgSize);
+            calres = CalibRect.Rectify(allPts, imgSize);
             Console.WriteLine("Callres");
             Console.WriteLine(calres.F);
             Console.WriteLine(calres.el.X.ToString("0.00") + " " + calres.el.Y.ToString("0.00"));
@@ -181,6 +182,8 @@ namespace StImgTest
             var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
             var h2 = CalibRect.GetH2(epol, new PointFloat(left.Width, left.Height));
             var h1 = CalibRect.GetH1(epol, new PointFloat(left.Width, left.Height), F, h2, leftPts, rightPts);
+
+            h1 = calres.H1;
 
             imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h1));
             imgRight.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
