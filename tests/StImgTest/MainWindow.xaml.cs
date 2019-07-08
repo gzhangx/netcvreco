@@ -102,7 +102,7 @@ namespace StImgTest
                 return;
             }
 
-            if (firstCfg.done)
+            if (firstCfg.done || true)
             {
                 if (calibRes == null)
                 {

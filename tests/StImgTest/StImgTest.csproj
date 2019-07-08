@@ -132,6 +132,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\com.veda.LinearAlg\com.veda.LinearAlg.csproj">
+      <Project>{6490458f-d023-40a5-8f43-5681ab295fd4}</Project>
+      <Name>com.veda.LinearAlg</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DisplayLib\DisplayLib.csproj">
       <Project>{62f06848-d0b0-43b1-94a8-f8829e76d2af}</Project>
       <Name>DisplayLib</Name>
