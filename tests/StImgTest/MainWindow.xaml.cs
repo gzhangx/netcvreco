@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿
+using Emgu.CV;
 using Emgu.CV.Structure;
 using netCvLib.calib3d;
 using System;
@@ -37,6 +38,19 @@ namespace StImgTest
 
         Window3dProj projWin = new Window3dProj();
 
+
+        string[] images = new string[] { "0", "1", "2", "3", "4", "5", "6", "7" };
+        const string imageDir = @"C:\test\netCvReco\data\images";
+        com.veda.LinearAlg.CalibRect.RectifyResult calres;
+        static com.veda.LinearAlg.PointFloat[] convertToPF(System.Drawing.PointF[] p)
+        {
+            var res = new com.veda.LinearAlg.PointFloat[p.Length];
+            for (int i = 0; i < p.Length; i++)
+            {
+                res[i] = new com.veda.LinearAlg.PointFloat(p[i].X, p[i].Y);
+            }
+            return res;
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -51,6 +65,35 @@ namespace StImgTest
                     Console.WriteLine(exc);
                 }
             }
+
+            var al = new List<com.veda.LinearAlg.PointFloat>();
+            var ar = new List<com.veda.LinearAlg.PointFloat>();
+            List<com.veda.LinearAlg.CalibRect.StereoPoints> allPts = new List<com.veda.LinearAlg.CalibRect.StereoPoints>();
+            com.veda.LinearAlg.PointFloat imgSize = null;
+            foreach (var iii in images)
+            {
+                var left = CvInvoke.Imread($"{imageDir}\\Left_{iii}.jpg");
+                imgSize = new com.veda.LinearAlg.PointFloat(left.Width, left.Height);
+                var right = CvInvoke.Imread($"{imageDir}\\Right_{iii}.jpg");
+                var corl = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+                al.AddRange(corl);
+                var corr = convertToPF(netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));
+                ar.AddRange(corr);
+
+                allPts.Add(new com.veda.LinearAlg.CalibRect.StereoPoints { Left = corl, Right = corr });
+                //File.WriteAllLines($"{imageDir}\\Left_{iii}.txt", cornerToString(corl));
+                //File.WriteAllLines($"{imageDir}\\Right_{iii}.txt", cornerToString(corr));
+                //var ff = com.veda.LinearAlg.Calib.CalcFundm((corl), (corr));
+                //Console.WriteLine(ff);
+
+            }
+            Console.WriteLine("F");
+            var F = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
+            Console.WriteLine(F);
+
+
+            calres = com.veda.LinearAlg.CalibRect.Rectify(allPts, imgSize);
+
             projWin.Show();
             //return;
             _Capture1 = new VideoCapture(1);
