@@ -40,6 +40,17 @@ namespace StImgTest
         public MainWindow()
         {
             InitializeComponent();
+            if (false)
+            {
+                try
+                {
+                    Calib.FileRectify();
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc);
+                }
+            }
             projWin.Show();
             //return;
             _Capture1 = new VideoCapture(1);

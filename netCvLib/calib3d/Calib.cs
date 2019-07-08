@@ -229,8 +229,9 @@ namespace netCvLib.calib3d
             if (File.Exists(saveFileName_mat))
             {
                 return stringToCalibOutput(File.ReadAllLines(saveFileName_mat));
-            }            
-            MCvPoint3D32f[][] corners_object_Points = new MCvPoint3D32f[buffer_length][]; //stores the calculated size for the chessboard
+            }
+            var objLen = corners_points_Left.GetLength(0); //buffer_length
+            MCvPoint3D32f[][] corners_object_Points = new MCvPoint3D32f[objLen][]; //stores the calculated size for the chessboard
             for (int k = 0; k < corners_points_Left.Length; k++)
             {
                 //Fill our objects list with the real world mesurments for the intrinsic calculations
@@ -388,6 +389,27 @@ namespace netCvLib.calib3d
             CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam1IntrinsicMatrix, co.IntrinsicCam1DistortionCoeffs, co.R1, co.P1, co.size, CV_16SC2, co.rmap00, co.rmap01);
             CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam2IntrinsicMatrix, co.IntrinsicCam2DistortionCoeffs, co.R2, co.P2, co.size, CV_16SC2, co.rmap10, co.rmap11);
             co.rectified = true;
+        }
+
+        public static void FileRectify(string imageDir = @"C:\test\netCvReco\data\images", int count = 8)
+        {
+            Calib.CornersStepCfg firstCfg = new Calib.CornersStepCfg();
+            firstCfg.corners_points_Left = new PointF[count][];
+            firstCfg.corners_points_Right = new PointF[count][];
+            Size frameSize = new Size();
+            for (int i = 0; i < count; i++)
+            {
+                var left = CvInvoke.Imread($"{imageDir}\\Left_{i}.jpg");                
+                var right = CvInvoke.Imread($"{imageDir}\\Right_{i}.jpg");
+                frameSize = left.Size;
+                var corl = (netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+                
+                var corr = (netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));                
+                firstCfg.corners_points_Left[i] = corl;
+                firstCfg.corners_points_Right[i] = corr;
+            }
+            var calibRes = Calib.Caluculating_Stereo_Intrinsics(firstCfg.corners_points_Left, firstCfg.corners_points_Right, frameSize);
+            Calib.Rectify(calibRes);
         }
     }
 }
