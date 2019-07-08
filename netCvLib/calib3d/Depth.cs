@@ -120,7 +120,8 @@ namespace netCvLib.calib3d
                 /*GC: graph cut-based algorithm
                   BM: block matching algorithm
                   SGBM: modified H. Hirschmuller algorithm HH08*/
-                res.points = PointCollection.ReprojectImageTo3D(res.disparityMap, Q); //Reprojects disparity image to 3D space.
+                  if (Q != null)
+                    res.points = PointCollection.ReprojectImageTo3D(res.disparityMap, Q); //Reprojects disparity image to 3D space.
             }
             return res;
         }
