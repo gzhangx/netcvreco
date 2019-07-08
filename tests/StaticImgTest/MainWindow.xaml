@@ -24,6 +24,10 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Slider x:Name="imgSel" Value="0" Maximum="7" ValueChanged="imgSel_ValueChanged" Width="300"></Slider>
                 <StackPanel Orientation="Horizontal" x:Name="stkEpoles"></StackPanel>
@@ -33,6 +37,14 @@
                 <TextBox x:Name="info" Text="                             0"></TextBox>
                 <Button x:Name="btnShow" Click="btnShow_Click"  Width="50" Margin="2,2,2,2">Show</Button>
             </StackPanel>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Image x:Name="imgLeftOrig"></Image>
+                <Image x:Name="imgRightOrig" Grid.Column="1"></Image>
+            </Grid>
         </Grid>
         
     </Grid>

@@ -43,14 +43,19 @@ namespace StImgTest
 
             var al = new List<PointFloat>();
             var ar = new List<PointFloat>();
+            List<StereoPoints> allPts = new List<StereoPoints>();
+            PointFloat imgSize = null;
             foreach (var iii in images)
             {
                 var left = CvInvoke.Imread($"{imageDir}\\Left_{iii}.jpg");
+                imgSize = new PointFloat(left.Width, left.Height);
                 var right = CvInvoke.Imread($"{imageDir}\\Right_{iii}.jpg");
                 var corl = convertToPF(netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
-                al.AddRange(corl);
+                al.AddRange(corl);                
                 var corr = convertToPF(netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));
                 ar.AddRange(corr);
+
+                allPts.Add(new StereoPoints { Left = corl, Right = corr });
                 File.WriteAllLines($"{imageDir}\\Left_{iii}.txt", cornerToString(corl));
                 File.WriteAllLines($"{imageDir}\\Right_{iii}.txt", cornerToString(corr));
                 var ff = com.veda.LinearAlg.Calib.CalcFundm((corl), (corr));
@@ -61,6 +66,15 @@ namespace StImgTest
             F = com.veda.LinearAlg.Calib.CalcFundm(al.ToArray(), ar.ToArray());
             Console.WriteLine(F);
 
+
+            var calres = CalibRect.Rectify(allPts, imgSize);
+            Console.WriteLine("Callres");
+            Console.WriteLine(calres.F);
+            Console.WriteLine(calres.el.X.ToString("0.00") + " " + calres.el.Y.ToString("0.00"));
+            Console.WriteLine(calres.LeftIntrinics);
+            Console.WriteLine(calres.RightIntrinics);
+            Console.WriteLine(calres.H1);
+            Console.WriteLine(calres.H2);
             who = 0;
             imgSelFunc();
 
@@ -160,8 +174,8 @@ namespace StImgTest
 
 
             
-            imgLeft.Source = DisplayLib.Util.Convert(left.Bitmap);
-            imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);
+            imgLeftOrig.Source = DisplayLib.Util.Convert(left.Bitmap);
+            imgRightOrig.Source = DisplayLib.Util.Convert(right.Bitmap);
 
 
             var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
@@ -170,6 +184,12 @@ namespace StImgTest
 
             imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h1));
             imgRight.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
+
+            Console.WriteLine("h1");
+            Console.WriteLine(h1);
+            Console.WriteLine("h2");
+            Console.WriteLine(h2);
+            Console.WriteLine($"epoX={epol.X.ToString("0.00")} {epol.Y.ToString("0.00")} ");
             //imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);            
         }
 

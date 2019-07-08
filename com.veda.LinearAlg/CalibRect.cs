@@ -127,5 +127,54 @@ namespace com.veda.LinearAlg
             return res;
         }
 
+
+        public class RectifyResult
+        {
+            public GMatrix H1;
+            public GMatrix H2;
+            public GMatrix F;
+
+            public PointFloat el;
+            public GMatrix LeftIntrinics;
+            public GMatrix RightIntrinics;
+        }
+
+        public class StereoPoints
+        {
+            public PointFloat[] Left;
+            public PointFloat[] Right;
+        }
+
+        public static RectifyResult Rectify(List<StereoPoints> allPts, PointFloat imgSize, int CalibGridRow=6, int CalibGridCol = 3)
+        {
+            var leftPts = allPts.SelectMany(x => x.Left).ToArray();
+            var rightPts = allPts.SelectMany(x => x.Right).ToArray();
+            var F = Calib.CalcFundm(leftPts, rightPts);
+            var epol = CalibRect.FindEpipole(leftPts, PointSide.Left, F);
+
+
+            var h2 = CalibRect.GetH2(epol, new PointFloat(imgSize.X, imgSize.Y));
+            var h1 = CalibRect.GetH1(epol, new PointFloat(imgSize.X, imgSize.Y), F, h2, allPts[0].Left, allPts[0].Right);
+
+
+            Func<Func<StereoPoints, PointFloat[]>, PointFloat[][]> fetch = f =>
+             {
+                 PointFloat[][] res = new PointFloat[allPts.Count][];
+                 for(var i = 0; i < allPts.Count; i++)
+                 {
+                     res[i] = f(allPts[i]);
+                 }
+                 return res;
+             };
+            return new RectifyResult
+            {
+                H1 = h1,
+                H2 = h2,
+                F = F,
+                el = epol,
+                LeftIntrinics = Calib.EstimateIntranics(fetch(x=>x.Left), CalibGridRow, CalibGridCol),
+                RightIntrinics = Calib.EstimateIntranics(fetch(x => x.Right), CalibGridRow, CalibGridCol),
+            };
+        }
     }
 }
