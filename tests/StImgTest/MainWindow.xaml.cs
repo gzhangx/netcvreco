@@ -127,6 +127,7 @@ namespace StImgTest
             //var m1 = _Capture1.QueryFrame();
             try
             {
+                m1 = Calib.TransformImg(calres.H1.To2DArray(), m1);
                 frame_S1 = m1.ToImage<Bgr, Byte>();
                 Gray_frame_S1 = frame_S1.Convert<Gray, Byte>();
             } catch (Exception exc)
@@ -137,6 +138,7 @@ namespace StImgTest
             try
             {
                 _Capture2.Retrieve(m2);
+                m2 = Calib.TransformImg(calres.H2.To2DArray(), m2);
                 frame_S2 = m2.ToImage<Bgr, Byte>();
                 Gray_frame_S2 = frame_S2.Convert<Gray, Byte>();
             }
