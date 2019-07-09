@@ -45,6 +45,19 @@ namespace com.veda.LinearAlg
             }
             return r;
         }
+
+        public double[,] To2DArray()
+        {
+            var stor = new double[rows, cols];
+            for (var r = 0; r < rows; r++)
+            {
+                for (var c = 0; c < cols; c++)
+                {
+                    stor[r, c] = storage[r][c];
+                }
+            }
+            return stor;
+        }
         public GMatrix(double[,] v)
         {
             rows = v.GetLength(0);

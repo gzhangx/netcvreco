@@ -185,8 +185,10 @@ namespace StImgTest
 
             h1 = calres.H1;
 
-            imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h1));
-            imgRight.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
+            //imgLeft.Source = DisplayLib.Util.Convert(TransformBmp(left.Bitmap, h1));            
+            //imgRight.Source = DisplayLib.Util.Convert(TransformBmp(right.Bitmap,h2));
+            imgLeft.Source = DisplayLib.Util.Convert(getTransformedImg(h1, left).Bitmap);
+            imgRight.Source = DisplayLib.Util.Convert(getTransformedImg(h2, right).Bitmap);
 
             Console.WriteLine("h1");
             Console.WriteLine(h1);
@@ -194,6 +196,15 @@ namespace StImgTest
             Console.WriteLine(h2);
             Console.WriteLine($"epoX={epol.X.ToString("0.00")} {epol.Y.ToString("0.00")} ");
             //imgRight.Source = DisplayLib.Util.Convert(right.Bitmap);            
+        }
+
+        static Mat getTransformedImg(GMatrix m, Mat mat)
+        {
+            var size = mat.Size;
+            Mat tm = new Mat();
+            Matrix<double> tranMat = new Matrix<double>(m.To2DArray());
+            CvInvoke.WarpPerspective(mat, tm, tranMat, size);
+            return tm;
         }
 
         public Bitmap TransformBmp(Bitmap bmp, GMatrix ma)
