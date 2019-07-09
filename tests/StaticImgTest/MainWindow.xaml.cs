@@ -200,11 +200,12 @@ namespace StImgTest
 
         static Mat getTransformedImg(GMatrix m, Mat mat)
         {
-            var size = mat.Size;
-            Mat tm = new Mat();
-            Matrix<double> tranMat = new Matrix<double>(m.To2DArray());
-            CvInvoke.WarpPerspective(mat, tm, tranMat, size);
-            return tm;
+            return netCvLib.calib3d.Calib.TransformImg(m.To2DArray(), mat);
+            //var size = mat.Size;
+            //Mat tm = new Mat();
+            //Matrix<double> tranMat = new Matrix<double>(m.To2DArray());
+            //CvInvoke.WarpPerspective(mat, tm, tranMat, size);
+            //return tm;
         }
 
         public Bitmap TransformBmp(Bitmap bmp, GMatrix ma)

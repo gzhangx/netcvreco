@@ -411,5 +411,14 @@ namespace netCvLib.calib3d
             var calibRes = Calib.Caluculating_Stereo_Intrinsics(firstCfg.corners_points_Left, firstCfg.corners_points_Right, frameSize);
             Calib.Rectify(calibRes);
         }
+
+        public static Mat TransformImg(double[,] m, Mat mat)
+        {
+            var size = mat.Size;
+            Mat tm = new Mat();
+            Matrix<double> tranMat = new Matrix<double>(m);
+            CvInvoke.WarpPerspective(mat, tm, tranMat, size);
+            return tm;
+        }
     }
 }
