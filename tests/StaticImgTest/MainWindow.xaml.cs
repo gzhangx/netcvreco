@@ -76,6 +76,16 @@ namespace StImgTest
             Console.WriteLine(calres.RightIntrinics);
             Console.WriteLine(calres.H1);
             Console.WriteLine(calres.H2);
+
+            var rtl = calres.GetRT(calres.LeftIntrinics);
+            var rtr = calres.GetRT(calres.RightIntrinics);
+            Console.WriteLine("RT from left");
+            Console.WriteLine(rtl.R);
+            Console.WriteLine(rtl.T);
+
+            Console.WriteLine("RT from right");
+            Console.WriteLine(rtr.R);
+            Console.WriteLine(rtr.T);
             who = 0;
             imgSelFunc();
 

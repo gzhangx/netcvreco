@@ -127,7 +127,11 @@ namespace com.veda.LinearAlg
             return res;
         }
 
-
+        public class Ert
+        {
+            public GMatrix R;
+            public GMatrix T;
+        }
         public class RectifyResult
         {
             public GMatrix H1;
@@ -137,6 +141,33 @@ namespace com.veda.LinearAlg
             public PointFloat el;
             public GMatrix LeftIntrinics;
             public GMatrix RightIntrinics;
+
+            public Ert GetRT(GMatrix m)
+            {
+                var svd = JacobSvd.JacobiSVD(m);
+                var W = new GMatrix(new double[,]
+                {
+                    {0, -1, 0 },
+                    {1,  0, 0 },
+                    {0,  0, 1 }
+                });
+
+                var Wt = new GMatrix(new double[,]
+                {
+                    { 0,  1, 0 },
+                    {-1,  0, 0 },
+                    { 0,  0, 1 }
+                });
+
+                svd.W[2] = 0;
+                var t = svd.U.dot(W).dot(svd.getWMat()).dot(svd.U.tranpose());
+                var r = svd.U.dot(Wt).dot(svd.Vt);
+                return new Ert
+                {
+                    R = r,
+                    T = t,
+                };
+            }
         }
 
         public class StereoPoints
