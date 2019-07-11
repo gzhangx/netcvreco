@@ -137,6 +137,7 @@ namespace com.veda.LinearAlg
             public GMatrix H1;
             public GMatrix H2;
             public GMatrix F;
+            public GMatrix E;
 
             public PointFloat el;
             public GMatrix LeftIntrinics;
@@ -197,14 +198,20 @@ namespace com.veda.LinearAlg
                  }
                  return res;
              };
+
+            var li = Calib.EstimateIntranics(fetch(x => x.Left), CalibGridRow, CalibGridCol);
+            var ri = Calib.EstimateIntranics(fetch(x => x.Right), CalibGridRow, CalibGridCol);
+
+            var E = GMatrix.Inverse3x3(li).tranpose().dot(F).dot(GMatrix.Inverse3x3(ri));
             return new RectifyResult
             {
                 H1 = h1,
                 H2 = h2,
                 F = F,
+                E = E,
                 el = epol,
-                LeftIntrinics = Calib.EstimateIntranics(fetch(x=>x.Left), CalibGridRow, CalibGridCol),
-                RightIntrinics = Calib.EstimateIntranics(fetch(x => x.Right), CalibGridRow, CalibGridCol),
+                LeftIntrinics = li,
+                RightIntrinics = ri,
             };
         }
     }
