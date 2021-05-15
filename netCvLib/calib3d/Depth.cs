@@ -42,7 +42,7 @@ namespace netCvLib.calib3d
             public int minDispatities = 0;
 
             /*The matched block size. Must be an odd number >=1 . Normally, it should be somewhere in 3..11 range*/
-            public int SAD = 1;
+            public int SAD = 3;
 
             /*P1, P2 – Parameters that control disparity smoothness. The larger the values, the smoother the disparity. 
              * P1 is the penalty on the disparity change by plus or minus 1 between neighbor pixels. 
@@ -69,10 +69,10 @@ namespace netCvLib.calib3d
             /*Maximum disparity variation within each connected component. 
              * If you do speckle filtering, set it to some positive value, multiple of 16. 
              * Normally, 16 or 32 is good enough*/
-            public int Speckle = 0;
+            public int Speckle = 16;
 
             /*Maximum disparity variation within each connected component. If you do speckle filtering, set it to some positive value, multiple of 16. Normally, 16 or 32 is good enough.*/
-            public int SpeckleRange = 0;
+            public int SpeckleRange = 16;
 
             /*Set it to true to run full-scale 2-pass dynamic programming algorithm. It will consume O(W*H*numDisparities) bytes, 
              * which is large for 640x480 stereo and huge for HD-size pictures. By default this is usually false*/
@@ -120,7 +120,8 @@ namespace netCvLib.calib3d
                 /*GC: graph cut-based algorithm
                   BM: block matching algorithm
                   SGBM: modified H. Hirschmuller algorithm HH08*/
-                res.points = PointCollection.ReprojectImageTo3D(res.disparityMap, Q); //Reprojects disparity image to 3D space.
+                  if (Q != null)
+                    res.points = PointCollection.ReprojectImageTo3D(res.disparityMap, Q); //Reprojects disparity image to 3D space.
             }
             return res;
         }

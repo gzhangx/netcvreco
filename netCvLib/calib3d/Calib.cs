@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace netCvLib.calib3d
@@ -56,13 +57,24 @@ namespace netCvLib.calib3d
             public PointF[] corners_Right = null;
         }
 
+        public static PointF[] findConers(Image<Gray, Byte> Gray_frame_S1)
+        {
+            Size patternSize = new Size(width, height); //size of chess board to be detected
+
+            //Find the chessboard in bothe images
+            var corners = FindChessboardCorners(Gray_frame_S1, patternSize, Emgu.CV.CvEnum.CalibCbType.AdaptiveThresh);
+            if (corners == null) return null;
+            Gray_frame_S1.FindCornerSubPix(new PointF[1][] { corners }, new Size(11, 11), new Size(-1, -1), new MCvTermCriteria(30, 0.01));
+            return corners;
+        }
+
         /// <summary>
         /// Call with new CornesStepCfg, keep calling with images till cfg.done == true
         /// </summary>
         /// <param name="cfg"></param>
         /// <param name="Gray_frame_S1"></param>
         /// <param name="Gray_frame_S2"></param>
-        public static void findCorners(CornersStepCfg cfg, Image<Gray, Byte> Gray_frame_S1, Image<Gray, Byte> Gray_frame_S2)
+        public static bool findCorners(CornersStepCfg cfg, Image<Gray, Byte> Gray_frame_S1, Image<Gray, Byte> Gray_frame_S2, bool shoot)
         {
             if (File.Exists(saveFileName_corners))
             {
@@ -71,7 +83,7 @@ namespace netCvLib.calib3d
                 cfg.corners_points_Left = res[0];
                 cfg.corners_points_Right = res[1];
                 cfg.done = true;
-                return;
+                return false;
             }
 
             Size patternSize = new Size(width, height); //size of chess board to be detected
@@ -94,25 +106,37 @@ namespace netCvLib.calib3d
                     //save the calculated points into an array
                     cfg.corners_points_Left[cfg.buffer_savepoint] = cfg.corners_Left;
                     cfg.corners_points_Right[cfg.buffer_savepoint] = cfg.corners_Right;
-                    cfg.buffer_savepoint++;//increase buffer positon
-
-                    //check the state of buffer
-                    if (cfg.buffer_savepoint == buffer_length)
+                    if (shoot)
                     {
-                        var saveStr = cornerToString(cfg.corners_points_Left) + cornerToString(cfg.corners_points_Right);
-                        File.AppendAllText(saveFileName_corners, saveStr);
-                        cfg.done = true;
-                    }                    
+                        Gray_frame_S1.Save($"{saveFilePath}images\\Left_{cfg.buffer_savepoint}.jpg");
+                        Gray_frame_S2.Save($"{saveFilePath}images\\Right_{cfg.buffer_savepoint}.jpg");
+                        cfg.buffer_savepoint++;//increase buffer positon                    
+                                               //check the state of buffer
+                        if (cfg.buffer_savepoint == buffer_length)
+                        {
+                            var saveStr = cornerToString(cfg.corners_points_Left) + cornerToString(cfg.corners_points_Right);
+                            File.AppendAllText(saveFileName_corners, saveStr);
+                            cfg.done = true;
+                        }
+                    }        
                     //Show state of Buffer                        
                 }
 
 
                 //calibrate the delay bassed on size of buffer
-                //if buffer small you want a big delay if big small delay
-                //Thread.Sleep(100);//allow the user to move the board to a different position
+                //if buffer small you want a big delay if big small delay                
+                //Thread.Sleep(100);//allow the user to move the board to a different position                
+                if (shoot)
+                {
+                    cfg.corners_Left = null;
+                    cfg.corners_Right = null;
+                    return true;
+                }
             }
+
             //corners_Left = null;
             //corners_Right = null;
+            return false;
         }
 
 
@@ -197,14 +221,17 @@ namespace netCvLib.calib3d
             public Matrix<double> P1 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 1.
             public Matrix<double> P2 = new Matrix<double>(3, 4); //projection matrices in the new (rectified) coordinate systems for Camera 2.
             public bool rectified = false;
+
+            public Matrix<short> rmap00, rmap01, rmap10, rmap11;
         }
         public static CalibOutput Caluculating_Stereo_Intrinsics(PointF[][] corners_points_Left,PointF[][] corners_points_Right, Size size)
         {
             if (File.Exists(saveFileName_mat))
             {
                 return stringToCalibOutput(File.ReadAllLines(saveFileName_mat));
-            }            
-            MCvPoint3D32f[][] corners_object_Points = new MCvPoint3D32f[buffer_length][]; //stores the calculated size for the chessboard
+            }
+            var objLen = corners_points_Left.GetLength(0); //buffer_length
+            MCvPoint3D32f[][] corners_object_Points = new MCvPoint3D32f[objLen][]; //stores the calculated size for the chessboard
             for (int k = 0; k < corners_points_Left.Length; k++)
             {
                 //Fill our objects list with the real world mesurments for the intrinsic calculations
@@ -351,7 +378,47 @@ namespace netCvLib.calib3d
                                              co.R1, co.R2, co.P1, co.P2, co.Q,
                                              Emgu.CV.CvEnum.StereoRectifyType.Default, 0,
                                              co.size, ref co.Rec1, ref co.Rec2);
+
+            co.rmap00 = new Matrix<short>(co.size);
+            co.rmap01 = new Matrix<short>(co.size);
+
+            co.rmap10 = new Matrix<short>(1,1);
+            co.rmap11 = new Matrix<short>(1,1);
+            var CV_16SC2 = (Emgu.CV.CvEnum.DepthType.Cv16S + 8);
+            //var CV_16SC2 = (Emgu.CV.CvEnum.DepthType.Default );
+            CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam1IntrinsicMatrix, co.IntrinsicCam1DistortionCoeffs, co.R1, co.P1, co.size, CV_16SC2, co.rmap00, co.rmap01);
+            CvInvoke.InitUndistortRectifyMap(co.IntrinsicCam2IntrinsicMatrix, co.IntrinsicCam2DistortionCoeffs, co.R2, co.P2, co.size, CV_16SC2, co.rmap10, co.rmap11);
             co.rectified = true;
+        }
+
+        public static void FileRectify(string imageDir = @"C:\test\netCvReco\data\images", int count = 8)
+        {
+            Calib.CornersStepCfg firstCfg = new Calib.CornersStepCfg();
+            firstCfg.corners_points_Left = new PointF[count][];
+            firstCfg.corners_points_Right = new PointF[count][];
+            Size frameSize = new Size();
+            for (int i = 0; i < count; i++)
+            {
+                var left = CvInvoke.Imread($"{imageDir}\\Left_{i}.jpg");                
+                var right = CvInvoke.Imread($"{imageDir}\\Right_{i}.jpg");
+                frameSize = left.Size;
+                var corl = (netCvLib.calib3d.Calib.findConers(left.ToImage<Gray, Byte>()));
+                
+                var corr = (netCvLib.calib3d.Calib.findConers(right.ToImage<Gray, Byte>()));                
+                firstCfg.corners_points_Left[i] = corl;
+                firstCfg.corners_points_Right[i] = corr;
+            }
+            var calibRes = Calib.Caluculating_Stereo_Intrinsics(firstCfg.corners_points_Left, firstCfg.corners_points_Right, frameSize);
+            Calib.Rectify(calibRes);
+        }
+
+        public static Mat TransformImg(double[,] m, Mat mat)
+        {
+            var size = mat.Size;
+            Mat tm = new Mat();
+            Matrix<double> tranMat = new Matrix<double>(m);
+            CvInvoke.WarpPerspective(mat, tm, tranMat, size);
+            return tm;
         }
     }
 }
